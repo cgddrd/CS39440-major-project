@@ -51,11 +51,15 @@
 
 For a robot requiring autonomous motion or travelling capabilities, the task of navigating through a (typically) unknown environment is one that plays a fundamental role in ensuring such a machine can successfully make safe, yet objective decisions on how best to traverse from a starting location to a target location over typically uneven and/or poorly modelled terrain. \\
 
-When analysed as a problem-space, autonomous navigation can be de-composed into two key areas; \textit{reactive} and \textit{deliberative}. Reactive (or local) navigation is concerned with controlling the path of the robot through the immediate surrounding area, in particular focussing on the safe traversal around ``dangerous" terrain hazards including obstacles and precipices. Deliberative (or global) navigation is concerned with planning ``higher-level" paths through a larger area of the environment, and tends to focus on planning the most optimal path from one point to another, over necessarily the ``safest" path. In a typical autonomous navigation system, feedback from both reactive and deliberative sub-systems must be combined to choose a final path that balances safety and objectivity. \\
+As a problem-space, autonomous navigation can be de-composed into two key areas of focus; one of \textit{reactive} navigation and the other of \textit{deliberative} navigation. Reactive (or local) navigation is concerned with controlling the path of the robot through the immediate surrounding area, in particular focussing on the safe traversal around ``dangerous" terrain hazards including obstacles and precipices. Deliberative (or global) navigation is concerned with planning ``higher-level" paths through a larger area of the environment, and tends to focus on planning the most optimal path from one point to another, over necessarily the ``safest" path. In a typical autonomous navigation system, feedback from both reactive and deliberative sub-systems must be combined to choose a final path that balances safety and objectivity. \\
 
-The ability to autonomously identify and avoid obstacles is a keen, and well-explored area of robotics research, with a variety of approaches now available adopting many types of sensor including sonar and laser scanning. An alternative and exciting approach that has enjoyed increasingly greater research focus over the past decade is that of \textit{vision-based} obstacle avoidance, involving the analysis of images captured from one or more digital cameras in order to identify possible obstacles in robot's field of view. \\
+The ability to autonomously identify and avoid obstacles is a keen, and well-explored area of robotics research, with a variety of approaches now available adopting many types of sensor including sonar and laser scanning. An alternative approach that has enjoyed increasingly greater research focus over the past decade is that of vision-based obstacle avoidance, involving the analysis of images captured from one or more digital cameras in order to identify possible dangers currently situated within the robot's field of view. \\ 
 
-Combining recent advances in camera technology with appropriate computer vision technique, this project focusses on developing a computer application capable of autonomously estimating the change in position and orientation of a wheeled robot through the real-time computational analysis of images taken of the surrounding environment (also known as visual odometry).
+Many solutions to vision-based obstacle avoidance have been suggested and published, with the majority proposing novel ways of combining ``standard" computer-vision algorithms in order to improve on previously published results, or to focus on specific types of obstacle avoidance (e.g. precipice or animal detection). \\
+
+The project proposed for the CS39440 Major Project aims to combine recent advances in camera technology with appropriate computer vision technique in order to research and develop a system for estimating the shape of the terrain currently travelled by a wheeled robot. In addition, it is predicted that such a system could also provide an estimation of the speed and rotation/orientation of the robot as it follows a path along the surface (similar to Visual Odometry). \\
+
+While similar vision-based systems have been produced previously, it does not appear that any of these systems have adopted appearance-based patch tracking in such a way as to prevent the need to provide a ``rigid" calibration model in exchange for an incremental, more flexible calibration procedure. 
 
 
 %==============================================================================
@@ -65,7 +69,8 @@ Combining recent advances in camera technology with appropriate computer vision 
 As part of the project scope analysis, this section details a list of key tasks identified as necessary in order to achieve the aims of proposed project. To provide as realistic a prediction as possible at this time, any identified potential approaches (and associated issues), along with a prediction of current developer knowledge, were taken into account.
 
 \begin{enumerate}
-	\item \textbf{Analysis of Existing Approaches} \\ \indent Given the high variety of 
+	\item \textbf{Analysis of Existing Approaches} \\\\ \indent Given the high variety of. In particular, attention will need to be focussed on the comparison between appearance-based, and feature-based tracking as a mechanism for determining the distance travelled between subsequent images. 
+	\item \textbf{}
 \end{enumerate}
 
 
