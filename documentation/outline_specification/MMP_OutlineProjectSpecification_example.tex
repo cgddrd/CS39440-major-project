@@ -60,9 +60,9 @@ For a robot requiring autonomous motion or travelling capabilities, the task of 
 
 The identification and subsequent avoidance of obstacles is naturally a crucial ability for an autonomous mobile robot to possess in order to help to maximise its own chances of survival. As a result, it is a keen and well-explored area of robotics research, with a variety of approaches now available adopting many types of sensor including sonar and laser scanning. An alternative approach that has enjoyed increasingly greater research focus over the past decade is that of vision-based obstacle avoidance, involving the analysis of images captured from one or more digital cameras in order to identify possible dangers currently situated within the robot's field of view. \\
 
-Many solutions to vision-based obstacle avoidance have been suggested and published, with the majority proposing novel approaches of combining ``standard" computer-vision algorithms (e.g. optical flow, feature tracking or patch tracking) in order to improve on previously published detection or performance results, or to focus on specific types of obstacle avoidance (e.g. precipice or animal detection).
+Many solutions to vision-based obstacle avoidance have been suggested and published, with the majority proposing novel approaches of amalgamating ``standard" computer-vision algorithms (e.g. optical flow, feature tracking or patch tracking) in order to improve on previously published detection or performance results, or to focus on specific types of obstacle avoidance (e.g. precipice or animal detection).
 
-\subsection{Proposed Project}
+\subsection{Project Overview}
 
 Combining recent advances in camera technology with appropriate computer vision algorithms and technique, the proposed project aims to design and implement a vision-based software application capable of estimating the general ``shape" of the terrain currently in front of a moving robot as it follows a route through its environment. Through this system it should be possible to identify the presence of both positive, and negative obstacles (e.g. rocks and pits respectively), providing a reasonable indication of their general size and location. \\
 
@@ -81,28 +81,28 @@ Cameras are becoming an increasingly favourable sensor for use on robotic system
 \section{Proposed Tasks}
 %==============================================================================
 
-Forming part of the project scope analysis, this section details a list of key tasks identified as necessary in order to achieve the aims of the proposed project. To provide as realistic a prediction as possible, any  potential approaches (and associated issues) identified, along with a prediction of current developer knowledge have been taken into account.
+%Forming part of the project scope analysis, this section details a list of key tasks identified as necessary in order to achieve the aims of the proposed project. To provide as realistic a prediction as possible, any  potential approaches (and associated issues) identified, along with a prediction of current developer knowledge have been taken into account.
 
 \begin{enumerate}
-	\item \textbf{Research \& Analysis of Existing Computer Vision Approaches} \\\\  A thorough analysis of previously published work with similar aims to the proposed project will be conducted to identify the key strengths and weaknesses of these various approaches, so that an informed decision can be made as to the most appropriate computer-vision methods for the purposes of the project. Particular attention will be focussed on the comparison between appearance-based, and feature-based tracking as a mechanism for determining the distance travelled between subsequent images. 
+	\item \textbf{Research \& Analysis of Existing Computer Vision Approaches} -  A thorough analysis of previously published work with similar aims to the proposed project will be conducted to identify the key strengths and weaknesses of these various approaches, so that an informed decision can be made as to the most appropriate computer-vision methods for the purposes of the project. Particular attention will be focussed on the comparison between appearance-based, and feature-based tracking as a mechanism for determining the distance travelled between subsequent images. 
 	
-	\item \textbf{Project \& System Planning} \\\\ Following the completion of an appropriate analysis of existing techniques, algorithms and hardware/software technologies, this information will be feed into discussions with the project supervisor to plan and confirm the exact details of what the proposed system will do, and the approach to be taken in its implementation.
+	\item \textbf{Project \& System Planning} - Following the completion of an appropriate analysis of existing techniques, algorithms and hardware/software technologies, this information will be feed into discussions with the project supervisor to plan and confirm the exact details of what the proposed system will do, and the approach to be taken in its implementation.
 
-	\item \textbf{Investigation of Software Technologies} \\\\ An investigation into suitable programming languages and (if appropriate) third-party libraries will be conducted prior to beginning design work. Factors including recommendations from published work and robot hardware requirements will need to be taken into consideration.
+	\item \textbf{Investigation of Software Technologies} - An investigation into suitable programming languages and (if appropriate) third-party libraries will be conducted prior to beginning design work. Factors including recommendations from published work and robot hardware requirements will need to be taken into consideration.
 	
-	\item \textbf{Investigation of Hardware Technologies} \\\\ Decisions around the selection of hardware will need to be made, focussing mainly on the type and number of cameras. These will be influenced primarily by the choice of computer-vision methods and the existing hardware available.
+	\item \textbf{Investigation of Hardware Technologies} - Decisions around the selection of hardware will need to be made, focussing mainly on the type and number of cameras. These will be influenced primarily by the choice of computer-vision methods and the existing hardware available.
 
-	\item \textbf{System Design} \\\\ Architectural and component-level designs will be produced, detailing the structure of the software and hardware aspects individually, along with the interactions between the two.
+	\item \textbf{System Design} - Architectural and component-level designs will be produced, detailing the structure of the software and hardware aspects individually, along with the interactions between the two.
 	
-	\item \textbf{Testing Design} \\\\ Given the research-based nature of the project, appropriate testing strategies will require careful planning and design. This is to ensure robust evaluation of the ``successes" of the system processes and methods in addressing the project aims (e.g qualitative vs quantitative evaluation).
+	\item \textbf{Testing Design} - Given the research-based nature of the project, appropriate testing strategies will require careful planning and design. This is to ensure robust evaluation of the ``successes" of the system processes and methods in addressing the project aims (e.g qualitative vs quantitative evaluation).
 	
-	\item \textbf{System Implementation} \\\\ All code will be versioned and check-in against work items. The project is expected to follow the SCRUM agile-methodology approach to development, with work broken-down into time-boxed releases and subsequent sprints. 
+	\item \textbf{System Implementation} - All code will be versioned and checked-in against work items. The project is expected to follow the SCRUM agile-methodology approach to development, with work broken-down into time-boxed releases and subsequent sprints. 
 	
-	\item \textbf{System Testing \& Evaluation} \\\\ A significant level of attention is expected to focus on testing of the computer-vision approach/algorithms using ``ground truth" testing data as a primary measure. However, extensive software testing will also be conducted incorporating unit testing, testing tables, and possibly continuous integration testing (if appropriate).
+	\item \textbf{System Testing \& Evaluation} - A significant level of attention is expected to focus on testing of the computer-vision approach/algorithms using ``ground truth" testing data as a primary measure. However, extensive software testing will also be conducted incorporating unit testing, testing tables, and possibly continuous integration testing (if appropriate).
 	
-	\item \textbf{Production of Final Report} \\\\ A 20,000-word report will be written describing and justifying all aspects of the major project including the planning, design, implementation, testing and evaluation.
+	\item \textbf{Production of Final Report} - A 20,000-word report will be written describing and justifying all aspects of the major project including the planning, design, implementation, testing and evaluation.
 	
-	\item \textbf{Logging of Work} \\\\ Throughout the entirety of the project, any key thoughts or notes will be published to a live web-blog available at: \url{http://mmpblog.connorlukegoddard.com}. This blog will act as a memory aid when writing the final report.
+	\item \textbf{Logging of Work} - Throughout the entirety of the project, any key thoughts or notes will be published to a live web-blog available at: \url{http://mmpblog.connorlukegoddard.com}. This blog will act as a memory aid when writing the final report.
 
 \end{enumerate}
 
@@ -111,23 +111,21 @@ Forming part of the project scope analysis, this section details a list of key t
 \section{Project Deliverables}
 %==============================================================================
 
-It is expected that the resulting items will be produced as a result of the work conducted throughout the duration of the proposed project.
-
 \begin{enumerate}
 
-	\item \textbf{Design Documentation} \\\\ Collection of architectural and component-level UML design diagrams (including sequence, class and use case diagrams) with accompanying descriptions and justifications for choices made.
+	\item \textbf{Existing Algorithm Analysis} - Results of analysis conducted to identify suitable computer vision algorithms/approaches adopted in previously published work, including a statement of the investigation outcomes and justification. 
 
-	\item \textbf{Existing Algorithm Analysis} \\\\ Results of analysis conducted to identify suitable computer vision algorithms/approaches adopted in previously published work, including statement of final choices with justification. 
-	
-	\item \textbf{Testing Plan} \\\\ Details of testing strategies (and criteria) for the final system, including a specific breakdown and analysis of tests for the high-level computer vision algorithms and implemented software.
+	\item \textbf{Design Documentation} - Collection of architectural and component-level  designs (including UML sequence, class and use case diagrams) with accompanying descriptions and justifications for choices made.
+
+	\item \textbf{Testing Plan} - Details of testing strategies (with criteria) for the final system, including a specific breakdown and analysis of tests for both the high-level computer vision algorithm(s) and implemented software.
 	 
-	\item \textbf{Proposed Algorithm(s)} \\\\  Detailed description, discussion and justification of proposed algorithm(s) 
+	\item \textbf{Proposed Algorithm(s)} -  Description, discussion and justification of proposed algorithm(s) developed for the project, including details on the approach to testing 	and expected evaluation conclusions of their application within the final system. 
 	
-	\item \textbf{Final Implemented System} \\\\ 
+	\item \textbf{Final Implemented System} - The complete system in a working, demonstrable state, that achieves the complete set of finalised tasks. The full source code, in addition to a system demonstration will also be provided.
 	
-	\item \textbf{Progress Report} \\\\ 
+	\item \textbf{Progress Report} - Details of the current state of the project to date, including any changes made to the expected aims, tasks or deliverables (and the reasons for these) and any significant issues encountered with (if possible) descriptions of the solution.
 
-	\item \textbf{Final Report} \\\\
+	\item \textbf{Final Report} - Final project report covering all aspects of the major project in its entirety. This will include a detailed description, discussion and justification on areas including the design, implementation, deployment and documentation of the final system, including particular focus on the evaluation of the computer-vision algorithm(s) developed and any future expansions that could be pursued.
 		
 
 
@@ -146,6 +144,6 @@ It is expected that the resulting items will be produced as a result of the work
 %\bibliographystyle{authordate2annot}
 \bibliographystyle{IEEEannot}
 \renewcommand{\refname}{Annotated Bibliography}  % if you put text into the final {} on this line, you will get an extra title, e.g. References. This isn't necessary for the outline project specification. 
-\bibliography{mmp} % References file
+\bibliography{ops} % References file
 
 \end{document}
