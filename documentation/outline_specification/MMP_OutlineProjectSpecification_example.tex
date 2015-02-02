@@ -8,14 +8,8 @@
 \usepackage{amssymb} %math fonts
 \usepackage{lastpage} %for footer page numbers
 \usepackage{fancyhdr} %header and footer package
-\usepackage{mmpv2} 
+\usepackage{mmp_cg} 
 \usepackage{url}
-
-\usepackage{enumitem}
-\setlist{parsep=0pt,listparindent=\parindent}
-\setlength{\parindent}{0pt}
-\usepackage{hyperref}
-\newcommand{\forceindent}{\leavevmode{\parindent=1em\indent}}
 
 % the following packages are used for citations - You only need to include one. 
 %
@@ -39,7 +33,7 @@
 \degreeschemename{MEng Software Engineering}
 \supervisor{Dr. Fr\'ed\'eric Labrosse} % e.g. Neil Taylor
 \supervisorid{ffl}
-\wordcount{}
+\wordcount{1505}
 
 %optional - comment out next line to use current date for the document
 %\documentdate{10th February 2014} 
@@ -60,6 +54,8 @@ For a robot requiring autonomous motion or travelling capabilities, the task of 
 
 The identification and subsequent avoidance of obstacles is naturally a crucial ability for an autonomous mobile robot to possess in order to help to maximise its own chances of survival. As a result, it is a keen and well-explored area of robotics research, with a variety of approaches now available adopting many types of sensor including sonar and laser scanning. An alternative approach that has enjoyed increasingly greater research focus over the past decade is that of vision-based obstacle avoidance, involving the analysis of images captured from one or more digital cameras in order to identify possible dangers currently situated within the robot's field of view. \\
 
+Cameras are becoming an increasingly favourable sensor for use on robotic systems, due primarily to the impressive variety and quantity of potential data that can be captured \textit{simultaneously} from a single device. They are also one of few sensors that have experienced a consistent reduction in price over the past decade, making them viable for many types of project application and budget. \\
+
 Many solutions to vision-based obstacle avoidance have been suggested and published, with the majority proposing novel approaches of amalgamating ``standard" computer-vision algorithms (e.g. optical flow, feature tracking or patch tracking) in order to improve on previously published detection or performance results, or to focus on specific types of obstacle avoidance (e.g. precipice or animal detection).
 
 \subsection{Project Overview}
@@ -70,9 +66,7 @@ In addition, it is predicted that such a system will also be able to provide an 
 
 While the primary aims of the proposed project are certainly research-focussed, the ultimate goal of the project would be to implement the system onto a working mobile robot, such as the `IDRIS' four wheeled all-terrain robot currently in operation at the Aberystwyth University Computer Science department. \\
 
-Although at the time of writing there is still much discussion to be had as to the exact implementation details, it is generally expected that the system will adopt image patch-based tracking and correspondence to allow for the establishment of the general motion trend (i.e. optical flow) of the ground (or the egomotion of the robot). \\
-
-Cameras are becoming an increasingly favourable sensor for use on robotic systems, due primarily to the impressive variety and quantity of potential data that can be captured \textit{simultaneously} from a single device. They are also one of few sensors that have experienced a consistent reduction in price over the past decade, making them viable for many types of project application and budget.
+Although at the time of writing there is still much discussion to be had as to the exact implementation details, it is generally expected that the system will adopt image patch-based tracking and correspondence to allow for the establishment of the general motion trend (i.e. optical flow) of the ground (or the egomotion of the robot).
 
 %While there is no doubt that many similar vision-based systems have been produced previously, it does not appear that any of these systems have adopted appearance-based patch tracking in such a way as to prevent the need to provide a ``rigid" calibration model in exchange for an incremental, more flexible calibration procedure. 
 
@@ -113,19 +107,19 @@ Cameras are becoming an increasingly favourable sensor for use on robotic system
 
 \begin{enumerate}
 
-	\item \textbf{Existing Algorithm Analysis} - Results of analysis conducted to identify suitable computer vision algorithms/approaches adopted in previously published work, including a statement of the investigation outcomes and justification. 
+	\item \textbf{Report on Existing Approach Analysis} - Results of analysis conducted to identify suitable computer vision algorithms/approaches adopted in previously published work, including a statement of the investigation outcomes and justification. 
 
 	\item \textbf{Design Documentation} - Collection of architectural and component-level  designs (including UML sequence, class and use case diagrams) with accompanying descriptions and justifications for choices made.
 
 	\item \textbf{Testing Plan} - Details of testing strategies (with criteria) for the final system, including a specific breakdown and analysis of tests for both the high-level computer vision algorithm(s) and implemented software.
 	 
-	\item \textbf{Proposed Algorithm(s)} -  Description, discussion and justification of proposed algorithm(s) developed for the project, including details on the approach to testing 	and expected evaluation conclusions of their application within the final system. 
+	\item \textbf{Proposed Algorithm(s)} -  Description, discussion and justification of proposed algorithm(s) developed for the project, including details of the approach to testing 	and expected evaluation criteria. 
 	
 	\item \textbf{Final Implemented System} - The complete system in a working, demonstrable state, that achieves the complete set of finalised tasks. The full source code, in addition to a system demonstration will also be provided.
 	
 	\item \textbf{Progress Report} - Details of the current state of the project to date, including any changes made to the expected aims, tasks or deliverables (and the reasons for these) and any significant issues encountered with (if possible) descriptions of the solution.
 
-	\item \textbf{Final Report} - Final project report covering all aspects of the major project in its entirety. This will include a detailed description, discussion and justification on areas including the design, implementation, deployment and documentation of the final system, including particular focus on the evaluation of the computer-vision algorithm(s) developed and any future expansions that could be pursued.
+	\item \textbf{Final Report} - Final project report providing a detailed description, discussion and justification of aspects including the design, implementation, deployment and documentation of the final system. Particular focus given to the evaluation of the computer-vision algorithm(s) developed and any future expansions that could be pursued.
 		
 
 

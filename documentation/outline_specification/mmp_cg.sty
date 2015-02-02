@@ -1,0 +1,181 @@
+%% LaTeX class to write Major/Minor projects for the Computer Science Department,
+%% Aberystwyth University.
+%%
+%% Modified by Connor Goddard (clg11@aber.ac.uk) for use in Major Project 2015.
+%%
+%% Originally written by Neil Taylor
+%% Comments and bugs to nst@aber.ac.uk
+%%
+%% See the accompanying file MMP_ProgressReport_example.tex for an example on how to
+%% use it.
+%%
+\ProvidesPackage{mmp_cg}
+
+% CG - Add packages to remove indentation in paragraphs and lists.
+\usepackage{enumitem}
+\setlist{parsep=0pt,listparindent=\parindent}
+\setlength{\parindent}{0pt}
+
+% CG - Add new command to force indentation in paragraph. 
+\newcommand{\forceindent}{\leavevmode{\parindent=1em\indent}}
+
+\usepackage{hyperref}
+
+\usepackage[a4paper,margin=2.5cm,nohead, headheight=3cm, headsep=20pt]{geometry}
+\usepackage{graphicx} %to allow images to be imported see example at end of template
+
+\newcommand{\is}{\hspace*{0.2in}} %little indent space
+
+\newcommand{\mmpdocdate}{\today}
+
+\newcommand{\documentdate}[1]{
+  \renewcommand{\mmpdocdate}{#1}
+}
+
+\newcommand{\name}[1]{
+  \newcommand{\showname}{#1}
+}
+
+\newcommand{\userid}[1]{
+   \newcommand{\showuserid}{#1}
+}
+
+\newcommand{\supervisor}[1]{
+  \newcommand{\showsupervisor}{#1}
+}
+
+\newcommand{\supervisorid}[1]{
+  \newcommand{\showsupervisorid}{#1}
+}
+
+\newcommand{\projecttitle}[1]{
+  \newcommand{\showprojecttitle}{#1}
+}
+
+\newcommand{\reporttitle}[1]{
+  \newcommand{\showreporttitle}{#1}
+}
+
+\newcommand{\projecttitlememoir}[1]{
+  \newcommand{\showprojecttitlememoir}{#1}
+}
+
+\newcommand{\version}[1]{
+  \newcommand{\showversion}{#1}
+}
+
+\newcommand{\docstatus}[1]{
+  \newcommand{\showdocstatus}{#1}
+}
+
+\newcommand{\degreeschemecode}[1]{
+  \newcommand{\showdegreeschemecode}{#1}
+}
+
+\newcommand{\degreeschemename}[1]{
+  \newcommand{\showdegreeschemename}{#1}
+}
+
+\newcommand{\modulecode}[1]{
+  \newcommand{\showmodulecode}{#1}
+}
+
+\newcommand{\wordcount}[1]{
+  \newcommand{\showwordcount}{#1}
+}
+
+\newcommand{\helv}{
+	%bold, 18point, 21point line spacing
+	\fontfamily{phv}\fontsize{18}{21}\selectfont
+}
+
+\newcommand{\mmp}{
+\pagestyle{fancy}
+\thispagestyle{empty} %no headers/footers on title page
+%
+
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\begin{center}
+
+% CG - Custom Title Page.
+
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\Large Prifysgol Aberystwyth University}\\[1.5cm] % Name of your university/college
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.4cm]
+{ \huge \fontsize{18}{21}\selectfont \showprojecttitle}\\%[0.4cm] % Title of your document
+\HRule \\[1.5cm]
+
+\textsc{\Large \showreporttitle}\\[0.5cm] % Major heading such as course name
+\textsc{\large \showmodulecode ~- Major Project}\\[0.1cm] % Minor heading such as course title
+\textsc{\small \showdegreeschemecode \hspace*{0.05in}(\showdegreeschemename)}\\[1.5cm]
+ 
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+\showname \hspace*{0.05in}(\showuserid) \\ % Your name
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+\showsupervisor \hspace*{0.05in}(\showsupervisorid) % Supervisor's Name
+\end{flushright}
+\end{minipage}\\[4cm]
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}\\[1cm] % Date, change the \today to a set date if you want to be precise
+
+%{\normalsize \textsc Word Count: \showwordcount\\[0.2cm]}
+{\normalsize \textsc Revision: \showversion\\[0.2cm]
+Status: \showdocstatus\\ [3cm]}
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+
+\includegraphics[scale=0.15]{aber_logo.png} % Include a department/university logo - this will require the graphicx package
+ 
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+
+\end{center}
+ \pagebreak
+ \newpage
+ \makeheaders
+ \setcounter{page}{1}
+ \normalsize
+}
+
+%==============================================================================
+%header and footer information
+%==============================================================================
+\newcommand{\makeheaders}{
+	\fancyhead{}
+	%Right on Odd numberd pages and Left on Even numbered pages
+	\fancyhead[LO,RE]{{\showreporttitle} - {\showversion} ({\showdocstatus})\vspace{0.1cm}}
+	\fancyhead[RO,LE]{{\showname} ({\showuserid})\vspace{0.1cm}}
+	\fancyfoot{}
+	\fancyfoot[RO,LE]{{\thepage} of {\pageref{LastPage}}}
+	\fancyfoot[LO,RE]{\showprojecttitlememoir}
+	\renewcommand{\headrulewidth}{0.5pt}
+	\renewcommand{\footrulewidth}{0.5pt}
+}
