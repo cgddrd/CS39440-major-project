@@ -26,7 +26,7 @@
 \projecttitle{Estimation of Terrain Shape Using a Monocular Vision-based System}
 \projecttitlememoir{Estimation of Terrain Shape Using a Monocular Vision-based System} %same as the project title or abridged version for page header
 \reporttitle{Outline Project Specification}
-\version{0.3}
+\version{0.4}
 \docstatus{Draft}
 \modulecode{CS39440}
 \degreeschemecode{G601}
@@ -48,7 +48,7 @@
 
 \subsection{Background}
 
-For a robot requiring autonomous motion or travelling capabilities, the task of navigating through a (typically) unknown environment is one that plays a fundamental role in ensuring such a device can successfully make safe, yet objective decisions on how best to traverse from a starting location to a target location, over typically uneven and/or poorly modelled terrain. \\
+ Accurate navigation allows for robot requiring autonomous motion capabilities to make safe, yet objective decisions on how best to traverse from a starting location to a target location over typically uneven and/or poorly modelled terrain. \\
 
 %As a problem-space, autonomous navigation can be de-composed into two key areas of focus; one of \textit{reactive} navigation, and the other of \textit{deliberative} navigation. Reactive, or local navigation is concerned with controlling the path of the robot through the immediate surrounding area, in particular focussing on the safe traversal around dangerous terrain hazards including obstacles and precipices. In contrast, deliberative or global navigation is tasked with planning the ``higher-level" path that a robot will follow top reach its destination, and as such, tends to adopt a greater level of focus on calculating the most \textit{optimal} path through the environment over necessarily the one that is ``safest" for the robot. Traditionally within autonomous navigation systems, feedback from both the reactive and deliberative components are combined in order to arrive at final path that balances both safety and objectivity. \\
 
@@ -56,15 +56,15 @@ The identification and subsequent avoidance of obstacles is naturally a crucial 
 
 Cameras are becoming an increasingly favourable sensor for use on robotic systems, due primarily to the impressive variety and quantity of potential data that can be captured \textit{simultaneously} from a single device. They are also one of few sensors that have experienced a consistent reduction in price over the past decade, making them viable for many types of project application and budget. \\
 
-Many solutions to vision-based obstacle avoidance have been suggested and published, with the majority proposing novel approaches of amalgamating ``standard" computer-vision algorithms (e.g. optical flow, feature tracking or patch tracking) in order to improve on previously published detection or performance results, or to focus on specific types of obstacle avoidance (e.g. precipice or animal detection).
+Many solutions to vision-based obstacle avoidance have been suggested and published, with the majority proposing novel approaches of combining ``standard" computer-vision algorithms (e.g. optical flow, feature tracking or patch tracking) with a variety of hardware configurations (e.g. monocular systems, stereo cameras, vision and 3D hybrid). Typically these improve on previously published performance results, or to focus on specific types of obstacle avoidance (e.g. precipice or animal detection).
 
 \subsection{Project Overview}
 
-Combining recent advances in camera technology with appropriate computer vision algorithms and technique, the proposed project aims to design and implement a vision-based software application capable of estimating the general ``shape" of the terrain currently in front of a moving robot as it follows a route through its environment. Through this system it should be possible to identify the presence of both positive, and negative obstacles (e.g. rocks and pits respectively), providing a reasonable indication of their general size and location. \\
+Combining recent advances in camera technology with appropriate computer vision algorithms and technique, the proposed project aims to design and implement a vision-based software application capable of estimating the general ``shape" of the terrain currently in front of a moving robot as it follows a route through its environment. Through this system, it should be possible to identify the presence of both positive, and negative obstacles (e.g. rocks and pits respectively), providing a reasonable indication of their general size and location. \\
 
 In addition, it is predicted that such a system will also be able to provide an estimation of the speed and change in rotation/orientation of the robot as it traverses along a path. These will be calculated as by-products of the terrain inference mechanism, and could form part of a larger visual odometry system. \\
 
-While the primary aims of the proposed project are certainly research-focussed, the ultimate goal of the project would be to implement the system onto a working mobile robot, such as the `IDRIS' four wheeled all-terrain robot currently in operation at the Aberystwyth University Computer Science department. \\
+While the primary aims of the proposed project are research-focussed, the ultimate goal of the project will be to implement the system onto a working mobile robot, such as the `IDRIS' all-terrain wheeled robot currently in use by the Aberystwyth University Computer Science department. \\
 
 Although at the time of writing there is still much discussion to be had as to the exact implementation details, it is generally expected that the system will adopt image patch-based tracking and correspondence to allow for the establishment of the general motion trend (i.e. optical flow) of the ground (or the egomotion of the robot).
 
@@ -78,9 +78,9 @@ Although at the time of writing there is still much discussion to be had as to t
 %Forming part of the project scope analysis, this section details a list of key tasks identified as necessary in order to achieve the aims of the proposed project. To provide as realistic a prediction as possible, any  potential approaches (and associated issues) identified, along with a prediction of current developer knowledge have been taken into account.
 
 \begin{enumerate}
-	\item \textbf{Research \& Analysis of Existing Computer Vision Approaches} -  A thorough analysis of previously published work with similar aims to the proposed project will be conducted to identify the key strengths and weaknesses of these various approaches, so that an informed decision can be made as to the most appropriate computer-vision methods for the purposes of the project. Particular attention will be focussed on the comparison between appearance-based, and feature-based tracking as a mechanism for determining the distance travelled between subsequent images. 
+	\item \textbf{Research \& Analysis of Existing Computer Vision Approaches} -  A thorough analysis of previously published work will be conducted to identify the key strengths and weaknesses of these various approaches. This will allow for an informed decision to be made as to the most appropriate computer-vision methods for use in the project. Particular attention will be focussed on the comparison between appearance-based, and feature-based tracking as a mechanism for determining the distance travelled between subsequent images. 
 	
-	\item \textbf{Project \& System Planning} - Following the completion of an appropriate analysis of existing techniques, algorithms and hardware/software technologies, this information will be feed into discussions with the project supervisor to plan and confirm the exact details of what the proposed system will do, and the approach to be taken in its implementation.
+	\item \textbf{Project \& System Planning} - Information gathered from analysis of existing approaches will be fed into discussions with the project supervisor to plan and confirm the exact details of what the proposed system will do, and the approach to be taken in its implementation.
 
 	\item \textbf{Investigation of Software Technologies} - An investigation into suitable programming languages and (if appropriate) third-party libraries will be conducted prior to beginning design work. Factors including recommendations from published work and robot hardware requirements will need to be taken into consideration.
 	
@@ -90,7 +90,7 @@ Although at the time of writing there is still much discussion to be had as to t
 	
 	\item \textbf{Testing Design} - Given the research-based nature of the project, appropriate testing strategies will require careful planning and design. This is to ensure robust evaluation of the ``successes" of the system processes and methods in addressing the project aims (e.g qualitative vs quantitative evaluation).
 	
-	\item \textbf{System Implementation} - All code will be versioned and checked-in against work items. The project is expected to follow the SCRUM agile-methodology approach to development, with work broken-down into time-boxed releases and subsequent sprints. 
+	\item \textbf{System Implementation} - All code will be version controlled and checked-in against relevant work items (project is expected to follow a SCRUM agile-methodology approach to development). 
 	
 	\item \textbf{System Testing \& Evaluation} - A significant level of attention is expected to focus on testing of the computer-vision approach/algorithms using ``ground truth" testing data as a primary measure. However, extensive software testing will also be conducted incorporating unit testing, testing tables, and possibly continuous integration testing (if appropriate).
 	
@@ -107,13 +107,13 @@ Although at the time of writing there is still much discussion to be had as to t
 
 \begin{enumerate}
 
-	\item \textbf{Report on Existing Approach Analysis} - Results of analysis conducted to identify suitable computer vision algorithms/approaches adopted in previously published work, including a statement of the investigation outcomes and justification. 
+	\item \textbf{Existing Approach Analysis Report} - Results of analysis conducted to identify suitable computer vision algorithms/approaches adopted in previously published work, including a statement of the investigation outcomes and justification. 
 
-	\item \textbf{Design Documentation} - Collection of architectural and component-level  designs (including UML sequence, class and use case diagrams) with accompanying descriptions and justifications for choices made.
+	\item \textbf{Design Documentation} - While focussing primarily on algorithm design documentation (e.g. experiment/test design), documentation will also contain software-level designs (including UML sequence, class and use case diagrams) with accompanying descriptions and justifications for choices made.
 
 	\item \textbf{Testing Plan} - Details of testing strategies (with criteria) for the final system, including a specific breakdown and analysis of tests for both the high-level computer vision algorithm(s) and implemented software.
 	 
-	\item \textbf{Proposed Algorithm(s)} -  Description, discussion and justification of proposed algorithm(s) developed for the project, including details of the approach to testing 	and expected evaluation criteria. 
+	\item \textbf{Proposed Algorithm(s)} - Description, discussion and justification of proposed algorithm(s) developed for the project, including details of the approach to testing 	and expected evaluation criteria. 
 	
 	\item \textbf{Final Implemented System} - The complete system in a working, demonstrable state, that achieves the complete set of finalised tasks. The full source code, in addition to a system demonstration will also be provided.
 	
