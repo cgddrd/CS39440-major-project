@@ -10,31 +10,31 @@
 	<string>optical_flow_lk_two_images</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>C68313D0F2EEADD80CEC916DDA78126A1A398903</key>
-		<string>https://github.com/cgddrd/OpenCV-Lab.git</string>
+		<key>C25EF85B8BBB7D57FFB3ACF7E8B7EBB8BBC8453A</key>
+		<string>https://github.com/cgddrd/CS39440-major-project.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>c++/optical_flow_lk_two_images/optical_flow_lk_two_images.xcodeproj</string>
+	<string>experiments/optical_flow_lk_two_images/optical_flow_lk_two_images.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>C68313D0F2EEADD80CEC916DDA78126A1A398903</key>
+		<key>C25EF85B8BBB7D57FFB3ACF7E8B7EBB8BBC8453A</key>
 		<string>../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/cgddrd/OpenCV-Lab.git</string>
+	<string>https://github.com/cgddrd/CS39440-major-project.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>C68313D0F2EEADD80CEC916DDA78126A1A398903</string>
+	<string>C25EF85B8BBB7D57FFB3ACF7E8B7EBB8BBC8453A</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>C68313D0F2EEADD80CEC916DDA78126A1A398903</string>
+			<string>C25EF85B8BBB7D57FFB3ACF7E8B7EBB8BBC8453A</string>
 			<key>IDESourceControlWCCName</key>
-			<string>OpenCV-Lab</string>
+			<string>CS39440-major-project</string>
 		</dict>
 	</array>
 </dict>
