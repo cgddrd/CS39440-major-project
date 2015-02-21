@@ -11,10 +11,10 @@ int ScanImageIterator(Mat& I);
 int ScanImageForLoop(Mat& I);
 int ScanImagePointer(Mat& I);
 
-int main()
+int main(int argc, char** argv)
 {
     
-    Mat img = imread("1.JPG",CV_LOAD_IMAGE_COLOR);
+    Mat img = imread(argv[1],CV_LOAD_IMAGE_COLOR);
     
     // CG - Used to "time" each iteration approach.
     double t = (double) getTickCount();
