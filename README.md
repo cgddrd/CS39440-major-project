@@ -1,7 +1,4 @@
-# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project)
-
-### Status
-[![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project)
+# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project)
 
 ## Background
 
