@@ -11,10 +11,4 @@ dependencies: \
   /usr/local/include/opencv2/core/core_c.h \
   /usr/local/include/opencv2/video/tracking.hpp \
   /usr/local/include/opencv2/imgproc/imgproc.hpp \
-  /usr/local/include/opencv2/imgproc/types_c.h \
-  /usr/local/include/opencv2/features2d/features2d.hpp \
-  /usr/local/include/opencv2/flann/miniflann.hpp \
-  /usr/local/include/opencv2/flann/defines.h \
-  /usr/local/include/opencv2/flann/config.h \
-  /usr/local/include/opencv2/nonfree/nonfree.hpp \
-  /usr/local/include/opencv2/nonfree/features2d.hpp
+  /usr/local/include/opencv2/imgproc/types_c.h

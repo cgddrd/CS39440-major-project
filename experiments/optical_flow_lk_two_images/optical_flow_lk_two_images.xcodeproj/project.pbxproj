@@ -27,7 +27,7 @@
 		9980079A1A8CAD7E005BC23B /* optical_flow_lk_two_images */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = optical_flow_lk_two_images; sourceTree = BUILT_PRODUCTS_DIR; };
 		9980079D1A8CAD7E005BC23B /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		99DD732C1A992E3A006E73B7 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
-		99DD732D1A992E3A006E73B7 /* Utils.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Utils.hpp; sourceTree = "<group>"; };
+		99DD732F1A993CE4006E73B7 /* Utils.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Utils.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +62,7 @@
 			children = (
 				9980079D1A8CAD7E005BC23B /* main.cpp */,
 				99DD732C1A992E3A006E73B7 /* Utils.cpp */,
-				99DD732D1A992E3A006E73B7 /* Utils.hpp */,
+				99DD732F1A993CE4006E73B7 /* Utils.hpp */,
 			);
 			path = optical_flow_lk_two_images;
 			sourceTree = "<group>";
