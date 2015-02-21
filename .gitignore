@@ -27,9 +27,10 @@
 *.out
 *.app
 Debug/
+build/
 
 # Latex files
- 
+
 *.aux
 *.glo
 *.idx
@@ -58,7 +59,7 @@ Debug/
 *.out
 *.synctex.gz
 *.pdf
- 
+
 # Mac IDE files
 *.swp
 *~
@@ -66,6 +67,6 @@ Debug/
 Backup[ ]of[ ]*.pages/
 Backup[ ]of[ ]*.key/
 Backup[ ]of[ ]*.numbers/
- 
+
 # Mac finder files and hidden folders
 .DS_Store
