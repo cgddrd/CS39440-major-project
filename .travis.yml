@@ -32,7 +32,7 @@ script:
   - g++ main.cpp -o mat_pixel_iteration -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_nonfree -lopencv_features2d
   - ./mat_pixel_iteration ../../eval_data/1.JPG
   - cd ../../optical_flow_lk_two_images/optical_flow_lk_two_images
-  - g++ main.cpp Utils.cpp -o optical_flow_lk_two_images -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_nonfree -lopencv_features2d
+  - g++ main.cpp Utils.cpp -o optical_flow_lk_two_images -lopencv_video -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_nonfree -lopencv_features2d
   #- ./optical_flow_lk_two_images ../../eval_data/1.JPG ../../eval_data/2.JPG
   - cd ../../optical_flow_lk_image_template_match/optical_flow_lk_image_template_match
   - g++ main.cpp -o optical_flow_lk_image_template_match -lopencv_core -lopencv_highgui -lopencv_imgproc
