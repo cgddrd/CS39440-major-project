@@ -26,12 +26,10 @@ int main(int argc, char** argv) {
     }
     
     static const int match_method = CV_TM_CCOEFF_NORMED;
-    int patchSize = 100;
+    int patchSize = 30;
     
     Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
-    
-    Mat result, img1_gray, img2_gray;
     
     if(img1.empty() || img2.empty())
     {
@@ -39,19 +37,25 @@ int main(int argc, char** argv) {
         return -1;
     }
     
+    
+    resize(img1, img1, Size(img1.cols/4, img1.rows/4));
+    resize(img2, img2, Size(img2.cols/4, img2.rows/4));
+    
+    Mat result, img1_gray, img2_gray;
+    
     cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
     cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
     
     //CG - Calculate a central column through the two images that has a width of 10% of the original images.
     double centre_point = img1_gray.cols / 2;
-    double width_ten_percent = img1_gray.cols * 0.5;
+    double width_ten_percent = img1_gray.cols * 0.3;
     double half_width_ten_percent = width_ten_percent / 2;
     
     //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
     Mat roi = img1_gray( Rect(centre_point - half_width_ten_percent,0,width_ten_percent,img1_gray.rows) );
     Mat roi2 = img2_gray( Rect(centre_point - half_width_ten_percent,0,width_ten_percent,img2_gray.rows) );
     
-    Mat opticalFlow = Mat(img2.rows, img2.cols, CV_32FC3);
+    Mat opticalFlow = Mat::zeros(img2.rows, img2.cols, CV_8UC3);
     
     //Mat templ = img1_gray( Rect(centre_point - (windowsize / 2),y,windowsize,windowsize) );
     
@@ -105,20 +109,15 @@ int main(int argc, char** argv) {
         
         
         //rectangle( result, Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Point( matchLoc.x + (centre_point - half_width_ten_percent) + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
-        
-        
-        circle(img2, (*i2), 1, Scalar(255, 0, 0), 1, 1, 0);
-        
-        
+    
         char str[10];
         char str2[10];
-        char str3[10];
         
         //sprintf(str,"%d",txtcount);
         
-        putText(img1, str, Point((*i2).x + (centre_point - half_width_ten_percent) + (patchSize / 2), (*i2).y + (patchSize / 2)), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
+        //putText(img1, str, Point((*i2).x + (centre_point - half_width_ten_percent) + (patchSize / 2), (*i2).y + (patchSize / 2)), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
         
-        putText(img2, str, Point(matchLoc.x + (centre_point - half_width_ten_percent) + (patchSize / 2), matchLoc.y + (patchSize / 2)), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
+      //  putText(img2, str, Point(matchLoc.x + (centre_point - half_width_ten_percent) + (patchSize / 2), matchLoc.y + (patchSize / 2)), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
         
         
         
@@ -130,9 +129,6 @@ int main(int argc, char** argv) {
         float angle = innerAngle((*i2).x + (centre_point - half_width_ten_percent), matchLoc.y, matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y,  (*i2).x + (centre_point - half_width_ten_percent), (*i2).y);
         
         
-        
-        double length = sqrt(pow((matchLoc.x - (*i2).x),2) + pow((matchLoc.y - (*i2).y), 2));
-        
         float lengthOFVector = sqrt(pow(vectorOF.x, 2) + pow(vectorOF.y, 2));
         
         
@@ -140,10 +136,8 @@ int main(int argc, char** argv) {
         
         sprintf(str2,"%3.1f",lengthOFVector);
         
-        sprintf(str3,"%3.1lf",length);
         
-        
-        if (((*i2).y - matchLoc.y) > 0 /*|| (((*i2).y - matchLoc.y) < (2 * patchSize * -1)) */) {
+        if (((*i2).y - matchLoc.y) > 0 || (((*i2).y - matchLoc.y) < (2 * patchSize * -1)) || angle < 45) {
             
 //            arrowedLine(img2, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(0,0,255));
 //            
@@ -179,8 +173,6 @@ int main(int argc, char** argv) {
             
             putText(opticalFlow, str2, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0,255,0));
             
-            putText(opticalFlow, str3, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y - 30), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0,0,255));
-            
         }
         
         
@@ -191,18 +183,17 @@ int main(int argc, char** argv) {
         // rectangle( img1, Point(centre_point - (templ.cols / 2), y), Point( centre_point + (templ.cols / 2) , y + templ.rows ), Scalar(0, 255, 0), 2, 8, 0 );
     }
     
-    resize(img2, img2, Size(img2.cols/2, img2.rows/2));
-    //resize(result, result, Size(result.cols/2, result.rows/2));
-    resize(img1, img1, Size(img1.cols/2, img1.rows/2));
-    resize(roi, roi, Size(roi.cols/2, roi.rows/2));
-    resize(roi2, roi2, Size(roi2.cols/2, roi2.rows/2));
+//    resize(img2, img2, Size(img2.cols/2, img2.rows/2));
+//    //resize(result, result, Size(result.cols/2, result.rows/2));
+//    resize(img1, img1, Size(img1.cols/2, img1.rows/2));
+//    resize(roi, roi, Size(roi.cols/2, roi.rows/2));
+//    resize(roi2, roi2, Size(roi2.cols/2, roi2.rows/2));
     
-    resize(opticalFlow, opticalFlow, Size(opticalFlow.cols/1.5, opticalFlow.rows/1.5));
+    //resize(opticalFlow, opticalFlow, Size(opticalFlow.cols * 2, opticalFlow.rows * 2));
     
     //CG - <0.5 = more balance to 'resultFrame', >0.5 = more balance to 'img1'.
     double alpha = 0.4;
     
-    imshow("Original", img1);
     //imshow("Normalised Result", result);
 
     imshow("ROI1", roi);
@@ -216,6 +207,8 @@ int main(int argc, char** argv) {
     imshow("Merged Result", img2);
     
     imshow("OPTICAL FLOW", opticalFlow);
+    
+    imshow("Original", img1);
     
     waitKey(0);
     
@@ -290,7 +283,7 @@ vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSi
     
     vector<Mat> mats;
     
-    int count = 0;
+ //   int count = 0;
     
     // accept only char type matrices
     CV_Assert(inputMat.depth() != sizeof(uchar));
@@ -306,7 +299,12 @@ vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSi
     
     int i,j;
     uchar* p;
-    for( i = 0; i < nRows; i+=patchSize)
+    
+   // int tempPatch = patchSize;
+    
+    //int newPatchSize = patchSize;
+    
+    for( i = ((patchSize/2) + 1); i < nRows - ((patchSize /2) + 1); i+=patchSize)
     {
         
 //        if (count == 500) {
@@ -317,17 +315,23 @@ vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSi
         
         p = inputMat.ptr<uchar>(i);
         
-        count++;
+      //  count++;
+        
+       // patchSize = tempPatch;
         
         // CG - Here we loop through EACH ROW, and EACH COLOUR CHANNEL WITHIN EACH OF THESE ROWS AS WELL!
-        for ( j = 0; j < nCols; j+=patchSize)
+        for ( j = ((patchSize/2) + 1); j < nCols - ((patchSize/2) + 1); j+=patchSize)
         {
             
             //I( Rect(j - (patchSize / 2),i - (patchSize / 2),patchSize,patchSize) );
             
-            int x = j - (patchSize / 2);
             
-            int y = i - (patchSize / 2);
+            
+           int x = j - (patchSize / 2);
+           
+           int y = i - (patchSize / 2);
+//            
+//            cout << "X: " << x << ", J: " << j << ", Y: " << y << ", I: " << i << endl;
             
 //            if (x > (patchSize / 2) && x < nCols - (patchSize / 2) && y > (patchSize / 2) && y < nRows - (patchSize / 2) && (x + patchSize) <= nCols) {
 //            
@@ -335,14 +339,69 @@ vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSi
 //                
 //            }
             
-            if (x >= 0 && y >= 0 && (x + patchSize) <= nCols && (y + patchSize) <= nRows) {
+//            x = x >= 0 ? x : 0;
+//            
+//            y = x >= 0 ? x : 0;
+//            
+//            x = (x+ patchSize) <= nCols ? x : nCols;
+//            
+//            x = (y+ patchSize) <= nRows ? x : nRows;
+            
+            
+//            if (x < 0) {
+//            
+//                //Subtract x from patchSize (patchSize + (-x))
+//                patchSize += x;
+//                
+//                x = 0;
+//                
+//            }
+//            
+//            if ((x + patchSize) > nCols) {
+//                
+//                patchSize -= (x + patchSize);
+//                
+//                x = nCols-patchSize;
+//            }
+//            
+//            if (y < 0) {
+//                
+//                //Subtract x from patchSize (patchSize + (-x)
+//                patchSize += y;
+//                
+//                y = 0;
+//                
+//            }
+//            
+//            if ((y + patchSize) > nRows) {
+//                
+//                patchSize -= (y + patchSize);
+//                
+//                y = nRows-patchSize;
+//            }
+//            
+            //cout << "X: " << x << ", J: " << j << ", Y: " << y << ", I: " << i << endl;
+            
+           // if (x >= 0 && y >= 0 && (x + patchSize) <= nCols && (y + patchSize) <= nRows) {
+            
+           // if (patchSize > 0) {
                 
                 mats.push_back(inputMat(Rect(x,y,patchSize,patchSize)));
                 
                 //CG - Same as Point2f (typename alias)
                 points.push_back(Point_<float>(x, y));
                 
-            }
+           // }
+        
+            
+                
+           // }
+            
+        
+            
+//            newPatchSize = patchSize > 0 ? patchSize : 1;
+//            
+//            patchSize = tempPatch;
             
         }
         
