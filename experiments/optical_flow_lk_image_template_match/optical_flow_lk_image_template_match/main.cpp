@@ -11,6 +11,7 @@ using namespace std;
 vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSize = 10);
 static void arrowedLine(cv::Mat& img, cv::Point pt1, cv::Point pt2, const cv::Scalar& color, int thickness=1, int line_type=8, int shift=0, double tipLength=0.1);
 static float innerAngle(float px1, float py1, float px2, float py2, float cx1, float cy1);
+static int getLargestPrimeFactor(int num);
 
 static void help()
 {
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
     
     //CG - Calculate a central column through the two images that has a width of 10% of the original images.
     double centre_point = img1_gray.cols / 2;
-    double width_ten_percent = img1_gray.cols * 0.3;
+    double width_ten_percent = img1_gray.cols * 0.1;
     double half_width_ten_percent = width_ten_percent / 2;
     
     //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
@@ -65,6 +66,12 @@ int main(int argc, char** argv) {
     result.create( result_cols, result_rows, CV_32FC1 );
     
     vector<Point2f> points;
+    
+    int primefactor = getLargestPrimeFactor(roi.cols);
+    
+    cout << "Input: " << roi.cols << " Prime: " << primefactor << endl;
+    
+    patchSize = primefactor;
     
     vector<Mat> test = ScanImagePointer(roi, points, patchSize);
     
@@ -274,6 +281,26 @@ static float innerAngle(float px1, float py1, float px2, float py2, float cx1, f
     return A;
 }
 
+
+
+static int getLargestPrimeFactor(int num) {
+    
+    int largest = 0;
+    
+    for (int factor = 1; factor < num; factor++)
+    {
+        if (num % factor == 0)
+        {
+            
+            largest = factor;
+            
+        }
+        
+    }
+    
+    return largest;
+    
+}
 
 
 
