@@ -164,15 +164,10 @@ int main(int argc, char** argv) {
             arrowedLine(opticalFlow, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point((*i2).x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(255,0,0));
             
             
-            
-            
            // double Angle = atan2(matchLoc.y - (*i2).y,matchLoc.x - (*i2).x) * 180.0 / CV_PI;
             
             //if(Angle<0) Angle=Angle+360;
-            
-       
-            
-            
+        
             
             //double Angle = atan2(vectorOF.y,vectorOF.x) - atan2(vectorYComponent.y,vectorYComponent.x) * 180.0 / CV_PI;
             
