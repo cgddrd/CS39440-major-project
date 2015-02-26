@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
     }
     
     static const int match_method = CV_TM_CCOEFF_NORMED;
-    int patchSize = 40;
+    int patchSize = 50;
     
     Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
@@ -38,23 +38,24 @@ int main(int argc, char** argv) {
     
     resize(img1, img1, Size(img1.cols/2, img1.rows/2));
     resize(img2, img2, Size(img2.cols/2, img2.rows/2));
+
     
     Mat result, img1_gray, img2_gray, localisedSearchWindow, templatePatch;
     
-   // cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
-   // cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
+    // cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
+    // cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
     
-    cvtColor(img1, img1_gray, cv::COLOR_BGR2HSV);
-    cvtColor(img2, img2_gray, cv::COLOR_BGR2HSV);
+     cvtColor(img1, img1_gray, cv::COLOR_BGR2HSV);
+     cvtColor(img2, img2_gray, cv::COLOR_BGR2HSV);
     
-  //  img1_gray = img1.clone();
+   // img1_gray = img1.clone();
     
    // img2_gray = img2.clone();
     
     
     //CG - Calculate a central column through the two images that has a width of 10% of the original images.
     double imageCentreX = img1_gray.cols / 2;
-    double imageROIWidth = img1_gray.cols * 0.5;
+    double imageROIWidth = img1_gray.cols * 0.2;
     double imageROIHalfWidth = imageROIWidth / 2;
     double imgROIStartX = imageCentreX - imageROIHalfWidth;
     double imgROIEndX = imageCentreX + imageROIHalfWidth;
@@ -78,9 +79,9 @@ int main(int argc, char** argv) {
     for( i1 = test.begin(), i2 = points.begin(); i1 < test.end() && i2 < points.end(); ++i1, ++i2 )
     {
         
-//        if (txtcount >=1) {
-//            break;
-//        }
+        if (txtcount >=100) {
+            break;
+        }
         
         Point2f templateOrigin = (*i2);
         templatePatch = *i1;
@@ -102,90 +103,191 @@ int main(int argc, char** argv) {
         int result_cols =  localisedSearchWindow.cols - templatePatch.cols + 1;
         int result_rows = localisedSearchWindow.rows - templatePatch.rows + 1;
         
-        result.create( result_cols, result_rows, CV_32FC1 );
+        result.create( result_rows, result_cols, CV_32FC1 );
         
-        matchTemplate( localisedSearchWindow, templatePatch, result, match_method );
+        int i,j;
+        uchar* p;
         
-        normalize( result, result, 0, 1, NORM_MINMAX, -1, Mat() );
+        Mat result2;
+        
+        double currentMaxResult = 0;
+        
+        int val = 0;
+        
+        /// Using 50 bins for hue and 60 for saturation
+        int h_bins = 50; int s_bins = 60;
+        int histSize[] = { h_bins, s_bins };
+        
+        // hue varies from 0 to 179, saturation from 0 to 255
+        float h_ranges[] = { 0, 180 };
+        float s_ranges[] = { 0, 256 };
+        
+        const float* ranges[] = { h_ranges, s_ranges };
+        
+        // Use the o-th and 1-st channels
+        int channels[] = { 0, 1 };
+        
+        Mat hist_template;
+        Mat hist_current;
+        
+        /// Calculate the histograms for the HSV images
+        calcHist( &templatePatch, 1, channels, Mat(), hist_template, 2, histSize, ranges, true, false );
+        normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+        
+        //result2.create(localisedSearchWindow.rows - localisedSearchWindow.rows + 1, localisedSearchWindow.cols - localisedSearchWindow.cols + 1, CV_32FC1);
+        
+        for( i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
+            //for( i = 0; i < 1; i++)
+        {
+            p = localisedSearchWindow.ptr<uchar>(i);
+            
+            Mat current = localisedSearchWindow.clone();
+            
+            current = current(Rect(0, i, templatePatch.cols, templatePatch.rows));
+            
+            //cvtColor(localisedSearchWindow, localisedSearchWindow, cv::COLOR_BGR2HSV);
+            
+            //matchTemplate( current, templatePatch, result2, match_method );
+            //normalize( result2, result2, 0, 1, NORM_MINMAX, -1, Mat() );
+            
+            //cvtColor(templatePatch, templatePatch, cv::COLOR_BGR2HSV);
+            //cvtColor(current, current, cv::COLOR_BGR2HSV);
+            
+            
+            
+            calcHist( &current, 1, channels, Mat(), hist_current, 2, histSize, ranges, true, false );
+            normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+            
+           // double minVal; double maxVal; Point minLoc; Point maxLoc;
+           // Point matchLoc;
+            
+           // minMaxLoc( result2, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
+            
+           // if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+           // { matchLoc = minLoc; }
+           // else
+           // { matchLoc = maxLoc; }
+            
+            double histresult = compareHist( hist_current, hist_template, 0 );
+            
+            if (histresult > currentMaxResult) {
+             
+                currentMaxResult = histresult;
+                val = i;
+                
+            }
+            
+            //cout << "I: " << i << " - " << maxVal << ", " << minVal << ", X: " << matchLoc.x << ", Y: " << matchLoc.y << endl;
+            
+            //cout << "I: " << i << " - Result: " << histresult << endl;
+            
+            //resize(result2, result2, Size(result2.cols*10, result2.rows*10));
+            
+            //imshow("Result", result2);
+            
+            //imshow("Template Patch", templatePatch);
+            
+            //CG - Allows the output window displaying the current patch to be updated automatically.
+            //cv::waitKey(10);
+            
+           // imshow("Current", current);
+            //imshow("Result", result2);
+            
+        }
+        
+        //imshow("Template Patch", templatePatch);
+        
+        
+       // cout << "MAX POSITION: " << val << " - " << currentMaxResult << endl;
+        
+        //rectangle( img2, Point(imgROIStartX + localisedWindowX, localisedWindowY), Point(imgROIStartX + localisedWindowX + localisedSearchWindow.cols , localisedWindowY + localisedSearchWindow.rows), Scalar(123, 34, 255), 2, 8, 0 );
+        
+        //matchTemplate( localisedSearchWindow, templatePatch, result, match_method );
+        
+       // normalize( result, result, 0, 1, NORM_MINMAX, -1, Mat() );
         
         // Localizing the best match with minMaxLoc
-        double minVal; double maxVal; Point minLoc; Point maxLoc;
-        Point matchLoc;
-        
-        minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
-        
-        // For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
-        if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
-        { matchLoc = minLoc; }
-        else
-        { matchLoc = maxLoc; }
-        
-        // CG - Draw main ROI windows.
-        rectangle( img1, Point(imgROIStartX, 0), Point(imgROIEndX , img1.rows), Scalar(0, 0, 255), 2, 8, 0 );
-        rectangle( img2, Point(imgROIStartX, 0), Point(imgROIEndX , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
+//        double minVal; double maxVal; Point minLoc; Point maxLoc;
+//        Point matchLoc;
+//        
+//        minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
+//        
+//        // For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
+//        if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+//        { matchLoc = minLoc; }
+//        else
+//        { matchLoc = maxLoc; }
         
         
         // CG - Draw location of best match patch found in localised search window (column)
-        rectangle( localisedSearchWindow, Point(matchLoc.x, matchLoc.y), Point(matchLoc.x + templatePatch.cols , matchLoc.y + templatePatch.rows), Scalar(0, 0, 255), 2, 8, 0 );
+        //rectangle( localisedSearchWindow, Point(matchLoc.x, matchLoc.y), Point(matchLoc.x + templatePatch.cols , matchLoc.y + templatePatch.rows), Scalar(0, 0, 255), 2, 8, 0 );
         
         
-        matchLoc.x += localisedWindowX;
+       // matchLoc.x += localisedWindowX;
         
         
         rectangle( img1, Point(imgROIStartX + templateOrigin.x, templateOrigin.y), Point( (imgROIStartX + templateOrigin.x + templatePatch.cols), templateOrigin.y + templatePatch.rows ), Scalar(255, 0, 0), 2, 8, 0 );
         
-        circle(img1, Point(imgROIStartX + templateOrigin.x, templateOrigin.y),5, Scalar(255,255,255), CV_FILLED, 8,0);
+       // circle(img1, Point(imgROIStartX + templateOrigin.x, templateOrigin.y),5, Scalar(255,255,255), CV_FILLED, 8,0);
         
-        rectangle( img2, Point(imgROIStartX + matchLoc.x, matchLoc.y), Point(imgROIStartX + matchLoc.x + templatePatch.cols , matchLoc.y + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
+        //rectangle( img2, Point(imgROIStartX + matchLoc.x, matchLoc.y), Point(imgROIStartX + matchLoc.x + templatePatch.cols , matchLoc.y + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
         
-        circle(img2, Point(imgROIStartX + matchLoc.x, matchLoc.y),5, Scalar(255,255,255), CV_FILLED, 8,0);
-
+        //circle(img2, Point(imgROIStartX + matchLoc.x, matchLoc.y),5, Scalar(255,255,255), CV_FILLED, 8,0);
+        
+        //CG - Histogram top value position rectangle
+        rectangle( img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val), Point(imgROIStartX + localisedWindowX + templatePatch.cols ,localisedWindowY + val + templatePatch.rows), Scalar(255, 0, 255), 2, 8, 0 );
+        
+        circle(img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val),2, Scalar(255,255,255), CV_FILLED, 8,0);
+        
         //CG - Green OF motion vector.
-        Point vectorOF(matchLoc.x - templateOrigin.x, matchLoc.y - templateOrigin.y);
+        //Point vectorOF(matchLoc.x - templateOrigin.x, matchLoc.y - templateOrigin.y);
         
         //CG - Blue OF 'Y'-component vector.
-        Point vectorYComponent(templateOrigin.x - templateOrigin.x, matchLoc.y - templateOrigin.y);
+        //Point vectorYComponent(templateOrigin.x - templateOrigin.x, matchLoc.y - templateOrigin.y);
         
         //CG - Check that the vector direction is downwards. Ignore any upwards directions.
-        if ((templateOrigin.y - matchLoc.y) < 0) {
-            
-            //CG - OF motion vector arrow
-            arrowedLine(img2, Point(imgROIStartX + templateOrigin.x , templateOrigin.y), Point(imgROIStartX + matchLoc.x, matchLoc.y), Scalar(0,255,0));
-            
-            
-            //CG - OF motion vector arrow
-            arrowedLine(opticalFlow, Point(imgROIStartX + templateOrigin.x, templateOrigin.y), Point(imgROIStartX + matchLoc.x, matchLoc.y), Scalar(0,255,0));
-            
-            
-            //CG - y component
-            arrowedLine(opticalFlow, Point(imgROIStartX + templateOrigin.x, templateOrigin.y), Point(imgROIStartX + templateOrigin.x, matchLoc.y), Scalar(255,0,0));
-            
-        }
+//        if ((templateOrigin.y - matchLoc.y) < 0) {
+//            
+//            //CG - OF motion vector arrow
+//            arrowedLine(img2, Point(imgROIStartX + templateOrigin.x , templateOrigin.y), Point(imgROIStartX + matchLoc.x, matchLoc.y), Scalar(0,255,0));
+//            
+//            
+//            //CG - OF motion vector arrow
+//            arrowedLine(opticalFlow, Point(imgROIStartX + templateOrigin.x, templateOrigin.y), Point(imgROIStartX + matchLoc.x, matchLoc.y), Scalar(0,255,0));
+//            
+//            
+//            //CG - y component
+//            arrowedLine(opticalFlow, Point(imgROIStartX + templateOrigin.x, templateOrigin.y), Point(imgROIStartX + templateOrigin.x, matchLoc.y), Scalar(255,0,0));
+//            
+//        }
         
-
+        
         txtcount++;
         
     }
-
+    
+    // CG - Draw main ROI windows.
+    rectangle( img1, Point(imgROIStartX, 0), Point(imgROIEndX , img1.rows), Scalar(0, 0, 255), 2, 8, 0 );
+    rectangle( img2, Point(imgROIStartX, 0), Point(imgROIEndX , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
     
     //CG - <0.5 = more balance to 'resultFrame', >0.5 = more balance to 'img1'.
     double alpha = 0.4;
     
     imshow("Result", img2);
-    
-    addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
-    
-    imshow("Merged Result", img2);
-    
-    imshow("OPTICAL FLOW", opticalFlow);
-    
-    imshow("Original", img1);
-    
+    //
+    //    addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
+    //
+    //    imshow("Merged Result", img2);
+    //
+    //    imshow("OPTICAL FLOW", opticalFlow);
+    //
+   // imshow("Original", img1);
+    //
     imshow("Search Window", localisedSearchWindow);
-    
-    imshow("Template", templatePatch);
-    
-    imshow("Normalised Result matrix", result);
+    //
+    //    imshow("Template", templatePatch);
+    //
+    //    imshow("Normalised Result matrix", result);
     
     waitKey(0);
     
@@ -212,22 +314,22 @@ vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSi
 {
     
     vector<Mat> mats;
-
+    
     CV_Assert(inputMat.depth() != sizeof(uchar));
     
-   // int channels = inputMat.channels();
+    // int channels = inputMat.channels();
     
     int nRows = inputMat.rows;
-
+    
     // CG - Multiply each row by the colour channels (i.e. 3 for BGR, and 1 for grayscale)
-   // int nCols = inputMat.cols * channels;
+    // int nCols = inputMat.cols * channels;
     
     int nCols = inputMat.cols;
     
     int i,j;
     uchar* p;
     
-    for( i = 0; i < nRows - patchSize; i+=2)
+    for( i = 500; i < nRows - patchSize; i+=2)
     {
         
         p = inputMat.ptr<uchar>(i);
@@ -235,10 +337,10 @@ vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSi
         // CG - Here we loop through EACH ROW, and EACH COLOUR CHANNEL WITHIN EACH OF THESE ROWS AS WELL!
         for ( j = 0; j < nCols - patchSize; j+=2)
         {
-           mats.push_back(inputMat(Rect(j,i,patchSize,patchSize)));
-                
-           //CG - Same as Point2f (typename alias)
-           points.push_back(Point_<float>(j, i));
+            mats.push_back(inputMat(Rect(j,i,patchSize,patchSize)));
+            
+            //CG - Same as Point2f (typename alias)
+            points.push_back(Point_<float>(j, i));
             
         }
         
