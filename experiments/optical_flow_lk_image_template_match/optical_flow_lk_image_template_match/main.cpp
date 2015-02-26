@@ -26,7 +26,9 @@ int main(int argc, char** argv) {
     
 
     int negativeScalingFactor = 4;
-    int patchSize = 50/negativeScalingFactor;
+    int patchSize = 100/negativeScalingFactor;
+    int histogramCompMethod = CV_COMP_CORREL;
+    bool useRGB = false;
     
     Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
@@ -45,12 +47,27 @@ int main(int argc, char** argv) {
     // cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
     // cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
     
-    cvtColor(img1, img1_gray, cv::COLOR_BGR2HSV);
-    cvtColor(img2, img2_gray, cv::COLOR_BGR2HSV);
     
-    // img1_gray = img1.clone();
-    // img2_gray = img2.clone();
-    
+    if (useRGB) {
+        
+        //cvtColor(img1, img1_gray, cv::COLOR_BGR2RGB);
+        //cvtColor(img2, img2_gray, cv::COLOR_BGR2RGB);
+        
+        cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
+        cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
+        
+        //img1_gray = img1.clone();
+        //img2_gray = img2.clone();
+        
+    } else {
+        
+        //BGR2HSV = Hue Range: 0-180
+        //BGR2HSV_FULL = Hue Range: 0-360
+        cvtColor(img1, img1_gray, cv::COLOR_BGR2HSV);
+        cvtColor(img2, img2_gray, cv::COLOR_BGR2HSV);
+        
+    }
+   
     //CG - Calculate a central column through the two images that has a percentage width of the original images.
     double imageCentreX = img1_gray.cols / 2;
     double imageROIWidth = img1_gray.cols * 0.3;
@@ -77,9 +94,9 @@ int main(int argc, char** argv) {
     for( i1 = test.begin(), i2 = points.begin(); i1 < test.end() && i2 < points.end(); ++i1, ++i2 )
     {
         
-        //if (txtcount >=100) {
-        //  break;
-        //}
+//        if (txtcount >=5) {
+//          break;
+//        }
         
         double currentMaxResult = 0;
         int val = 0;
@@ -98,33 +115,53 @@ int main(int argc, char** argv) {
         //Could look at applying a gaussian blur? - Does this help at all?
         //GaussianBlur( localisedSearchWindow, localisedSearchWindow, Size( 123,123 ), 0, 0 );
         //GaussianBlur( templatePatch, templatePatch, Size( 123,123 ), 0, 0 );
-        
-        int result_cols =  localisedSearchWindow.cols - templatePatch.cols + 1;
-        int result_rows = localisedSearchWindow.rows - templatePatch.rows + 1;
-        
-        result.create(result_rows, result_cols, CV_32FC1 );
     
-        /// Using 50 bins for hue and 60 for saturation
-        int h_bins = 50; int s_bins = 60;
-        int histSize[] = { h_bins, s_bins };
+        MatND hist_template;
+        MatND hist_current;
         
-        // hue varies from 0 to 179, saturation from 0 to 255
-        float h_ranges[] = { 0, 180 };
-        float s_ranges[] = { 0, 256 };
-        
-        const float* ranges[] = { h_ranges, s_ranges };
-        
-        // Use the o-th and 1-st channels
-        int channels[] = { 0, 1 };
-        
-        Mat hist_template;
-        Mat hist_current;
-        
-        /// Calculate the histograms for the HSV images
-        calcHist( &templatePatch, 1, channels, Mat(), hist_template, 2, histSize, ranges, true, false );
-        normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
-        
-        //result2.create(localisedSearchWindow.rows - localisedSearchWindow.rows + 1, localisedSearchWindow.cols - localisedSearchWindow.cols + 1, CV_32FC1);
+        if (useRGB) {
+            
+//            int imgCount = 1;
+//            int dims = 3;
+//            const int sizes[] = {256,256,256};
+//            const int channels[] = {0,1,2};
+//            float rRange[] = {0,256};
+//            float gRange[] = {0,256};
+//            float bRange[] = {0,256};
+//            const float *ranges[] = {rRange,gRange,bRange};
+//            
+//            calcHist(&templatePatch, imgCount, channels, Mat(), hist_template, dims, sizes, ranges);
+//            //normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+            
+            // Initialize parameters
+            int histSize = 256;    // bin size
+            float range[] = { 0, 255 };
+            const float *ranges[] = { range };
+            
+            // Calculate histogram
+            calcHist( &templatePatch, 1, 0, Mat(), hist_template, 1, &histSize, ranges, true, false );
+            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+            
+        } else {
+            
+            /// Using 50 bins for hue and 60 for saturation
+            int h_bins = 50; int s_bins = 60;
+            int histSize[] = { h_bins, s_bins };
+            
+            // hue varies from 0 to 179, saturation from 0 to 255
+            float h_ranges[] = { 0, 180 };
+            float s_ranges[] = { 0, 256 };
+            
+            const float* ranges[] = { h_ranges, s_ranges };
+            
+            // Use the 0-th and 1-st channels
+            int channels[] = { 0, 1 };
+            
+            /// Calculate the histogram for the template patch image.
+            calcHist( &templatePatch, 1, channels, Mat(), hist_template, 2, histSize, ranges, true, false );
+            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+            
+        }
         
         for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
         {
@@ -133,10 +170,51 @@ int main(int argc, char** argv) {
             
             current = current(Rect(0, i, templatePatch.cols, templatePatch.rows));
             
-            calcHist( &current, 1, channels, Mat(), hist_current, 2, histSize, ranges, true, false );
-            normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+            if (useRGB) {
+                
+//                int imgCount = 1;
+//                int dims = 3;
+//                const int sizes[] = {256,256,256};
+//                const int channels[] = {0,1,2};
+//                float rRange[] = {0,256};
+//                float gRange[] = {0,256};
+//                float bRange[] = {0,256};
+//                const float *ranges[] = {rRange,gRange,bRange};
+//                
+//                calcHist(&current, imgCount, channels, Mat(), hist_current, dims, sizes, ranges);
+//                //normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+                
+                // Initialize parameters
+                int histSize = 256;    // bin size
+                float range[] = { 0, 255 };
+                const float *ranges[] = { range };
+                
+                // Calculate histogram
+                calcHist( &current, 1, 0, Mat(), hist_current, 1, &histSize, ranges, true, false );
+                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+                
+            } else {
+                
+                /// Using 50 bins for hue and 60 for saturation
+                int h_bins = 50; int s_bins = 60;
+                int histSize[] = { h_bins, s_bins };
+                
+                // hue varies from 0 to 179, saturation from 0 to 255
+                float h_ranges[] = { 0, 180 };
+                float s_ranges[] = { 0, 256 };
+                
+                const float* ranges[] = { h_ranges, s_ranges };
+                
+                // Use the o-th and 1-st channels
+                int channels[] = { 0, 1 };
+                
+                /// Calculate the histogram for the template patch image.
+                calcHist( &current, 1, channels, Mat(), hist_current, 2, histSize, ranges, true, false );
+                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+                
+            }
             
-            double histresult = compareHist( hist_current, hist_template, 0 );
+            double histresult = compareHist( hist_current, hist_template, histogramCompMethod );
             
             if (histresult > currentMaxResult) {
                 
@@ -149,9 +227,11 @@ int main(int argc, char** argv) {
             //cv::waitKey(10);
             //imshow("Current", current);
             
+            cout << "I: " << i << " - Result: " << histresult << endl;
+            
         }
         
-        //cout << "MAX POSITION: " << val << " - " << currentMaxResult << endl;
+        cout << "MAX POSITION: " << val << " - " << currentMaxResult << endl;
         
         rectangle( img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point( (imgROIStartX + originPixelCoords.x + templatePatch.cols), originPixelCoords.y + templatePatch.rows ), Scalar(255, 0, 0), 2, 8, 0 );
         
