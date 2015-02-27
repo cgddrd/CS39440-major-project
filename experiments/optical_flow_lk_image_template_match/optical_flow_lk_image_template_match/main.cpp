@@ -8,8 +8,8 @@
 using namespace cv;
 using namespace std;
 
-vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSize = 10);
-static void arrowedLine(cv::Mat& img, cv::Point pt1, cv::Point pt2, const cv::Scalar& color, int thickness=1, int line_type=8, int shift=0, double tipLength=0.1);
+vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSize = 10);
+void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, int& highScoreIndexY);
 
 static void help()
 {
@@ -24,13 +24,10 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-
     int negativeScalingFactor = 4;
     int patchSize = 100/negativeScalingFactor;
     int histogramCompMethod = CV_COMP_CORREL;
     bool useRGB = false;
-    
-    int match_method = CV_TM_CCOEFF_NORMED;
     
     Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
@@ -44,43 +41,43 @@ int main(int argc, char** argv) {
     resize(img1, img1, Size(img1.cols/negativeScalingFactor, img1.rows/negativeScalingFactor));
     resize(img2, img2, Size(img2.cols/negativeScalingFactor, img2.rows/negativeScalingFactor));
     
-    Mat result, result2, img1_gray, img2_gray, localisedSearchWindow, templatePatch;
+    Mat result, result2, img1ColourTransform, img2ColourTransform, localisedSearchWindow, templatePatch;
     
-    // cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
-    // cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
+    // cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2GRAY);
+    // cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2GRAY);
     
     
     if (useRGB) {
         
-        //cvtColor(img1, img1_gray, cv::COLOR_BGR2RGB);
-        //cvtColor(img2, img2_gray, cv::COLOR_BGR2RGB);
+        //cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2RGB);
+        //cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2RGB);
         
-        cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
-        cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
+        cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2GRAY);
+        cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2GRAY);
         
-        //img1_gray = img1.clone();
-        //img2_gray = img2.clone();
+        //img1ColourTransform = img1.clone();
+        //img2ColourTransform = img2.clone();
         
     } else {
         
         //BGR2HSV = Hue Range: 0-180
         //BGR2HSV_FULL = Hue Range: 0-360
-        cvtColor(img1, img1_gray, cv::COLOR_BGR2HSV);
-        cvtColor(img2, img2_gray, cv::COLOR_BGR2HSV);
+        cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
+        cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
         
     }
-   
+    
     //CG - Calculate a central column through the two images that has a percentage width of the original images.
-    double imageCentreX = img1_gray.cols / 2;
-    double imageROIWidth = img1_gray.cols * 0.3;
+    double imageCentreX = img1ColourTransform.cols / 2;
+    double imageROIWidth = img1ColourTransform.cols * 0.3;
     double imageROIHalfWidth = imageROIWidth / 2;
     double imgROIStartX = imageCentreX - imageROIHalfWidth;
     double imgROIEndX = imageCentreX + imageROIHalfWidth;
     
     
     //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
-    Mat image1ROI = img1_gray( Rect(imgROIStartX,0,imageROIWidth,img1_gray.rows) );
-    Mat image2ROI = img2_gray( Rect(imgROIStartX,0,imageROIWidth,img2_gray.rows) );
+    Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
+    Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img2ColourTransform.rows) );
     
     Mat opticalFlow = Mat::zeros(img2.rows, img2.cols, CV_8UC3);
     
@@ -97,24 +94,11 @@ int main(int argc, char** argv) {
     {
         
         if (txtcount >=1) {
-          break;
+            break;
         }
         
-        double currentMaxResult = 0;
-        int val = 0;
-        
+        int val;
         double bestVal;
-        
-        if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED ) {
-            
-            bestVal = 100;
-            
-        } else {
-            
-            bestVal = 0;
-            
-        }
-        
         
         Point2f originPixelCoords = (*i2);
         
@@ -128,188 +112,15 @@ int main(int argc, char** argv) {
         localisedSearchWindow = image2ROI(Rect(localisedWindowX, localisedWindowY, localisedWindowWidth, localisedWindowHeight) );
         
         //Could look at applying a gaussian blur? - Does this help at all?
-        //GaussianBlur( localisedSearchWindow, localisedSearchWindow, Size( 123,123 ), 0, 0 );
-        //GaussianBlur( templatePatch, templatePatch, Size( 123,123 ), 0, 0 );
-    
-        MatND hist_template;
-        MatND hist_current;
+        // The gaussian size has to be ODD!
+        //GaussianBlur( localisedSearchWindow, localisedSearchWindow, Size( 9, 9 ), 0, 0 );
+        //GaussianBlur( templatePatch, templatePatch, Size( 9, 9 ), 0, 0 );
         
-//        if (useRGB) {
-//            
-////            int imgCount = 1;
-////            int dims = 3;
-////            const int sizes[] = {256,256,256};
-////            const int channels[] = {0,1,2};
-////            float rRange[] = {0,256};
-////            float gRange[] = {0,256};
-////            float bRange[] = {0,256};
-////            const float *ranges[] = {rRange,gRange,bRange};
-////            
-////            calcHist(&templatePatch, imgCount, channels, Mat(), hist_template, dims, sizes, ranges);
-////            //normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
-//            
-//            // Initialize parameters
-//            int histSize = 256;    // bin size
-//            float range[] = { 0, 255 };
-//            const float *ranges[] = { range };
-//            
-//            // Calculate histogram
-//            calcHist( &templatePatch, 1, 0, Mat(), hist_template, 1, &histSize, ranges, true, false );
-//            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
-//            
-//        } else {
-//            
-//            /// Using 50 bins for hue and 60 for saturation
-//            int h_bins = 50; int s_bins = 60;
-//            int histSize[] = { h_bins, s_bins };
-//            
-//            // hue varies from 0 to 179, saturation from 0 to 255
-//            float h_ranges[] = { 0, 180 };
-//            float s_ranges[] = { 0, 256 };
-//            
-//            const float* ranges[] = { h_ranges, s_ranges };
-//            
-//            // Use the 0-th and 1-st channels
-//            int channels[] = { 0, 1 };
-//            
-//            /// Calculate the histogram for the template patch image.
-//            calcHist( &templatePatch, 1, channels, Mat(), hist_template, 2, histSize, ranges, true, false );
-//            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
-//            
-//        }
+        //CG - Calculate the match score between each patch, and return the row index of the TOP-LEFT corner for the patch that returned the highest match score.
+        calcPatchMatchScore(localisedSearchWindow, templatePatch, CV_TM_SQDIFF, bestVal, val);
         
-        for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
-        {
-
-            Mat current = localisedSearchWindow.clone();
-            
-            current = current(Rect(0, i, templatePatch.cols, templatePatch.rows));
-            
-//            if (useRGB) {
-//                
-////                int imgCount = 1;
-////                int dims = 3;
-////                const int sizes[] = {256,256,256};
-////                const int channels[] = {0,1,2};
-////                float rRange[] = {0,256};
-////                float gRange[] = {0,256};
-////                float bRange[] = {0,256};
-////                const float *ranges[] = {rRange,gRange,bRange};
-////                
-////                calcHist(&current, imgCount, channels, Mat(), hist_current, dims, sizes, ranges);
-////                //normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
-//                
-//                // Initialize parameters
-//                int histSize = 256;    // bin size
-//                float range[] = { 0, 255 };
-//                const float *ranges[] = { range };
-//                
-//                // Calculate histogram
-//                calcHist( &current, 1, 0, Mat(), hist_current, 1, &histSize, ranges, true, false );
-//                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
-//                
-//            } else {
-//                
-//                /// Using 50 bins for hue and 60 for saturation
-//                int h_bins = 50; int s_bins = 60;
-//                int histSize[] = { h_bins, s_bins };
-//                
-//                // hue varies from 0 to 179, saturation from 0 to 255
-//                float h_ranges[] = { 0, 180 };
-//                float s_ranges[] = { 0, 256 };
-//                
-//                const float* ranges[] = { h_ranges, s_ranges };
-//                
-//                // Use the o-th and 1-st channels
-//                int channels[] = { 0, 1 };
-//                
-//                /// Calculate the histogram for the template patch image.
-//                calcHist( &current, 1, channels, Mat(), hist_current, 2, histSize, ranges, true, false );
-//                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
-//                
-//            }
-            
-//            double histresult = compareHist( hist_current, hist_template, histogramCompMethod );
-//            
-//            if (histresult > currentMaxResult) {
-//                
-//                currentMaxResult = histresult;
-//                val = i;
-//                
-//            }
-            
-            /// Create the result matrix
-            int result_cols =  current.cols - templatePatch.cols + 1;
-            int result_rows = current.rows - templatePatch.rows + 1;
-            
-            result.create( result_cols, result_rows, CV_32FC1 );
-            
-            /// Do the Matching and Normalize
-            matchTemplate( current, templatePatch, result, match_method );
-            
-            // Adding 'normalise doesn't seem to work very well. Hmm..
-            //normalize( result, result, 0, 1, NORM_MINMAX, -1, Mat() );
-            
-            /// Localizing the best match with minMaxLoc
-            double minVal; double maxVal; Point minLoc; Point maxLoc;
-            Point matchLoc;
-            
-            
-            minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
-            
-            /// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
-            if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
-            { matchLoc = minLoc;
-                //bestVal = minVal;
-                
-                if (minVal < bestVal) {
-                    
-                    bestVal = minVal;
-                    val = i;
-                    
-                }
-                
-                cout << "I: " << i << " - Min Result: " << minVal << endl;
-            }
-            else
-            {
-                matchLoc = maxLoc;
-                //bestVal = maxVal;
-                
-                if (maxVal > bestVal) {
-                    
-                    bestVal = maxVal;
-                    val = i;
-                    
-                }
-                
-                cout << "I: " << i << " - Max Result: " << maxVal << endl;
-            }
-
-            
-            //CG - Allows the output window displaying the current patch to be updated automatically.
-            cv::waitKey(10);
-            resize(result, result, Size(result.cols*10, result.rows*10));
-            imshow("Normalised RESULT", result);
-            
-            //cout << "I: " << i << " - Result: " << histresult << endl;
-            
-            
-            
-            
-            
-        }
-        
-        //cout << "MAX POSITION: " << val << " - " << currentMaxResult << endl;
-        
+        //Print out the "best score" for the matching function, and the row index from wihtin the localised search window.
         cout << "MAX POSITION: " << val << " - " << bestVal << endl;
-        
-        //rectangle( img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point( (imgROIStartX + originPixelCoords.x + templatePatch.cols), originPixelCoords.y + templatePatch.rows ), Scalar(255, 0, 0), 2, 8, 0 );
-        
-        //CG - Histogram top value position rectangle
-        //rectangle( img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val), Point(imgROIStartX + localisedWindowX + templatePatch.cols ,localisedWindowY + val + templatePatch.rows), Scalar(255, 0, 255), 2, 8, 0 );
-        
-        //circle(img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val),2, Scalar(255,255,255), CV_FILLED, 8,0);
         
         txtcount++;
         
@@ -322,12 +133,12 @@ int main(int argc, char** argv) {
     //CG - <0.5 = more balance to 'resultFrame', >0.5 = more balance to 'img1'.
     double alpha = 0.4;
     
-    imshow("Result", img2);
+    //imshow("Result", img2);
     
-    addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
+    //addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
     
-    imshow("Merged Result", img2);
-
+    //imshow("Merged Result", img2);
+    
     imshow("Search Window", localisedSearchWindow);
     
     imshow("Template", templatePatch);
@@ -338,24 +149,10 @@ int main(int argc, char** argv) {
     
 }
 
-// CG - Arrowed Line drawing method. (PhilLab - http://stackoverflow.com/questions/10161351) (Built into OpenCV v3.0.0)
-static void arrowedLine(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness, int line_type, int shift, double tipLength)
-{
-    const double tipSize = norm(pt1-pt2)*tipLength; // Factor to normalize the size of the tip depending on the length of the arrow
-    line(img, pt1, pt2, color, thickness, line_type, shift);
-    const double angle = atan2( (double) pt1.y - pt2.y, (double) pt1.x - pt2.x );
-    Point p(cvRound(pt2.x + tipSize * cos(angle + CV_PI / 4)),
-            cvRound(pt2.y + tipSize * sin(angle + CV_PI / 4)));
-    line(img, p, pt2, color, thickness, line_type, shift);
-    p.x = cvRound(pt2.x + tipSize * cos(angle - CV_PI / 4));
-    p.y = cvRound(pt2.y + tipSize * sin(angle - CV_PI / 4));
-    line(img, p, pt2, color, thickness, line_type, shift);
-}
-
 // CG - Here, we are passing 'inputMat' and 'points' by REFERENCE, NOT BY VALUE.
-vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSize)
+vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSize)
 {
-
+    
     CV_Assert(inputMat.depth() != sizeof(uchar));
     
     vector<Mat> mats;
@@ -384,4 +181,75 @@ vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSi
     }
     
     return mats;
+}
+
+
+void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, int& highScoreIndexY) {
+    
+    Mat result, currentPatch;
+    
+    //Set "initialiser" value for best match score.
+    int bestScoreYIndex = -1;
+    double bestScore = -1;
+    
+    // For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better.
+    //double bestScore = match_method == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED ? 100 : 0;
+    
+    for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
+    {
+        currentPatch = localisedSearchWindow.clone();
+        currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
+        
+        // Create the result matrix
+        int result_cols =  currentPatch.cols - templatePatch.cols + 1;
+        int result_rows = currentPatch.rows - templatePatch.rows + 1;
+        
+        result.create(result_cols, result_rows, CV_32FC1);
+        
+        // Do the Matching and Normalize
+        matchTemplate( currentPatch, templatePatch, result, match_method );
+        
+        // Localizing the best match with minMaxLoc
+        double minVal, maxVal;
+        
+        // We do not need to pass in any 'Point' objects, as we are not interested in getting the "best match point" location back (as the 'result' matrix is only 1px x 1px in size).
+        minMaxLoc( result, &minVal, &maxVal, NULL, NULL, Mat() );
+        
+        // For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better.
+        if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+        {
+            
+            if (bestScore == -1 || minVal < bestScore) {
+                
+                bestScore = minVal;
+                bestScoreYIndex = i;
+                
+            }
+            
+            cout << "I: " << i << " - Min Result: " << minVal << endl;
+        }
+        else
+        {
+            
+            if (bestScore == -1 || maxVal > bestScore) {
+                
+                bestScore = maxVal;
+                bestScoreYIndex = i;
+                
+            }
+            
+            cout << "I: " << i << " - Max Result: " << maxVal << endl;
+        }
+        
+        
+        //CG - Allows the output window displaying the current patch to be updated automatically.
+        //cv::waitKey(10);
+        //resize(result, result, Size(result.cols*10, result.rows*10));
+        //imshow("Normalised RESULT", result);
+        
+    }
+    
+    highScore = bestScore;
+    highScoreIndexY = bestScoreYIndex;
+    
 }
