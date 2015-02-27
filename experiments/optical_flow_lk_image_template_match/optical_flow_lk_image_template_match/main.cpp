@@ -30,6 +30,8 @@ int main(int argc, char** argv) {
     int histogramCompMethod = CV_COMP_CORREL;
     bool useRGB = false;
     
+    int match_method = CV_TM_CCOEFF_NORMED;
+    
     Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
     
@@ -94,12 +96,25 @@ int main(int argc, char** argv) {
     for( i1 = test.begin(), i2 = points.begin(); i1 < test.end() && i2 < points.end(); ++i1, ++i2 )
     {
         
-//        if (txtcount >=5) {
-//          break;
-//        }
+        if (txtcount >=1) {
+          break;
+        }
         
         double currentMaxResult = 0;
         int val = 0;
+        
+        double bestVal;
+        
+        if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED ) {
+            
+            bestVal = 100;
+            
+        } else {
+            
+            bestVal = 0;
+            
+        }
+        
         
         Point2f originPixelCoords = (*i2);
         
@@ -119,49 +134,49 @@ int main(int argc, char** argv) {
         MatND hist_template;
         MatND hist_current;
         
-        if (useRGB) {
-            
-//            int imgCount = 1;
-//            int dims = 3;
-//            const int sizes[] = {256,256,256};
-//            const int channels[] = {0,1,2};
-//            float rRange[] = {0,256};
-//            float gRange[] = {0,256};
-//            float bRange[] = {0,256};
-//            const float *ranges[] = {rRange,gRange,bRange};
+//        if (useRGB) {
 //            
-//            calcHist(&templatePatch, imgCount, channels, Mat(), hist_template, dims, sizes, ranges);
-//            //normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
-            
-            // Initialize parameters
-            int histSize = 256;    // bin size
-            float range[] = { 0, 255 };
-            const float *ranges[] = { range };
-            
-            // Calculate histogram
-            calcHist( &templatePatch, 1, 0, Mat(), hist_template, 1, &histSize, ranges, true, false );
-            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
-            
-        } else {
-            
-            /// Using 50 bins for hue and 60 for saturation
-            int h_bins = 50; int s_bins = 60;
-            int histSize[] = { h_bins, s_bins };
-            
-            // hue varies from 0 to 179, saturation from 0 to 255
-            float h_ranges[] = { 0, 180 };
-            float s_ranges[] = { 0, 256 };
-            
-            const float* ranges[] = { h_ranges, s_ranges };
-            
-            // Use the 0-th and 1-st channels
-            int channels[] = { 0, 1 };
-            
-            /// Calculate the histogram for the template patch image.
-            calcHist( &templatePatch, 1, channels, Mat(), hist_template, 2, histSize, ranges, true, false );
-            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
-            
-        }
+////            int imgCount = 1;
+////            int dims = 3;
+////            const int sizes[] = {256,256,256};
+////            const int channels[] = {0,1,2};
+////            float rRange[] = {0,256};
+////            float gRange[] = {0,256};
+////            float bRange[] = {0,256};
+////            const float *ranges[] = {rRange,gRange,bRange};
+////            
+////            calcHist(&templatePatch, imgCount, channels, Mat(), hist_template, dims, sizes, ranges);
+////            //normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+//            
+//            // Initialize parameters
+//            int histSize = 256;    // bin size
+//            float range[] = { 0, 255 };
+//            const float *ranges[] = { range };
+//            
+//            // Calculate histogram
+//            calcHist( &templatePatch, 1, 0, Mat(), hist_template, 1, &histSize, ranges, true, false );
+//            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+//            
+//        } else {
+//            
+//            /// Using 50 bins for hue and 60 for saturation
+//            int h_bins = 50; int s_bins = 60;
+//            int histSize[] = { h_bins, s_bins };
+//            
+//            // hue varies from 0 to 179, saturation from 0 to 255
+//            float h_ranges[] = { 0, 180 };
+//            float s_ranges[] = { 0, 256 };
+//            
+//            const float* ranges[] = { h_ranges, s_ranges };
+//            
+//            // Use the 0-th and 1-st channels
+//            int channels[] = { 0, 1 };
+//            
+//            /// Calculate the histogram for the template patch image.
+//            calcHist( &templatePatch, 1, channels, Mat(), hist_template, 2, histSize, ranges, true, false );
+//            normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+//            
+//        }
         
         for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
         {
@@ -170,75 +185,131 @@ int main(int argc, char** argv) {
             
             current = current(Rect(0, i, templatePatch.cols, templatePatch.rows));
             
-            if (useRGB) {
-                
-//                int imgCount = 1;
-//                int dims = 3;
-//                const int sizes[] = {256,256,256};
-//                const int channels[] = {0,1,2};
-//                float rRange[] = {0,256};
-//                float gRange[] = {0,256};
-//                float bRange[] = {0,256};
-//                const float *ranges[] = {rRange,gRange,bRange};
+//            if (useRGB) {
 //                
-//                calcHist(&current, imgCount, channels, Mat(), hist_current, dims, sizes, ranges);
-//                //normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
-                
-                // Initialize parameters
-                int histSize = 256;    // bin size
-                float range[] = { 0, 255 };
-                const float *ranges[] = { range };
-                
-                // Calculate histogram
-                calcHist( &current, 1, 0, Mat(), hist_current, 1, &histSize, ranges, true, false );
-                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
-                
-            } else {
-                
-                /// Using 50 bins for hue and 60 for saturation
-                int h_bins = 50; int s_bins = 60;
-                int histSize[] = { h_bins, s_bins };
-                
-                // hue varies from 0 to 179, saturation from 0 to 255
-                float h_ranges[] = { 0, 180 };
-                float s_ranges[] = { 0, 256 };
-                
-                const float* ranges[] = { h_ranges, s_ranges };
-                
-                // Use the o-th and 1-st channels
-                int channels[] = { 0, 1 };
-                
-                /// Calculate the histogram for the template patch image.
-                calcHist( &current, 1, channels, Mat(), hist_current, 2, histSize, ranges, true, false );
-                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
-                
-            }
+////                int imgCount = 1;
+////                int dims = 3;
+////                const int sizes[] = {256,256,256};
+////                const int channels[] = {0,1,2};
+////                float rRange[] = {0,256};
+////                float gRange[] = {0,256};
+////                float bRange[] = {0,256};
+////                const float *ranges[] = {rRange,gRange,bRange};
+////                
+////                calcHist(&current, imgCount, channels, Mat(), hist_current, dims, sizes, ranges);
+////                //normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+//                
+//                // Initialize parameters
+//                int histSize = 256;    // bin size
+//                float range[] = { 0, 255 };
+//                const float *ranges[] = { range };
+//                
+//                // Calculate histogram
+//                calcHist( &current, 1, 0, Mat(), hist_current, 1, &histSize, ranges, true, false );
+//                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+//                
+//            } else {
+//                
+//                /// Using 50 bins for hue and 60 for saturation
+//                int h_bins = 50; int s_bins = 60;
+//                int histSize[] = { h_bins, s_bins };
+//                
+//                // hue varies from 0 to 179, saturation from 0 to 255
+//                float h_ranges[] = { 0, 180 };
+//                float s_ranges[] = { 0, 256 };
+//                
+//                const float* ranges[] = { h_ranges, s_ranges };
+//                
+//                // Use the o-th and 1-st channels
+//                int channels[] = { 0, 1 };
+//                
+//                /// Calculate the histogram for the template patch image.
+//                calcHist( &current, 1, channels, Mat(), hist_current, 2, histSize, ranges, true, false );
+//                normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+//                
+//            }
             
-            double histresult = compareHist( hist_current, hist_template, histogramCompMethod );
+//            double histresult = compareHist( hist_current, hist_template, histogramCompMethod );
+//            
+//            if (histresult > currentMaxResult) {
+//                
+//                currentMaxResult = histresult;
+//                val = i;
+//                
+//            }
             
-            if (histresult > currentMaxResult) {
+            /// Create the result matrix
+            int result_cols =  current.cols - templatePatch.cols + 1;
+            int result_rows = current.rows - templatePatch.rows + 1;
+            
+            result.create( result_cols, result_rows, CV_32FC1 );
+            
+            /// Do the Matching and Normalize
+            matchTemplate( current, templatePatch, result, match_method );
+            
+            // Adding 'normalise doesn't seem to work very well. Hmm..
+            //normalize( result, result, 0, 1, NORM_MINMAX, -1, Mat() );
+            
+            /// Localizing the best match with minMaxLoc
+            double minVal; double maxVal; Point minLoc; Point maxLoc;
+            Point matchLoc;
+            
+            
+            minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
+            
+            /// For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
+            if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+            { matchLoc = minLoc;
+                //bestVal = minVal;
                 
-                currentMaxResult = histresult;
-                val = i;
+                if (minVal < bestVal) {
+                    
+                    bestVal = minVal;
+                    val = i;
+                    
+                }
                 
+                cout << "I: " << i << " - Min Result: " << minVal << endl;
             }
+            else
+            {
+                matchLoc = maxLoc;
+                //bestVal = maxVal;
+                
+                if (maxVal > bestVal) {
+                    
+                    bestVal = maxVal;
+                    val = i;
+                    
+                }
+                
+                cout << "I: " << i << " - Max Result: " << maxVal << endl;
+            }
+
             
             //CG - Allows the output window displaying the current patch to be updated automatically.
-            //cv::waitKey(10);
-            //imshow("Current", current);
+            cv::waitKey(10);
+            resize(result, result, Size(result.cols*10, result.rows*10));
+            imshow("Normalised RESULT", result);
             
-            cout << "I: " << i << " - Result: " << histresult << endl;
+            //cout << "I: " << i << " - Result: " << histresult << endl;
+            
+            
+            
+            
             
         }
         
-        cout << "MAX POSITION: " << val << " - " << currentMaxResult << endl;
+        //cout << "MAX POSITION: " << val << " - " << currentMaxResult << endl;
         
-        rectangle( img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point( (imgROIStartX + originPixelCoords.x + templatePatch.cols), originPixelCoords.y + templatePatch.rows ), Scalar(255, 0, 0), 2, 8, 0 );
+        cout << "MAX POSITION: " << val << " - " << bestVal << endl;
+        
+        //rectangle( img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point( (imgROIStartX + originPixelCoords.x + templatePatch.cols), originPixelCoords.y + templatePatch.rows ), Scalar(255, 0, 0), 2, 8, 0 );
         
         //CG - Histogram top value position rectangle
-        rectangle( img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val), Point(imgROIStartX + localisedWindowX + templatePatch.cols ,localisedWindowY + val + templatePatch.rows), Scalar(255, 0, 255), 2, 8, 0 );
+        //rectangle( img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val), Point(imgROIStartX + localisedWindowX + templatePatch.cols ,localisedWindowY + val + templatePatch.rows), Scalar(255, 0, 255), 2, 8, 0 );
         
-        circle(img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val),2, Scalar(255,255,255), CV_FILLED, 8,0);
+        //circle(img2, Point(imgROIStartX + localisedWindowX, localisedWindowY + val),2, Scalar(255,255,255), CV_FILLED, 8,0);
         
         txtcount++;
         
