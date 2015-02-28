@@ -94,7 +94,9 @@ int main(int argc, char** argv) {
     std::vector<Point2f>::iterator i2;
     
     
-    myfile.open ("example.dat", ios::out | ios::trunc);
+    //myfile.open ("example.dat", ios::out | ios::trunc);
+    
+    myfile.open ("example2.dat", ios::out | ios::trunc);
     
     
     int txtcount = 0;
@@ -113,17 +115,10 @@ int main(int argc, char** argv) {
         
         templatePatch = *i1;
         
-        int localisedWindowX = originPixelCoords.x;
-        int localisedWindowY = originPixelCoords.y;
         int localisedWindowWidth = templatePatch.cols;
-        int localisedWindowHeight = image2ROI.rows - localisedWindowY;
+        int localisedWindowHeight = image2ROI.rows - originPixelCoords.y;
         
-        localisedSearchWindow = image2ROI(Rect(localisedWindowX, localisedWindowY, localisedWindowWidth, localisedWindowHeight) );
-        
-        //Could look at applying a gaussian blur? - Does this help at all?
-        // The gaussian size has to be ODD!
-        //GaussianBlur( localisedSearchWindow, localisedSearchWindow, Size( 9, 9 ), 0, 0 );
-        //GaussianBlur( templatePatch, templatePatch, Size( 9, 9 ), 0, 0 );
+        localisedSearchWindow = image2ROI(Rect(originPixelCoords.x, originPixelCoords.y, localisedWindowWidth, localisedWindowHeight) );
         
         myfile << "descriptor x_" << txtcount << " y_" << txtcount <<"\n";
         
@@ -134,6 +129,16 @@ int main(int argc, char** argv) {
         
         //Print out the "best score" for the matching function, and the row index from wihtin the localised search window.
         cout << "MAX POSITION F0R " << txtcount << ": " << val << " - " << bestVal << endl;
+        
+        cout << "DISPLACEMENT FOR: " << txtcount << ": " << val << "\n" << endl;
+        
+//        circle(img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y),2, Scalar(255,255,255), CV_FILLED, 8,0);
+//        
+//        circle(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + val),2, Scalar(255,255,255), CV_FILLED, 8,0);
+//        
+//        rectangle( img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point( (imgROIStartX + originPixelCoords.x + templatePatch.cols), originPixelCoords.y + templatePatch.rows ), Scalar(255, 0, 0), 2, 8, 0 );
+//        
+//        rectangle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + val), Point(imgROIStartX + originPixelCoords.x + templatePatch.cols ,originPixelCoords.y + templatePatch.rows + val), Scalar(255, 0, 255), 2, 8, 0 );
         
         txtcount++;
         
@@ -146,11 +151,13 @@ int main(int argc, char** argv) {
     //CG - <0.5 = more balance to 'resultFrame', >0.5 = more balance to 'img1'.
     double alpha = 0.4;
     
-    //imshow("Result", img2);
+    imshow("Image 1", img1);
     
-    //addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
+    imshow("Image 2", img2);
     
-    //imshow("Merged Result", img2);
+    addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
+    
+    imshow("Merged Result", img2);
     
     myfile.close();
     
@@ -177,14 +184,14 @@ vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSiz
     int i,j;
     uchar* p;
     
-    //CG - Stop extracting patches when we get 2*patchsize rows away from the botom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
-    for(i = 0; i < nRows - patchSize * 2; i+=patchSize)
+    //CG - Stop extracting patches when we get 2*patchsize rows away from the bottom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
+    for(i = 0; i < nRows - patchSize * 2; i++)
     {
         
         p = inputMat.ptr<uchar>(i);
         
         // CG - Here we loop through EACH ROW, and EACH COLOUR CHANNEL WITHIN EACH OF THESE ROWS AS WELL!
-        for (j = 0; j < nCols - patchSize; j+=patchSize)
+        for (j = 0; j < nCols - patchSize; j++)
         {
             mats.push_back(inputMat(Rect(j,i,patchSize,patchSize)));
             
