@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <iostream>
+#include <fstream>
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -10,6 +13,8 @@ using namespace std;
 
 vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSize = 10);
 void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, int& highScoreIndexY);
+
+ofstream myfile;
 
 static void help()
 {
@@ -88,14 +93,18 @@ int main(int argc, char** argv) {
     std::vector<Mat>::iterator i1;
     std::vector<Point2f>::iterator i2;
     
+    
+    myfile.open ("example.dat", ios::out | ios::trunc);
+    
+    
     int txtcount = 0;
     
     for( i1 = test.begin(), i2 = points.begin(); i1 < test.end() && i2 < points.end(); ++i1, ++i2 )
     {
         
-        if (txtcount >=1) {
-            break;
-        }
+//        if (txtcount >=1) {
+//            break;
+//        }
         
         int val;
         double bestVal;
@@ -116,11 +125,15 @@ int main(int argc, char** argv) {
         //GaussianBlur( localisedSearchWindow, localisedSearchWindow, Size( 9, 9 ), 0, 0 );
         //GaussianBlur( templatePatch, templatePatch, Size( 9, 9 ), 0, 0 );
         
+        myfile << "descriptor x_" << txtcount << " y_" << txtcount <<"\n";
+        
         //CG - Calculate the match score between each patch, and return the row index of the TOP-LEFT corner for the patch that returned the highest match score.
-        calcPatchMatchScore(localisedSearchWindow, templatePatch, CV_TM_SQDIFF, bestVal, val);
+        calcPatchMatchScore(localisedSearchWindow, templatePatch, CV_TM_SQDIFF_NORMED, bestVal, val);
+        
+        myfile << "\n";
         
         //Print out the "best score" for the matching function, and the row index from wihtin the localised search window.
-        cout << "MAX POSITION: " << val << " - " << bestVal << endl;
+        cout << "MAX POSITION F0R " << txtcount << ": " << val << " - " << bestVal << endl;
         
         txtcount++;
         
@@ -138,6 +151,8 @@ int main(int argc, char** argv) {
     //addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
     
     //imshow("Merged Result", img2);
+    
+    myfile.close();
     
     imshow("Search Window", localisedSearchWindow);
     
@@ -226,7 +241,8 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
                 
             }
             
-            cout << "I: " << i << " - Min Result: " << minVal << endl;
+            //cout << "I: " << i << " - Min Result: " << minVal << endl;
+            myfile << i << " " <<  minVal << "\n";
         }
         else
         {
@@ -238,7 +254,8 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
                 
             }
             
-            cout << "I: " << i << " - Max Result: " << maxVal << endl;
+            //cout << "I: " << i << " - Max Result: " << maxVal << endl;
+            myfile << i << " " <<  maxVal << "\n";
         }
         
         
