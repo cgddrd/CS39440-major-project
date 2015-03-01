@@ -27,13 +27,6 @@ static void help()
     printf("Usage: ./optical_flow_lk_image_template_match <image1> <image2>\n");
 }
 
-static void addToVec() {
-    
-    mtx.lock();
-    
-    mtx.unlock();
-}
-
 int main(int argc, char** argv) {
     
     if(argc != 3)
@@ -42,7 +35,7 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    double negativeScalingFactor = 0.40;
+    double negativeScalingFactor = 0.30;
     
     double t = (double)getTickCount();
     
@@ -93,7 +86,7 @@ int main(int argc, char** argv) {
     double imgROIStartX = imageCentreX - imageROIHalfWidth;
     double imgROIEndX = imageCentreX + imageROIHalfWidth;
     
-    int patchSize = imageROIWidth * 0.2;
+    int patchSize = imageROIWidth * 0.4;
     
     //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
     Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
@@ -111,8 +104,8 @@ int main(int argc, char** argv) {
     
     //myfile.open ("example.dat", ios::out | ios::trunc);
     
-    myfile.open ("displacement_patch_20_20.dat", ios::out | ios::trunc);
-    myfilehist.open ("displacement_hist_20_20.dat", ios::out | ios::trunc);
+    myfile.open ("displacement_patch_40_40.dat", ios::out | ios::trunc);
+    myfilehist.open ("displacement_hist_40_40.dat", ios::out | ios::trunc);
     
     int patchCount = 0;
     int rowNumber = 0;
@@ -171,13 +164,13 @@ int main(int argc, char** argv) {
         // Constructs the new thread and runs it. Does not block execution.
         thread t2(calcHistMatchScore, localisedSearchWindow, templatePatch, histogramCompMethod, ref(bestValHist), ref(valHist));
         
-        //calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, bestVal, val);
+      //  calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, bestVal, val);
         
-       // calcHistMatchScore(localisedSearchWindow, templatePatch, histogramCompMethod, bestValHist, valHist);
+      //  calcHistMatchScore(localisedSearchWindow, templatePatch, histogramCompMethod, bestValHist, valHist);
         
         t1.join();
         t2.join();
-        
+    //
         v.push_back(val);
         v_hist.push_back(valHist);
         
