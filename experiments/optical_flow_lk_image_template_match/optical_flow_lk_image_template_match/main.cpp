@@ -112,12 +112,6 @@ int main(int argc, char** argv) {
     //    timeTaken.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
     
     
-//    vector<double> test1 = {1, 3, 5, 7};
-//    
-//    vector<double> test2 = {2, 4, 6, 8};
-//    
-//    vector<vector<double> > test = {test1, test2};
-    
     exportResults(all_results, result_rows, methods, roiPercentage, patchPercentage);
     
     exportTimeResults(timeTaken, methods, patchPercentage, roiPercentage);
@@ -249,7 +243,7 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
     vector<Point2f>::iterator i2;
     
     int patchCount = 0;
-    int rowNumber = 0;
+    int rowNumber = (patchSize / 2);
     
     
     for( i1 = patch_templates.begin(), i2 = patch_template_coords.begin(); i1 < patch_templates.end() && i2 < patch_template_coords.end(); ++i1, ++i2 )
@@ -262,6 +256,11 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         Point2f originPixelCoords = (*i2);
         
         if (rowNumber != originPixelCoords.y) {
+            
+            if (rowNumber == 55) {
+                
+                cout << "twat";
+            }
             
             double sum = accumulate(raw_result.begin(), raw_result.end(), 0.0);
             double mean = sum / raw_result.size();
@@ -276,12 +275,19 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             
         }
         
+        int w = image2ROI.cols;
+        int h = image2ROI.rows;
+        
         int localisedWindowWidth = templatePatch.cols;
-        int localisedWindowHeight = image2ROI.rows - originPixelCoords.y;
+        int localisedWindowHeight = image2ROI.rows - (originPixelCoords.y - (templatePatch.cols / 2));
         
-        localisedWindowHeight = localisedWindowHeight <= (patchSize * 2) ? localisedWindowHeight : (patchSize * 2);
+        //localisedWindowHeight = localisedWindowHeight <= (patchSize * 2) ? localisedWindowHeight : (patchSize * 2);
         
-        localisedSearchWindow = image2ROI(Rect(originPixelCoords.x, originPixelCoords.y, localisedWindowWidth, localisedWindowHeight) );
+        localisedSearchWindow = image2ROI(Rect(originPixelCoords.x - (templatePatch.cols / 2), originPixelCoords.y - (templatePatch.cols / 2), localisedWindowWidth, localisedWindowHeight));
+        
+//        imshow("shajadsh", templatePatch);
+//        imshow("fhjdshf", localisedSearchWindow);
+//        waitKey(1);
         
         // Constructs the new thread and runs it. Does not block execution.
         thread t1(calcPatchMatchScore, localisedSearchWindow, templatePatch, match_method, ref(highestScore), ref(displacement));
@@ -312,15 +318,20 @@ vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f>& points, vector<int>&
     uchar* p;
     
     //CG - Stop extracting patches when we get to the bottom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
-    for(i = 0; i < nRows - patchSize * 2; i+=2)
+    for(i = (patchSize / 2); i < (nRows - (patchSize / 2)); i+=2)
     {
         
         p = inputMat.ptr<uchar>(i);
         rows.push_back(i);
         
-        for (j = 0; j < nCols - patchSize; j+=2)
+        for (j = (patchSize / 2); j < (nCols - (patchSize / 2)); j+=2)
         {
-            mats.push_back(inputMat(Rect(j,i,patchSize,patchSize)));
+            
+            int x = j - (patchSize / 2);
+            
+            int y = i - (patchSize / 2);
+            
+            mats.push_back(inputMat(Rect(x,y,patchSize - 1 ,patchSize - 1)));
             
             //CG - Same as Point2f (typename alias)
             points.push_back(Point_<float>(j, i));
