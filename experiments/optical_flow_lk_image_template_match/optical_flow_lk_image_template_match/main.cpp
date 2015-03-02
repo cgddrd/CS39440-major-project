@@ -6,7 +6,6 @@
 #include <fstream>
 #include <numeric>
 #include <thread>
-#include <mutex>          // std::mutex
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -14,37 +13,39 @@
 using namespace cv;
 using namespace std;
 
-std::mutex mtx;           // mutex for critical section
-
-vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSize = 10);
-void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, int& highScoreIndexY);
+vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize = 10);
+void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
 void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, int& highScoreIndexY);
+vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords);
+void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix = "result_patch_");
+void exportTimeResults(vector<double> timeTaken, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix = "time_test_");
 
-ofstream myfile, myfilehist;
-
-static void help()
-{
-    printf("Usage: ./optical_flow_lk_image_template_match <image1> <image2>\n");
-}
 
 int main(int argc, char** argv) {
     
-    if(argc != 3)
-    {
-        help();
-        return -1;
-    }
-    
     double negativeScalingFactor = 0.30;
-    
-    double t = (double)getTickCount();
     
     int histogramCompMethod = CV_COMP_CORREL;
     bool useRGB = false;
     int match_method = CV_TM_SQDIFF_NORMED;
     
+    int patchPercentage = 40;
+    int roiPercentage = 40;
+    
+    vector<int> result_rows;
+    vector<Point2f> template_coords;
+    vector<Mat> patch_templates;
+    
+    Mat img1ColourTransform, img2ColourTransform;
+    
+    if(argc != 3)
+    {
+        return -1;
+    }
+    
     Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
     Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+    
     
     if(img1.empty() || img2.empty())
     {
@@ -55,99 +56,225 @@ int main(int argc, char** argv) {
     resize(img1, img1, Size(floor(img1.cols * negativeScalingFactor), floor(img1.rows * negativeScalingFactor)));
     resize(img2, img2, Size(floor(img2.cols * negativeScalingFactor), floor(img2.rows * negativeScalingFactor)));
     
-    Mat result, result2, img1ColourTransform, img2ColourTransform, localisedSearchWindow, templatePatch;
-    
-    // cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2GRAY);
-    // cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2GRAY);
-    
-    
-    if (useRGB) {
-        
-        
-        cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2GRAY);
-        cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2GRAY);
-        
-        //img1ColourTransform = img1.clone();
-        //img2ColourTransform = img2.clone();
-        
-    } else {
-        
-        //BGR2HSV = Hue Range: 0-180
-        //BGR2HSV_FULL = Hue Range: 0-360
-        cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
-        cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
-        
-    }
+    //BGR2HSV = Hue Range: 0-180
+    //BGR2HSV_FULL = Hue Range: 0-360
+    cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
+    cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
     
     //CG - Calculate a central column through the two images that has a percentage width of the original images.
     double imageCentreX = img1ColourTransform.cols / 2;
-    double imageROIWidth = img1ColourTransform.cols * 0.4;
+    double imageROIWidth = img1ColourTransform.cols * ((double) roiPercentage / 100);
     double imageROIHalfWidth = imageROIWidth / 2;
     double imgROIStartX = imageCentreX - imageROIHalfWidth;
     double imgROIEndX = imageCentreX + imageROIHalfWidth;
     
-    int patchSize = imageROIWidth * 0.4;
+    int patchSize = imageROIWidth * ((double) patchPercentage / 100);
+    
+    vector <vector<double > > all_results;
+    vector <double> timeTaken;
+    
+    double testElaspedTime = 0;
     
     //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
     Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
-    Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img2ColourTransform.rows) );
     
-    Mat opticalFlow = Mat::zeros(img2.rows, img2.cols, CV_8UC3);
+    Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
     
-    vector<Point2f> points;
+    patch_templates = ScanImagePointer(image1ROI, template_coords, result_rows, patchSize);
     
-    vector<Mat> test = ScanImagePointer(image1ROI, points, patchSize);
-    
-    std::vector<Mat>::iterator i1;
-    std::vector<Point2f>::iterator i2;
+    vector<string> methods {"sqdiffnormed", "coeffnormed"};
     
     
-    //myfile.open ("example.dat", ios::out | ios::trunc);
+        //TEST1
     
-    myfile.open ("displacement_patch_40_40.dat", ios::out | ios::trunc);
-    myfilehist.open ("displacement_hist_40_40.dat", ios::out | ios::trunc);
+        testElaspedTime = (double)getTickCount();
+    
+        all_results.push_back(runTestPatch(image2ROI, patchSize, CV_TM_SQDIFF_NORMED, patch_templates, template_coords));
+    
+        timeTaken.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
+    
+    
+        //TEST2
+    
+        testElaspedTime = (double)getTickCount();
+    
+        all_results.push_back(runTestPatch(image2ROI, patchSize, CV_TM_CCOEFF_NORMED, patch_templates, template_coords));
+    
+        timeTaken.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
+    
+    
+    //TEST3
+    
+    //    testElaspedTime = (double)getTickCount();
+    //
+    //    all_results.push_back(runTestPatch(image2ROI, patchSize, CV_TM_CCORR_NORMED, patch_templates, template_coords));
+    //
+    //    timeTaken.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
+    
+    
+//    vector<double> test1 = {1, 3, 5, 7};
+//    
+//    vector<double> test2 = {2, 4, 6, 8};
+//    
+//    vector<vector<double> > test = {test1, test2};
+    
+    exportResults(all_results, result_rows, methods, roiPercentage, patchPercentage);
+    
+    exportTimeResults(timeTaken, methods, patchPercentage, roiPercentage);
+    
+    return 0;
+    
+}
+
+void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix) {
+    
+    ostringstream oStream;
+    ofstream myfile;
+    
+    oStream << fileNamePrefix << roiSize << "_" << patchSize << ".dat";
+    
+    myfile.open (oStream.str(), ios::out | ios::trunc);
+    
+    oStream.clear();
+    oStream.str("");
+    
+    oStream << "descriptor image_row";
+    
+    for(std::vector<int>::size_type i = 0; i != methods.size(); i++) {
+        
+        oStream << " " << methods[i] << "_displacement";
+    }
+    
+    oStream << "\n";
+    
+    cout << oStream.str();
+    
+    myfile << oStream.str();
+    
+    oStream.clear();
+    oStream.str("");
+
+    for (int i = 0; i < all_results[0].size(); i++) {
+        
+        oStream << rows[i];
+        
+        for(std::vector<double>::size_type j = 0; j != all_results.size(); j++) {
+            
+            
+            //cout << all_results[j][i] << endl;
+            
+            oStream << " " << all_results[j][i];
+        }
+        
+        oStream << "\n";
+        
+    }
+    
+    cout << oStream.str();
+    
+    myfile << oStream.str();
+    
+    //cout << "\n\nhjdhsj\n\n";
+    
+    //    for(std::vector<double>::size_type i = 0; i != all_results.size(); i++) {
+    //
+    //
+    //        for (int j = 0; j < all_results[i].size(); i++) {
+    //            cout << all_results[i][j] << endl;
+    //        }
+    //
+    //    }
+    
+    //    std::vector< std::vector<double> >::const_iterator row;
+    //    std::vector<double>::const_iterator col;
+    //    for (row = all_results.begin(); row != all_results.end(); ++row) {
+    //        for (col = row->begin(); col != row->end(); ++col) {
+    //            std::cout << *col << endl;
+    //        }
+    //    }
+    
+    //cout<< endl;
+    
+    
+    
+    //        oStream << "\n";
+    //
+    //        //cout << oStream.str();
+    //
+    //        myfile << oStream.str();
+    //
+    //        oStream.clear();
+    //        oStream.str("");
+    
+    
+    myfile.close();
+    
+}
+
+void exportTimeResults(vector<double> timeTaken, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix) {
+    
+    ostringstream oStream;
+    ofstream myfile;
+    
+    oStream << fileNamePrefix << roiSize << "_" << patchSize << ".dat";
+    
+    myfile.open (oStream.str(), ios::out | ios::trunc);
+    
+    oStream.clear();
+    oStream.str("");
+    
+    myfile << "descriptor match_method time_taken\n";
+    
+    for(std::vector<int>::size_type i = 0; i != timeTaken.size(); i++) {
+        
+        oStream << methods[i] << " " << timeTaken[i] << "\n";
+        
+        myfile << oStream.str();
+        
+        oStream.clear();
+        oStream.str("");
+    }
+    
+    myfile.close();
+    
+}
+
+vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords) {
+    
+    Mat localisedSearchWindow, templatePatch;
+    vector<double> avg_result;
+    vector<double> raw_result;
+    
+    vector<Mat>::iterator i1;
+    vector<Point2f>::iterator i2;
     
     int patchCount = 0;
     int rowNumber = 0;
     
-    vector<double> v;
-    vector<double> v_hist;
     
-    myfile << "descriptor y displacement\n";
-    myfilehist << "descriptor y displacement\n";
-    
-    for( i1 = test.begin(), i2 = points.begin(); i1 < test.end() && i2 < points.end(); ++i1, ++i2 )
+    for( i1 = patch_templates.begin(), i2 = patch_template_coords.begin(); i1 < patch_templates.end() && i2 < patch_template_coords.end(); ++i1, ++i2 )
     {
         
-        int val, valHist;
-        double bestVal, bestValHist;
+        double displacement, highestScore;
+        
+        templatePatch = (*i1);
         
         Point2f originPixelCoords = (*i2);
         
         if (rowNumber != originPixelCoords.y) {
             
-            double sum = accumulate(v.begin(), v.end(), 0.0);
-            double mean = sum / v.size();
+            double sum = accumulate(raw_result.begin(), raw_result.end(), 0.0);
+            double mean = sum / raw_result.size();
             
-            double sum_hist = accumulate(v_hist.begin(), v_hist.end(), 0.0);
-            double mean_hist = sum_hist / v_hist.size();
+            avg_result.push_back(mean);
             
-            myfile << rowNumber << " " << mean << "\n";
-            myfilehist << rowNumber << " " << mean_hist << "\n";
+            //cout << avg_result[rowNumber];
             
             rowNumber = originPixelCoords.y;
             
-            v.clear();
-            v_hist.clear();
+            raw_result.clear();
             
         }
-        
-//        if (rowNumber >=1) {
-//            
-//            break;
-//        }
-        
-        templatePatch = (*i1);
         
         int localisedWindowWidth = templatePatch.cols;
         int localisedWindowHeight = image2ROI.rows - originPixelCoords.y;
@@ -156,77 +283,23 @@ int main(int argc, char** argv) {
         
         localisedSearchWindow = image2ROI(Rect(originPixelCoords.x, originPixelCoords.y, localisedWindowWidth, localisedWindowHeight) );
         
-        //CG - Calculate the match score between each patch, and return the row index of the TOP-LEFT corner for the patch that returned the highest match score.
-        
         // Constructs the new thread and runs it. Does not block execution.
-        thread t1(calcPatchMatchScore, localisedSearchWindow, templatePatch, match_method, ref(bestVal), ref(val));
-        
-        // Constructs the new thread and runs it. Does not block execution.
-        thread t2(calcHistMatchScore, localisedSearchWindow, templatePatch, histogramCompMethod, ref(bestValHist), ref(valHist));
-        
-      //  calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, bestVal, val);
-        
-      //  calcHistMatchScore(localisedSearchWindow, templatePatch, histogramCompMethod, bestValHist, valHist);
+        thread t1(calcPatchMatchScore, localisedSearchWindow, templatePatch, match_method, ref(highestScore), ref(displacement));
         
         t1.join();
-        t2.join();
-    //
-        v.push_back(val);
-        v_hist.push_back(valHist);
         
-//        circle(img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y),2, Scalar(255,255,255), CV_FILLED, 8,0);
-//        circle(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + val),2, Scalar(255,255,255), CV_FILLED, 8,0);
-//////        
-//       rectangle( img1, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point( (imgROIStartX + originPixelCoords.x + templatePatch.cols), originPixelCoords.y + templatePatch.rows ), Scalar(255, 0, 0), 2, 8, 0 );
-//////        
-//       rectangle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + val), Point(imgROIStartX + originPixelCoords.x + templatePatch.cols ,originPixelCoords.y + templatePatch.rows + val), Scalar(255, 0, 255), 2, 8, 0 );
-////        
+        raw_result.push_back(displacement);
         
-//       cv::waitKey(1);
-//        imshow("tempy", templatePatch);
-        
-        // Increment the patch count, as we are now moving across.
         patchCount++;
         
     }
     
-    myfile.close();
-    myfilehist.close();
-    
-    
-////    // CG - Draw main ROI windows.
-//    rectangle( img1, Point(imgROIStartX, 0), Point(imgROIEndX , img1.rows), Scalar(0, 0, 255), 2, 8, 0 );
-//    rectangle( img2, Point(imgROIStartX, 0), Point(imgROIEndX , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
-////    
-////    //CG - <0.5 = more balance to 'resultFrame', >0.5 = more balance to 'img1'.
-//  double alpha = 0.4;
-////    
-//    imshow("Image 1", img1);
-////    
-//    imshow("Image 2", img2);
-////    
-//    addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
-////    
-//    imshow("Merged Result", img2);
-////    
-//    imshow("Search Window", localisedSearchWindow);
-////    
-////    //CG - Should be 160 instead of 161 for row 1, as 160 is the last patch in row 1, before being incremented to row 2.
-////    //imshow("blah", test.at(160));
-////    
-//    imshow("template", templatePatch);
-////
-//    waitKey(0);
-    
-    t = ((double)getTickCount() - t)/getTickFrequency();
-    cout << "Times passed in seconds: " << t << endl;
-    
-    return 0;
+    return avg_result;
     
 }
 
 // CG - Here, we are passing 'inputMat' and 'points' by REFERENCE, NOT BY VALUE.
-vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSize)
+vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize)
 {
     
     CV_Assert(inputMat.depth() != sizeof(uchar));
@@ -243,6 +316,7 @@ vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSiz
     {
         
         p = inputMat.ptr<uchar>(i);
+        rows.push_back(i);
         
         for (j = 0; j < nCols - patchSize; j+=2)
         {
@@ -250,6 +324,7 @@ vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f> &points, int patchSiz
             
             //CG - Same as Point2f (typename alias)
             points.push_back(Point_<float>(j, i));
+            
             
         }
         
@@ -342,12 +417,12 @@ void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_m
 }
 
 
-void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, int& highScoreIndexY) {
+void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY) {
     
-    Mat result, currentPatch;
+    Mat resultMat, currentPatch;
     
     //Set "initialiser" value for best match score.
-    int bestScoreYIndex = -1;
+    double bestScoreYIndex = -1;
     double bestScore = -1;
     
     bool stop = false;
@@ -360,20 +435,20 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
         currentPatch = localisedSearchWindow.clone();
         currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
         
-        // Create the result matrix
-        int result_cols =  currentPatch.cols - templatePatch.cols + 1;
-        int result_rows = currentPatch.rows - templatePatch.rows + 1;
+        // Create the resultMat matrix
+        int resultMat_cols =  currentPatch.cols - templatePatch.cols + 1;
+        int resultMat_rows = currentPatch.rows - templatePatch.rows + 1;
         
-        result.create(result_cols, result_rows, CV_32FC1);
+        resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
         
         // Do the Matching and Normalize
-        matchTemplate( currentPatch, templatePatch, result, match_method );
+        matchTemplate( currentPatch, templatePatch, resultMat, match_method );
         
         // Localizing the best match with minMaxLoc
         double minVal, maxVal;
         
         // We do not need to pass in any 'Point' objects, as we are not interested in getting the "best match point" location back (as the 'result' matrix is only 1px x 1px in size).
-        minMaxLoc( result, &minVal, &maxVal, NULL, NULL, Mat() );
+        minMaxLoc( resultMat, &minVal, &maxVal, NULL, NULL, Mat() );
         
         // For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better.
         if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
