@@ -116,7 +116,7 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
             
             for(vector<int>::iterator it3 = match_type.begin(); it3 != match_type.end(); ++it3) {
                 
-                cout << "BEGIN: Test #" << testCount << ": ROI Size = " << *it1 << ", Patch Size = " << *it2 << ", Match Method = " << *it3 << endl;
+                cout << "BEGIN: Test #" << testCount << ": ROI Size = " << *it1 << ", Patch Size = " << *it2 << ", Match Method = " << getMatchMethodName(*it3) << endl;
                 
                 double testElaspedTime = (double)getTickCount();
                 
