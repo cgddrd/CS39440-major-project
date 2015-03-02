@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
+            timestampString = "447025942.937652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "379"
-            endingLineNumber = "379"
+            startingLineNumber = "347"
+            endingLineNumber = "347"
             landmarkName = "calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double&amp; highScore, int&amp; highScoreIndexY)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
+            timestampString = "447025942.937652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "348"
-            endingLineNumber = "348"
+            startingLineNumber = "316"
+            endingLineNumber = "316"
             landmarkName = "calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double&amp; highScore, int&amp; highScoreIndexY)"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
+            timestampString = "447025942.937652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "301"
-            endingLineNumber = "301"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
             landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords)"
             landmarkType = "7">
          </BreakpointContent>
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
+            timestampString = "447025942.937652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "267"
-            endingLineNumber = "267"
+            startingLineNumber = "250"
+            endingLineNumber = "250"
             landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords)"
             landmarkType = "7">
          </BreakpointContent>
@@ -74,27 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
+            timestampString = "447025942.937652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
-            landmarkName = "main(int argc, char** argv)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "282"
-            endingLineNumber = "282"
+            startingLineNumber = "261"
+            endingLineNumber = "261"
             landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords)"
             landmarkType = "7">
          </BreakpointContent>
@@ -106,11 +90,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
+            timestampString = "447025942.937652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "293"
-            endingLineNumber = "293"
+            startingLineNumber = "264"
+            endingLineNumber = "264"
             landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords)"
             landmarkType = "7">
          </BreakpointContent>
@@ -122,27 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
+            timestampString = "447025942.937652"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "268"
-            endingLineNumber = "268"
-            landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447011663.896359"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "260"
-            endingLineNumber = "260"
+            startingLineNumber = "251"
+            endingLineNumber = "251"
             landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords)"
             landmarkType = "7">
          </BreakpointContent>

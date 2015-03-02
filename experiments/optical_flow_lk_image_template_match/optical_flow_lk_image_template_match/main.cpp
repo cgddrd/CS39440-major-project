@@ -13,28 +13,19 @@
 using namespace cv;
 using namespace std;
 
-vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize = 10);
+vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize = 10);
 void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
 void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, int& highScoreIndexY);
 vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords);
-void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix = "result_patch_");
-void exportTimeResults(vector<double> timeTaken, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix = "time_test_");
+void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int patchSize, int roiSize, string fileNamePrefix = "result_patch_");
+void exportTimeResults(vector<double> timeTaken, vector<int> methods, int patchSize, int roiSize, string fileNamePrefix = "time_test_");
+string getMatchMethodName(int matchMethod);
+void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type);
 
 
 int main(int argc, char** argv) {
     
     double negativeScalingFactor = 0.30;
-    
-    int histogramCompMethod = CV_COMP_CORREL;
-    bool useRGB = false;
-    int match_method = CV_TM_SQDIFF_NORMED;
-    
-    int patchPercentage = 40;
-    int roiPercentage = 40;
-    
-    vector<int> result_rows;
-    vector<Point2f> template_coords;
-    vector<Mat> patch_templates;
     
     Mat img1ColourTransform, img2ColourTransform;
     
@@ -61,66 +52,103 @@ int main(int argc, char** argv) {
     cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
     cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
     
-    //CG - Calculate a central column through the two images that has a percentage width of the original images.
-    double imageCentreX = img1ColourTransform.cols / 2;
-    double imageROIWidth = img1ColourTransform.cols * ((double) roiPercentage / 100);
-    double imageROIHalfWidth = imageROIWidth / 2;
-    double imgROIStartX = imageCentreX - imageROIHalfWidth;
-    double imgROIEndX = imageCentreX + imageROIHalfWidth;
+    vector<int> methods {CV_TM_SQDIFF_NORMED, CV_TM_CCORR_NORMED};
     
-    int patchSize = imageROIWidth * ((double) patchPercentage / 100);
+    vector<int> patchSizes{10, 20, 30, 40};
     
-    vector <vector<double > > all_results;
-    vector <double> timeTaken;
+    vector<int> roiSizes {20, 30, 40};
     
-    double testElaspedTime = 0;
+    double totalElaspedTime = (double)getTickCount();
     
-    //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
-    Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
+    startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods);
     
-    Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
-    
-    patch_templates = ScanImagePointer(image1ROI, template_coords, result_rows, patchSize);
-    
-    vector<string> methods {"sqdiffnormed", "coeffnormed"};
-    
-    
-        //TEST1
-    
-        testElaspedTime = (double)getTickCount();
-    
-        all_results.push_back(runTestPatch(image2ROI, patchSize, CV_TM_SQDIFF_NORMED, patch_templates, template_coords));
-    
-        timeTaken.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
-    
-    
-        //TEST2
-    
-        testElaspedTime = (double)getTickCount();
-    
-        all_results.push_back(runTestPatch(image2ROI, patchSize, CV_TM_CCOEFF_NORMED, patch_templates, template_coords));
-    
-        timeTaken.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
-    
-    
-    //TEST3
-    
-    //    testElaspedTime = (double)getTickCount();
-    //
-    //    all_results.push_back(runTestPatch(image2ROI, patchSize, CV_TM_CCORR_NORMED, patch_templates, template_coords));
-    //
-    //    timeTaken.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
-    
-    
-    exportResults(all_results, result_rows, methods, roiPercentage, patchPercentage);
-    
-    exportTimeResults(timeTaken, methods, patchPercentage, roiPercentage);
+    cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
     
     return 0;
     
 }
 
-void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix) {
+string getMatchMethodName(int matchMethod) {
+    
+    switch (matchMethod) {
+        case CV_TM_SQDIFF_NORMED:
+            return "SQDIFF_NORMED";
+        case CV_TM_SQDIFF:
+            return "SQDIFF";
+        case CV_TM_CCORR_NORMED:
+            return "CCORR_NORMED";
+        case CV_TM_CCORR:
+            return "CCORR";
+        case CV_TM_CCOEFF_NORMED:
+            return "CCOEFF_NORMED";
+        case CV_TM_CCOEFF:
+            return "CCOEFF";
+        default:
+            return "UNKNOWN";
+    }
+}
+
+void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type) {
+    
+    int testCount = 0;
+    
+    for(vector<int>::iterator it1 = roiDimensions.begin(); it1 != roiDimensions.end(); ++it1) {
+        
+        //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
+        double imageCentreX = img1ColourTransform.cols / 2;
+        double imageROIWidth = img1ColourTransform.cols * ((double) *it1 / 100);
+        double imageROIHalfWidth = imageROIWidth / 2;
+        double imgROIStartX = imageCentreX - imageROIHalfWidth;
+        double imgROIEndX = imageCentreX + imageROIHalfWidth;
+        
+        Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
+        Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
+        
+        for(vector<int>::iterator it2 = patchDimensions.begin(); it2 != patchDimensions.end(); ++it2) {
+            
+            vector<int> result_rows;
+            vector<Point2f> template_coords;
+            vector<Mat> patch_templates = getROIPatches(image1ROI, template_coords, result_rows, *it2);
+            
+            vector <vector<double> > allResults;
+            vector <double> timeDurations;
+            
+            
+            for(vector<int>::iterator it3 = match_type.begin(); it3 != match_type.end(); ++it3) {
+                
+                cout << "BEGIN: Test #" << testCount << ": ROI Size = " << *it1 << ", Patch Size = " << *it2 << ", Match Method = " << *it3 << endl;
+                
+                double testElaspedTime = (double)getTickCount();
+                
+                allResults.push_back(runTestPatch(image2ROI, *it2, *it3, patch_templates, template_coords));
+                
+                timeDurations.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
+                
+                cout << "END: Test #" << testCount << "\n\n";
+                
+                testCount++;
+            }
+            
+            
+            exportResults(allResults, result_rows, match_type, *it1, *it2);
+            
+            exportTimeResults(timeDurations, match_type, *it1, *it2);
+            
+            //            allResults.clear();
+            //            timeDurations.clear();
+            //            result_rows.clear();
+            //            template_coords.clear();
+            //            patch_templates.clear();
+            
+            
+        }
+        
+        
+    }
+    
+}
+
+void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int patchSize, int roiSize, string fileNamePrefix) {
     
     ostringstream oStream;
     ofstream myfile;
@@ -136,26 +164,21 @@ void exportResults(vector<vector<double > > all_results, vector<int> rows, vecto
     
     for(std::vector<int>::size_type i = 0; i != methods.size(); i++) {
         
-        oStream << " " << methods[i] << "_displacement";
+        oStream << " " << getMatchMethodName(methods[i]);
     }
     
     oStream << "\n";
-    
-    cout << oStream.str();
     
     myfile << oStream.str();
     
     oStream.clear();
     oStream.str("");
-
+    
     for (int i = 0; i < all_results[0].size(); i++) {
         
         oStream << rows[i];
         
         for(std::vector<double>::size_type j = 0; j != all_results.size(); j++) {
-            
-            
-            //cout << all_results[j][i] << endl;
             
             oStream << " " << all_results[j][i];
         }
@@ -164,48 +187,13 @@ void exportResults(vector<vector<double > > all_results, vector<int> rows, vecto
         
     }
     
-    cout << oStream.str();
-    
     myfile << oStream.str();
-    
-    //cout << "\n\nhjdhsj\n\n";
-    
-    //    for(std::vector<double>::size_type i = 0; i != all_results.size(); i++) {
-    //
-    //
-    //        for (int j = 0; j < all_results[i].size(); i++) {
-    //            cout << all_results[i][j] << endl;
-    //        }
-    //
-    //    }
-    
-    //    std::vector< std::vector<double> >::const_iterator row;
-    //    std::vector<double>::const_iterator col;
-    //    for (row = all_results.begin(); row != all_results.end(); ++row) {
-    //        for (col = row->begin(); col != row->end(); ++col) {
-    //            std::cout << *col << endl;
-    //        }
-    //    }
-    
-    //cout<< endl;
-    
-    
-    
-    //        oStream << "\n";
-    //
-    //        //cout << oStream.str();
-    //
-    //        myfile << oStream.str();
-    //
-    //        oStream.clear();
-    //        oStream.str("");
-    
     
     myfile.close();
     
 }
 
-void exportTimeResults(vector<double> timeTaken, vector<string> methods, int patchSize, int roiSize, string fileNamePrefix) {
+void exportTimeResults(vector<double> timeTaken, vector<int> methods, int patchSize, int roiSize, string fileNamePrefix) {
     
     ostringstream oStream;
     ofstream myfile;
@@ -221,7 +209,7 @@ void exportTimeResults(vector<double> timeTaken, vector<string> methods, int pat
     
     for(std::vector<int>::size_type i = 0; i != timeTaken.size(); i++) {
         
-        oStream << methods[i] << " " << timeTaken[i] << "\n";
+        oStream << getMatchMethodName(methods[i]) << " " << timeTaken[i] << "\n";
         
         myfile << oStream.str();
         
@@ -257,17 +245,10 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         
         if (rowNumber != originPixelCoords.y) {
             
-            if (rowNumber == 55) {
-                
-                cout << "twat";
-            }
-            
             double sum = accumulate(raw_result.begin(), raw_result.end(), 0.0);
             double mean = sum / raw_result.size();
             
             avg_result.push_back(mean);
-            
-            //cout << avg_result[rowNumber];
             
             rowNumber = originPixelCoords.y;
             
@@ -275,24 +256,12 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             
         }
         
-        int w = image2ROI.cols;
-        int h = image2ROI.rows;
-        
         int localisedWindowWidth = templatePatch.cols;
         int localisedWindowHeight = image2ROI.rows - (originPixelCoords.y - (templatePatch.cols / 2));
         
-        //localisedWindowHeight = localisedWindowHeight <= (patchSize * 2) ? localisedWindowHeight : (patchSize * 2);
-        
         localisedSearchWindow = image2ROI(Rect(originPixelCoords.x - (templatePatch.cols / 2), originPixelCoords.y - (templatePatch.cols / 2), localisedWindowWidth, localisedWindowHeight));
         
-//        imshow("shajadsh", templatePatch);
-//        imshow("fhjdshf", localisedSearchWindow);
-//        waitKey(1);
-        
-        // Constructs the new thread and runs it. Does not block execution.
-        thread t1(calcPatchMatchScore, localisedSearchWindow, templatePatch, match_method, ref(highestScore), ref(displacement));
-        
-        t1.join();
+        calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, highestScore, displacement);
         
         raw_result.push_back(displacement);
         
@@ -304,8 +273,7 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
     
 }
 
-// CG - Here, we are passing 'inputMat' and 'points' by REFERENCE, NOT BY VALUE.
-vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize)
+vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize)
 {
     
     CV_Assert(inputMat.depth() != sizeof(uchar));
@@ -331,7 +299,7 @@ vector<Mat> ScanImagePointer(Mat inputMat, vector<Point2f>& points, vector<int>&
             
             int y = i - (patchSize / 2);
             
-            mats.push_back(inputMat(Rect(x,y,patchSize - 1 ,patchSize - 1)));
+            mats.push_back(inputMat(Rect(x,y,patchSize,patchSize)));
             
             //CG - Same as Point2f (typename alias)
             points.push_back(Point_<float>(j, i));
