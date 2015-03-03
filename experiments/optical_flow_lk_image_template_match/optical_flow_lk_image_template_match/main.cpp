@@ -29,10 +29,13 @@ Mat img1;
 Mat img2;
 double imgROIStartX = 0;
 
+bool simplePatches = false;
+bool useGUI = false;
+
 
 int main(int argc, char** argv) {
     
-    double negativeScalingFactor = 0.30;
+    double negativeScalingFactor = 0.40;
     
     Mat img1ColourTransform, img2ColourTransform;
     
@@ -54,25 +57,47 @@ int main(int argc, char** argv) {
     resize(img1, img1, Size(floor(img1.cols * negativeScalingFactor), floor(img1.rows * negativeScalingFactor)));
     resize(img2, img2, Size(floor(img2.cols * negativeScalingFactor), floor(img2.rows * negativeScalingFactor)));
     
+    cout << "Image Size: " << img1.cols << "px x " << img1.rows << "px.\n";
+    
     //BGR2HSV = Hue Range: 0-180
     //BGR2HSV_FULL = Hue Range: 0-360
-    cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
-    cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
+    cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV_FULL);
+    cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV_FULL);
     
-    vector<int> methods {CV_TM_SQDIFF_NORMED};
+    imshow("HSV Img1", img1ColourTransform);
     
-    vector<int> patchSizes{40};
+    Mat channel[3];
+    split(img1ColourTransform, channel);
     
-    vector<int> roiSizes {40};
+    //Set VALUE channel to 0
+    channel[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
     
-    double totalElaspedTime = (double)getTickCount();
+    Mat output( img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC3);
     
-    startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods);
+    merge(channel,3,output);
     
-    cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
+    imshow("result", output);
     
-    imshow("hjhd", img2);
+    
+//    vector<int> methods {CV_TM_SQDIFF_NORMED, CV_TM_CCORR_NORMED};
+//    
+//    vector<int> patchSizes{40};
+//    
+//    vector<int> roiSizes {30};
+//    
+//    double totalElaspedTime = (double)getTickCount();
+//    
+//    startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods);
+//    
+//    cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
+//    
+//    if (useGUI) {
+//        imshow("hjhd", img2);
+//        waitKey();
+//    }
+    
     waitKey();
+    
     return 0;
     
 }
@@ -263,8 +288,9 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         
         Point2f originPixelCoords = (*i2);
         
-        rectangle( img2, Point(imgROIStartX + originPixelCoords.x - (patchSize / 2), originPixelCoords.y - (patchSize / 2)), Point(imgROIStartX + originPixelCoords.x + (patchSize / 2) , originPixelCoords.y + (patchSize / 2)), Scalar(0, 0, 255), 2, 8, 0 );
-        
+        if (useGUI) {
+            rectangle( img2, Point(imgROIStartX + originPixelCoords.x - (patchSize / 2), originPixelCoords.y - (patchSize / 2)), Point(imgROIStartX + originPixelCoords.x + (patchSize / 2) , originPixelCoords.y + (patchSize / 2)), Scalar(0, 0, 255), 2, 8, 0 );
+        }
         
         //Once we reach the end of the row, we need to calculate the average displacement across the entire row.
         if (rowNumber != originPixelCoords.y) {
@@ -276,16 +302,15 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
                 
                 avg_result.push_back(mean);
                 
-                if (rowNumber == (patchSize / 2) || rowNumber == 300) {
+                if (rowNumber == (image2ROI.rows / 2)) {
                     
-                    double minVal = *min_element(raw_result.begin(), raw_result.end());
                     double maxVal = *max_element(raw_result.begin(), raw_result.end());
                     
-                    double bucketSize = 1;
+                    double bucketSize = 10;
                     
                    // double minusValue = (bucketSize / (bucketSize * 100));
                     
-                    vector<int> hist_result = calcHistogram(bucketSize, raw_result, maxVal + 1);
+                    vector<int> hist_result = calcHistogram(bucketSize, raw_result, maxVal);
                     
                     cout<< "RAW VALUES\n";
                     
@@ -319,9 +344,9 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             
         }
         
-        if(rowNumber >=(patchSize / 2) + 1) {
-            break;
-        }
+//        if(rowNumber >=(patchSize / 2) + 1) {
+//            break;
+//        }
     
         int localisedWindowWidth = templatePatch.cols;
         int localisedWindowHeight = image2ROI.rows - (originPixelCoords.y - (templatePatch.cols / 2));
@@ -330,12 +355,19 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         
         calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, highestScore, displacement);
         
-        raw_result.push_back(displacement);
+        if (useGUI) {
+            
+           rectangle( img2, Point(imgROIStartX + originPixelCoords.x - (patchSize / 2), originPixelCoords.y - (patchSize / 2) + displacement), Point(imgROIStartX + originPixelCoords.x + (patchSize / 2) , originPixelCoords.y + (patchSize / 2) + displacement), Scalar(0, 255, 0), 2, 8, 0 );
+            
+            //CG - Allows the output window displaying the current patch to be updated automatically.
+            cv::waitKey(10);
+            imshow("Search Window", localisedSearchWindow);
+            imshow("Template Patch", templatePatch);
+                
+            
+        }
         
-        //CG - Allows the output window displaying the current patch to be updated automatically.
-        cv::waitKey(1);
-        imshow("Search Window", localisedSearchWindow);
-        imshow("Template Patch", templatePatch);
+        raw_result.push_back(displacement);
         
         patchCount++;
         
@@ -355,11 +387,13 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
     int nCols = inputMat.cols;
     int halfPatchSize = (patchSize / 2);
     
+    int increment = simplePatches ? patchSize : 2;
+    
     int i,j;
     uchar* p;
     
     //CG - Stop extracting patches when we get to the bottom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
-    for(i = halfPatchSize; i < (nRows - halfPatchSize); i++)
+    for(i = halfPatchSize; i < (nRows - halfPatchSize); i+=increment)
     {
         
         p = inputMat.ptr<uchar>(i);
@@ -367,7 +401,7 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
         //CG - Push back the current row number (used for printing results later on).
         rows.push_back(i);
         
-        for (j = halfPatchSize; j < (nCols - halfPatchSize); j++)
+        for (j = halfPatchSize; j < (nCols - halfPatchSize); j+=increment)
         {
             
             int x = j - halfPatchSize;
@@ -481,7 +515,7 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
     double bestScore = -1;
     
     bool stop = false;
-    
+
     for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
     {
         currentPatch = localisedSearchWindow.clone();
@@ -536,11 +570,13 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
             //myfile << i << " " <<  maxVal << "\n";
         }
         
+        if (useGUI) {
+            //CG - Allows the output window displaying the current patch to be updated automatically.
+            cv::waitKey(10);
+            resize(resultMat, resultMat, Size(resultMat.cols*100, resultMat.rows*100));
+            imshow("Normalised Result", resultMat);
+        }
         
-        //CG - Allows the output window displaying the current patch to be updated automatically.
-//        cv::waitKey(1);
-//        resize(resultMat, resultMat, Size(resultMat.cols*100, resultMat.rows*100));
-//        imshow("Normalised RESULT", resultMat);
         
         if (stop) {
             
