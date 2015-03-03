@@ -25,6 +25,10 @@ string getMatchMethodName(int matchMethod);
 void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type);
 vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVal);
 
+Mat img1;
+Mat img2;
+double imgROIStartX = 0;
+
 
 int main(int argc, char** argv) {
     
@@ -36,9 +40,9 @@ int main(int argc, char** argv) {
     {
         return -1;
     }
-    
-    Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
-    Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+
+    img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
+    img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
     
     
     if(img1.empty() || img2.empty())
@@ -67,6 +71,8 @@ int main(int argc, char** argv) {
     
     cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
     
+    imshow("hjhd", img2);
+    waitKey();
     return 0;
     
 }
@@ -101,11 +107,13 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
         double imageCentreX = img1ColourTransform.cols / 2;
         double imageROIWidth = img1ColourTransform.cols * ((double) *it1 / 100);
         double imageROIHalfWidth = imageROIWidth / 2;
-        double imgROIStartX = imageCentreX - imageROIHalfWidth;
+        imgROIStartX = imageCentreX - imageROIHalfWidth;
         double imgROIEndX = imageCentreX + imageROIHalfWidth;
         
         Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
         Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
+        
+        rectangle( img2, Point(imgROIStartX, 0), Point(imgROIEndX , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
         
         for(vector<int>::iterator it2 = patchDimensions.begin(); it2 != patchDimensions.end(); ++it2) {
             
@@ -245,8 +253,7 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
     
     int patchCount = 0;
     int rowNumber = (patchSize / 2);
-    
-    
+
     for( i1 = patch_templates.begin(), i2 = patch_template_coords.begin(); i1 < patch_templates.end() && i2 < patch_template_coords.end(); ++i1, ++i2 )
     {
         
@@ -255,6 +262,9 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         templatePatch = (*i1);
         
         Point2f originPixelCoords = (*i2);
+        
+        rectangle( img2, Point(imgROIStartX + originPixelCoords.x - (patchSize / 2), originPixelCoords.y - (patchSize / 2)), Point(imgROIStartX + originPixelCoords.x + (patchSize / 2) , originPixelCoords.y + (patchSize / 2)), Scalar(0, 0, 255), 2, 8, 0 );
+        
         
         //Once we reach the end of the row, we need to calculate the average displacement across the entire row.
         if (rowNumber != originPixelCoords.y) {
@@ -266,7 +276,7 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
                 
                 avg_result.push_back(mean);
                 
-                if (rowNumber == (patchSize / 2)) {
+                if (rowNumber == (patchSize / 2) || rowNumber == 300) {
                     
                     double minVal = *min_element(raw_result.begin(), raw_result.end());
                     double maxVal = *max_element(raw_result.begin(), raw_result.end());
@@ -275,8 +285,7 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
                     
                    // double minusValue = (bucketSize / (bucketSize * 100));
                     
-                    vector<int> hist_result = calcHistogram(bucketSize, raw_result, maxVal);
-                    
+                    vector<int> hist_result = calcHistogram(bucketSize, raw_result, maxVal + 1);
                     
                     cout<< "RAW VALUES\n";
                     
@@ -286,11 +295,13 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
                         
                     }
                     
-                    cout << "\n\n HISTOGRAM \n";
+                    cout << "\n\nHISTOGRAM\n";
                     
                     for (std::vector<int>::size_type i = 0; i < hist_result.size(); ++i) {
                         
-                        cout << (i * bucketSize) << "-" << ((i + 1) * bucketSize - 1) << " -> " << hist_result[i] << "\n";
+                        //cout << (i * bucketSize) << "-" << ((i + 1) * bucketSize - 1) << " -> " << hist_result[i] << "\n";
+                        
+                        cout << (i * bucketSize) << " -> " << hist_result[i] << "\n";
                         
                     }
 
@@ -308,6 +319,10 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             
         }
         
+        if(rowNumber >=(patchSize / 2) + 1) {
+            break;
+        }
+    
         int localisedWindowWidth = templatePatch.cols;
         int localisedWindowHeight = image2ROI.rows - (originPixelCoords.y - (templatePatch.cols / 2));
         
@@ -316,6 +331,11 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, highestScore, displacement);
         
         raw_result.push_back(displacement);
+        
+        //CG - Allows the output window displaying the current patch to be updated automatically.
+        cv::waitKey(1);
+        imshow("Search Window", localisedSearchWindow);
+        imshow("Template Patch", templatePatch);
         
         patchCount++;
         
@@ -339,7 +359,7 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
     uchar* p;
     
     //CG - Stop extracting patches when we get to the bottom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
-    for(i = halfPatchSize; i < (nRows - halfPatchSize); i+=2)
+    for(i = halfPatchSize; i < (nRows - halfPatchSize); i++)
     {
         
         p = inputMat.ptr<uchar>(i);
@@ -347,7 +367,7 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
         //CG - Push back the current row number (used for printing results later on).
         rows.push_back(i);
         
-        for (j = halfPatchSize; j < (nCols - halfPatchSize); j+=2)
+        for (j = halfPatchSize; j < (nCols - halfPatchSize); j++)
         {
             
             int x = j - halfPatchSize;
@@ -362,6 +382,8 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
         }
         
     }
+    
+    
     
     return mats;
 }
@@ -460,9 +482,6 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
     
     bool stop = false;
     
-    // For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better.
-    //double bestScore = match_method == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED ? 100 : 0;
-    
     for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
     {
         currentPatch = localisedSearchWindow.clone();
@@ -519,9 +538,9 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
         
         
         //CG - Allows the output window displaying the current patch to be updated automatically.
-        //cv::waitKey(10);
-        //resize(result, result, Size(result.cols*10, result.rows*10));
-        //imshow("Normalised RESULT", result);
+//        cv::waitKey(1);
+//        resize(resultMat, resultMat, Size(resultMat.cols*100, resultMat.rows*100));
+//        imshow("Normalised RESULT", resultMat);
         
         if (stop) {
             
