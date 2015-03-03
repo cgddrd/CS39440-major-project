@@ -7,6 +7,8 @@
 #include <numeric>
 #include <thread>
 
+#include <cmath>
+
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
@@ -21,6 +23,7 @@ void exportResults(vector<vector<double > > all_results, vector<int> rows, vecto
 void exportTimeResults(vector<double> timeTaken, vector<int> methods, int patchSize, int roiSize, string fileNamePrefix = "time_test_");
 string getMatchMethodName(int matchMethod);
 void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type);
+vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVal);
 
 
 int main(int argc, char** argv) {
@@ -52,11 +55,11 @@ int main(int argc, char** argv) {
     cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
     cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
     
-    vector<int> methods {CV_TM_SQDIFF_NORMED, CV_TM_CCORR_NORMED};
+    vector<int> methods {CV_TM_SQDIFF_NORMED};
     
-    vector<int> patchSizes{10, 20, 30, 40};
+    vector<int> patchSizes{40};
     
-    vector<int> roiSizes {20, 30, 40};
+    vector<int> roiSizes {40};
     
     double totalElaspedTime = (double)getTickCount();
     
@@ -133,13 +136,6 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
             exportResults(allResults, result_rows, match_type, *it1, *it2);
             
             exportTimeResults(timeDurations, match_type, *it1, *it2);
-            
-            //            allResults.clear();
-            //            timeDurations.clear();
-            //            result_rows.clear();
-            //            template_coords.clear();
-            //            patch_templates.clear();
-            
             
         }
         
@@ -221,6 +217,23 @@ void exportTimeResults(vector<double> timeTaken, vector<int> methods, int patchS
     
 }
 
+vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVal) {
+    
+    int number_of_buckets = (int)ceil(maxVal / bucketSize);
+    
+    vector<int> histogram(number_of_buckets);
+    
+    for(vector<double>::const_iterator it = values.begin(); it != values.end(); ++it) {
+        
+        int bucket = (int)floor(*it / bucketSize);
+        histogram[bucket] += 1;
+        
+    }
+    
+    return histogram;
+    
+}
+
 vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords) {
     
     Mat localisedSearchWindow, templatePatch;
@@ -243,13 +256,52 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         
         Point2f originPixelCoords = (*i2);
         
+        //Once we reach the end of the row, we need to calculate the average displacement across the entire row.
         if (rowNumber != originPixelCoords.y) {
             
-            double sum = accumulate(raw_result.begin(), raw_result.end(), 0.0);
-            double mean = sum / raw_result.size();
-            
-            avg_result.push_back(mean);
-            
+            if (!raw_result.empty()) {
+                
+                double sum = accumulate(raw_result.begin(), raw_result.end(), 0.0);
+                double mean = sum / raw_result.size();
+                
+                avg_result.push_back(mean);
+                
+                if (rowNumber == (patchSize / 2)) {
+                    
+                    double minVal = *min_element(raw_result.begin(), raw_result.end());
+                    double maxVal = *max_element(raw_result.begin(), raw_result.end());
+                    
+                    double bucketSize = 1;
+                    
+                   // double minusValue = (bucketSize / (bucketSize * 100));
+                    
+                    vector<int> hist_result = calcHistogram(bucketSize, raw_result, maxVal);
+                    
+                    
+                    cout<< "RAW VALUES\n";
+                    
+                    for (std::vector<int>::size_type i = 0; i < raw_result.size(); ++i) {
+                        
+                        cout << raw_result[i] << "\n";
+                        
+                    }
+                    
+                    cout << "\n\n HISTOGRAM \n";
+                    
+                    for (std::vector<int>::size_type i = 0; i < hist_result.size(); ++i) {
+                        
+                        cout << (i * bucketSize) << "-" << ((i + 1) * bucketSize - 1) << " -> " << hist_result[i] << "\n";
+                        
+                    }
+
+                }
+                
+            } else {
+                
+                cout << "ERROR: No displacement values obtained for Row #: " << rowNumber;
+                
+            }
+
             rowNumber = originPixelCoords.y;
             
             raw_result.clear();
@@ -281,29 +333,31 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
     vector<Mat> mats;
     int nRows = inputMat.rows;
     int nCols = inputMat.cols;
+    int halfPatchSize = (patchSize / 2);
     
     int i,j;
     uchar* p;
     
     //CG - Stop extracting patches when we get to the bottom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
-    for(i = (patchSize / 2); i < (nRows - (patchSize / 2)); i+=2)
+    for(i = halfPatchSize; i < (nRows - halfPatchSize); i+=2)
     {
         
         p = inputMat.ptr<uchar>(i);
+        
+        //CG - Push back the current row number (used for printing results later on).
         rows.push_back(i);
         
-        for (j = (patchSize / 2); j < (nCols - (patchSize / 2)); j+=2)
+        for (j = halfPatchSize; j < (nCols - halfPatchSize); j+=2)
         {
             
-            int x = j - (patchSize / 2);
+            int x = j - halfPatchSize;
             
-            int y = i - (patchSize / 2);
+            int y = i - halfPatchSize;
             
             mats.push_back(inputMat(Rect(x,y,patchSize,patchSize)));
             
             //CG - Same as Point2f (typename alias)
             points.push_back(Point_<float>(j, i));
-            
             
         }
         
