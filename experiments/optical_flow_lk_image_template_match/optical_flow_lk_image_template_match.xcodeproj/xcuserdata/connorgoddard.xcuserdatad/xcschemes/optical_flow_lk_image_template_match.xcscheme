@@ -59,11 +59,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "../../../eval_data/1.JPG"
+            argument = "../../../eval_data/motion_images/1.JPG"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "../../../eval_data/2.JPG"
+            argument = "../../../eval_data/motion_images/2.JPG"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

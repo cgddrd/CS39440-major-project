@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		996D4AE71AA894E9000191AC /* TemplateMatching.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 996D4AE51AA894E9000191AC /* TemplateMatching.cpp */; };
 		99DD73501A9A3F54006E73B7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 99DD734F1A9A3F54006E73B7 /* main.cpp */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		996D4AE51AA894E9000191AC /* TemplateMatching.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TemplateMatching.cpp; sourceTree = "<group>"; };
+		996D4AE61AA894E9000191AC /* TemplateMatching.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = TemplateMatching.h; sourceTree = "<group>"; };
 		99DD734C1A9A3F54006E73B7 /* optical_flow_lk_image_template_match */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = optical_flow_lk_image_template_match; sourceTree = BUILT_PRODUCTS_DIR; };
 		99DD734F1A9A3F54006E73B7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,6 +61,8 @@
 			isa = PBXGroup;
 			children = (
 				99DD734F1A9A3F54006E73B7 /* main.cpp */,
+				996D4AE51AA894E9000191AC /* TemplateMatching.cpp */,
+				996D4AE61AA894E9000191AC /* TemplateMatching.h */,
 			);
 			path = optical_flow_lk_image_template_match;
 			sourceTree = "<group>";
@@ -119,6 +124,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				99DD73501A9A3F54006E73B7 /* main.cpp in Sources */,
+				996D4AE71AA894E9000191AC /* TemplateMatching.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,12 +10,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447106733.169749"
+            timestampString = "447259489.536644"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "298"
-            endingLineNumber = "298"
-            landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords)"
+            startingLineNumber = "319"
+            endingLineNumber = "319"
+            landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords, string histFileName)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447106733.169749"
+            timestampString = "447259489.536644"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "255"
-            endingLineNumber = "255"
+            startingLineNumber = "276"
+            endingLineNumber = "276"
             landmarkName = "calcHistogram(double bucketSize, vector&lt;double&gt; values, double maxVal)"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "447106733.169749"
+            timestampString = "447259489.536644"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "519"
-            endingLineNumber = "519"
+            startingLineNumber = "556"
+            endingLineNumber = "556"
             landmarkName = "calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double&amp; highScore, double&amp; highScoreIndexY)"
             landmarkType = "7">
          </BreakpointContent>
