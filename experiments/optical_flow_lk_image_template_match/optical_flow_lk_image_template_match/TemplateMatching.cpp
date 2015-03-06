@@ -1,5 +1,5 @@
 //
-//  EuclideanDistance.cpp
+//  TemplateMatching.cpp
 //  optical_flow_lk_image_template_match
 //
 //  Created by Connor Goddard on 05/03/2015.
@@ -13,82 +13,74 @@ using namespace cv;
 
 TemplateMatching::TemplateMatching() {}
 
-void TemplateMatching::calcEuclideanDistance() {
+double TemplateMatching::calcEuclideanDistance(Mat& patch1, Mat& patch2) {
     
-    
-    
+    // Euclidean distance returns the SQRT of the sum of squared differences.
+    return sqrt(calcSSD(patch1, patch2));
 }
 
-void TemplateMatching::calcSSD(Mat& patch1, Mat& patch2) {
+double TemplateMatching::calcSSD(Mat& patch1, Mat& patch2) {
     
     // accept only char type matrices
     CV_Assert(patch1.depth() != sizeof(uchar));
     CV_Assert(patch2.depth() != sizeof(uchar));
     
+    double ssd = 0;
+    
+    // Template patch (patch1) is a ROI from a larger image, therefore it currently CANNOT BE CONTINUOUS!
+    // Mat test = patch1.clone();
+    
     if (patch1.rows == patch2.rows && patch1.cols == patch2.cols) {
         
-        
-        
-        // SLOWER/SAFER APPROACH USING ITERATOR!
-        
-        MatIterator_<Vec3b> it, end;
-        double t = (double)getTickCount();
-        for( it = patch1.begin<Vec3b>(), end = patch1.end<Vec3b>(); it != end; ++it)
-        {
-            
-            // Set the B and G channels to 0.
-            (*it)[0] = 0;
-            (*it)[1] = 0;
-            
-        }
-        
-        t = ((double)getTickCount() - t)/getTickFrequency();
-        cout << "Times passed in seconds: " << t << endl;
-        
-        
         // FASTEST APPROACH - USING C-STYLE POINTER!
-        
         int nRows = patch2.rows;
-        int nCols = patch2.cols;
+        int nCols = patch2.cols * patch2.channels();
         
-        if (patch2.isContinuous())
+        if (patch1.isContinuous() && patch2.isContinuous())
         {
             nCols *= nRows;
             nRows = 1;
         }
         
         int i,j;
-        Vec3b* p;
-        
-        t = (double)getTickCount();
+        double diff = 0.0;
+        uchar* p1;
+        uchar* p2;
+        int channelNo = 0;
         
         for( i = 0; i < nRows; ++i)
         {
             
             // Get a pointer to the VECTOR of COLUMNS for the current ROW.
-            p = patch2.ptr<Vec3b>(i);
+            p1 = patch1.ptr<uchar>(i);
+            p2 = patch2.ptr<uchar>(i);
             
             for ( j = 0; j < nCols; ++j)
             {
-                // Access the current COLUMN (j) and then within that we can access each of the channels: B (0), G (1), R(2).
-                // Set the B and G channels to 0.
-                p[j][0] = 0;
-                p[j][1] = 0;
+                
+                //We only want to extract channels 0 and 1. (2 = Value (HSV) -> IGNORE!)
+                if (channelNo <= 1) {
+                    
+                    diff = int(p1[j]) - int(p2[j]);
+                    
+                    ssd += (diff * diff);
+                    
+                    channelNo++;
+                    
+                } else {
+                    
+                    channelNo = 0;
+                }
+                
             }
         }
         
-        t = ((double)getTickCount() - t)/getTickFrequency();
-        cout << "Times passed in seconds2: " << t << endl;
-        
-        imshow("fsdfs", patch1);
-        imshow("fsdfs", patch2);
-        waitKey();
         
     } else {
         
         cout << "ERROR: Two images are not of the same size!" << endl;
     }
     
+    return ssd;
+    
 }
-
-

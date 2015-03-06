@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <cmath>
 
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/video/tracking.hpp>
@@ -21,8 +22,8 @@ class TemplateMatching {
 public:
     
     TemplateMatching();
-    static void calcEuclideanDistance();
-    static void calcSSD(cv::Mat& patch1, cv::Mat& patch2);
+    static double calcEuclideanDistance(cv::Mat& patch1, cv::Mat& patch2);
+    static double calcSSD(cv::Mat& patch1, cv::Mat& patch2);
 };
 
 #endif /* defined(__optical_flow_lk_image_template_match__EuclideanDistance__) */
