@@ -13,6 +13,12 @@ using namespace cv;
 
 TemplateMatching::TemplateMatching() {}
 
+double TemplateMatching::calcEuclideanDistanceNorm(Mat& patch1, Mat& patch2) {
+    
+    return norm(patch1, patch2, NORM_L2);
+    
+}
+
 double TemplateMatching::calcEuclideanDistance(Mat& patch1, Mat& patch2) {
     
     // Euclidean distance returns the SQRT of the sum of squared differences.
