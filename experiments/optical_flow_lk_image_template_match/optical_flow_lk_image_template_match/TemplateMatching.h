@@ -24,12 +24,10 @@ public:
     TemplateMatching();
     static double calcEuclideanDistance(cv::Mat& patch1, cv::Mat& patch2);
     static double calcEuclideanDistanceNorm(cv::Mat& patch1, cv::Mat& patch2);
-    static double calcSSD(cv::Mat& patch1, cv::Mat& patch2);
-    static double calcCorrelaton(cv::Mat& patch1, cv::Mat& patch2);
-    static double calcNormalisationFactor(int pixel1, int pixel2);
-    static double calcSSDNormalised(cv::Mat& patch1, cv::Mat& patch2);
-    static double calcNormalisationFactorLoop(cv::Mat& patch1, cv::Mat& patch2);
-    static double calcNormalisationFactorLoop2(cv::Mat& patch1, cv::Mat& patch2);
+    static long double calcSSD(cv::Mat& patch1, cv::Mat& patch2);
+    static long double calcCorrelaton(cv::Mat& patch1, cv::Mat& patch2);
+    static long double calcSSDNormalised(cv::Mat& patch1, cv::Mat& patch2);
+    static long double calcNormalisationFactor(cv::Mat& patch1, cv::Mat& patch2);
 };
 
 #endif /* defined(__optical_flow_lk_image_template_match__EuclideanDistance__) */

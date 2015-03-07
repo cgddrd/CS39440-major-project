@@ -53,7 +53,7 @@ int main(int argc, char** argv) {
     
     //vector<vector<string>> files {{"1.JPG", "2.JPG"}, {"3.JPG", "4.JPG"}, {"5.JPG", "6.JPG"}, {"7.JPG", "8.JPG"}, {"9.JPG", "10.JPG"}, {"11.JPG", "12.JPG"}};
     
-    vector<vector<string>> files {{"1.JPG", "2.JPG"}};
+    vector<vector<string>> files {{"1.JPG", "2.JPG"}, {"1.JPG", "TEST.JPG"}};
 
     vector<int> patchSizes{50};
     
@@ -95,13 +95,21 @@ int main(int argc, char** argv) {
         merge(hsvChannelsImg1,3,img1ColourTransform);
         merge(hsvChannelsImg2,3,img2ColourTransform);
         
+        imshow("dhdjfs", img1ColourTransform);
+        imshow("fdfdf", img2ColourTransform);
+       // waitKey();
+        
 //        startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
         
-        double test1 = (TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform) / TemplateMatching::calcNormalisationFactorLoop(img1ColourTransform, img2ColourTransform));
+        double test1 = TemplateMatching::calcCorrelaton(img1ColourTransform, img2ColourTransform);
         
-        double test2 = (TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform) / TemplateMatching::calcNormalisationFactorLoop2(img1ColourTransform, img2ColourTransform));
+        double test2 = TemplateMatching::calcSSDNormalised(img1ColourTransform, img2ColourTransform);
         
-        cout << "1: " << test1 << "\n2: " << test2 << endl;
+        double test3 = TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform);
+        
+        double test4 = TemplateMatching::calcEuclideanDistanceNorm(img1ColourTransform, img2ColourTransform);
+        
+        cout << "Correlation: " << test1 << "\nSSD Norm: " << test2 << "\nSSD: " << test3 << "\nEuclidean Distance: " << test4 << "\n" << endl;
         
         pairNo++;
         
