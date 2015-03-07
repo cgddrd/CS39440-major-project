@@ -25,6 +25,7 @@ public:
     static double calcEuclideanDistance(cv::Mat& patch1, cv::Mat& patch2);
     static double calcEuclideanDistanceNorm(cv::Mat& patch1, cv::Mat& patch2);
     static double calcSSD(cv::Mat& patch1, cv::Mat& patch2);
+    static double calcCorrelaton(cv::Mat& patch1, cv::Mat& patch2);
 };
 
 #endif /* defined(__optical_flow_lk_image_template_match__EuclideanDistance__) */

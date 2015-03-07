@@ -15,10 +15,11 @@ using namespace std;
 
 vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize = 10);
 void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
+void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
 void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, int& highScoreIndexY);
 vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords, string histFileName);
-void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "ed3_filtered_result_patch_");
-void exportTimeResults(vector<double> timeTaken, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "ed3_filtered_time_test_");
+void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "result_patch_");
+void exportTimeResults(vector<double> timeTaken, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "time_test_");
 string getMatchMethodName(int matchMethod);
 void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type);
 vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVal);
@@ -29,7 +30,19 @@ double imgROIStartX = 0;
 
 bool simplePatches = false;
 bool useGUI = false;
-bool ed = true;
+bool exhaustiveSearch = false;
+
+enum
+{
+    TEST_SQDIFF        =0,
+    TEST_SQDIFF_NORMED =1,
+    TEST_CCORR         =2,
+    TEST_CCORR_NORMED  =3,
+    TEST_CCOEFF        =4,
+    TEST_CCOEFF_NORMED =5,
+    TEST_NORM =6,
+    TEST_CORR =7
+};
 
 int main(int argc, char** argv) {
     
@@ -72,7 +85,7 @@ int main(int argc, char** argv) {
     merge(hsvChannelsImg1,3,img1ColourTransform);
     merge(hsvChannelsImg2,3,img2ColourTransform);
     
-    vector<int> methods {CV_TM_SQDIFF};
+    vector<int> methods {CV_TM_CCOEFF_NORMED};
     
     vector<int> patchSizes{50};
     
@@ -96,18 +109,32 @@ int main(int argc, char** argv) {
 string getMatchMethodName(int matchMethod) {
     
     switch (matchMethod) {
-        case CV_TM_SQDIFF_NORMED:
+            /*case CV_TM_SQDIFF_NORMED:
+             return "SQDIFF_NORMED";
+             case CV_TM_SQDIFF:
+             return "SQDIFF";
+             case CV_TM_CCORR_NORMED:
+             return "CCORR_NORMED";
+             case CV_TM_CCORR:
+             return "CCORR";
+             case CV_TM_CCOEFF_NORMED:
+             return "CCOEFF_NORMED";
+             case CV_TM_CCOEFF:
+             return "CCOEFF";*/
+        case TEST_SQDIFF_NORMED:
             return "SQDIFF_NORMED";
-        case CV_TM_SQDIFF:
+        case TEST_SQDIFF:
             return "SQDIFF";
-        case CV_TM_CCORR_NORMED:
+        case TEST_CCORR_NORMED:
             return "CCORR_NORMED";
-        case CV_TM_CCORR:
+        case TEST_CCORR:
             return "CCORR";
-        case CV_TM_CCOEFF_NORMED:
+        case TEST_CCOEFF_NORMED:
             return "CCOEFF_NORMED";
-        case CV_TM_CCOEFF:
+        case TEST_CCOEFF:
             return "CCOEFF";
+        case TEST_NORM:
+            return "NORM";
         default:
             return "UNKNOWN";
     }
@@ -115,7 +142,7 @@ string getMatchMethodName(int matchMethod) {
 
 void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type) {
     
-    int testCount = 0;
+    int testCount = 1;
     
     for(vector<int>::iterator it1 = roiDimensions.begin(); it1 != roiDimensions.end(); ++it1) {
         
@@ -298,54 +325,12 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             
             if (!raw_result.empty()) {
                 
-                vector<double> filtered = Utils::filterOutliers(raw_result);
+                //vector<double> filtered = Utils::filterOutliers(raw_result);
                 
-                double mean = Utils::calcMean(filtered);
-                double sdDev = Utils::calcStandardDeviation(filtered);
+                double mean = Utils::calcMean(raw_result);
+                // double sdDev = Utils::calcStandardDeviation(filtered);
                 
                 avg_result.push_back(mean);
-                
-                /*if (rowNumber == (image2ROI.rows / 2)) {
-                 
-                 double maxVal = *max_element(raw_result.begin(), raw_result.end());
-                 
-                 double bucketSize = 2;
-                 
-                 vector<int> hist_result = calcHistogram(bucketSize, raw_result, maxVal);
-                 
-                 cout<< "RAW VALUES\n";
-                 
-                 for (std::vector<int>::size_type i = 0; i < raw_result.size(); ++i) {
-                 
-                 cout << raw_result[i] << "\n";
-                 
-                 }
-                 
-                 cout << "\n\nHISTOGRAM\n";
-                 
-                 ostringstream histstream;
-                 ofstream histfile;
-                 
-                 histfile.open (histFileName, ios::out | ios::trunc);
-                 
-                 histstream << "descriptor displacement frequency\n";
-                 
-                 for (std::vector<int>::size_type i = 0; i < hist_result.size(); ++i) {
-                 
-                 cout << (i * bucketSize) << " -> " << hist_result[i] << "\n";
-                 
-                 histstream << (i * bucketSize) << " " << hist_result[i] << "\n";
-                 
-                 histfile << histstream.str();
-                 
-                 histstream.clear();
-                 histstream.str("");
-                 
-                 }
-                 
-                 histfile.close();
-                 
-                 } */
                 
             } else {
                 
@@ -360,8 +345,8 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         }
         
         /* if(rowNumber >=(patchSize / 2) + 1) {
-            break;
-        } */
+         break;
+         } */
         
         int localisedWindowWidth = templatePatch.cols;
         int localisedWindowHeight = image2ROI.rows - (originPixelCoords.y - (templatePatch.cols / 2));
@@ -382,7 +367,10 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             
         }
         
-        raw_result.push_back(displacement);
+        if (displacement <= (templatePatch.rows*2)) {
+            // break;
+            raw_result.push_back(displacement);
+        }
         
         patchCount++;
         
@@ -435,84 +423,64 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
     return mats;
 }
 
-void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, int& highScoreIndexY) {
+void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY) {
     
-    Mat hist_template, hist_current, currentPatch;
+    Mat resultMat, currentPatch;
     
     //Set "initialiser" value for best match score.
-    int bestScoreYIndex = -1;
+    double bestScoreYIndex = -1;
     double bestScore = -1;
     
-    /// Using 50 bins for hue and 60 for saturation
-    int h_bins = 50; int s_bins = 60;
-    int histSize[] = { h_bins, s_bins };
+    // Create the resultMat matrix
+    int resultMat_cols =  localisedSearchWindow.cols - templatePatch.cols + 1;
+    int resultMat_rows = localisedSearchWindow.rows - templatePatch.rows + 1;
     
-    // hue varies from 0 to 179, saturation from 0 to 255
-    float h_ranges[] = { 0, 180 };
-    float s_ranges[] = { 0, 256 };
+    resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
     
-    const float* ranges[] = { h_ranges, s_ranges };
+    //Do the Matching and Normalize
+    matchTemplate( localisedSearchWindow, templatePatch, resultMat, match_method );
+    normalize( resultMat, resultMat, 0, 1, NORM_MINMAX, -1, Mat() );
     
-    // Use the 0-th and 1-st channels
-    int channels[] = { 0, 1 };
+    //Localizing the best match with minMaxLoc
+    double minVal, maxVal;
+    Point minLoc; Point maxLoc;
+    Point matchLoc;
     
-    bool stop = false;
+    //We do not need to pass in any 'Point' objects, as we are not interested in getting the "best match point" location back (as the 'result' matrix is only 1px x 1px in size).
+    minMaxLoc( resultMat, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
     
-    for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
+    if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
     {
         
-        currentPatch = localisedSearchWindow.clone();
-        currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
+        matchLoc = minLoc;
         
-        // Calculate the histogram for the template patch image.
-        calcHist( &templatePatch, 1, channels, Mat(), hist_template, 2, histSize, ranges, true, false );
-        normalize( hist_template, hist_template, 0, 1, NORM_MINMAX, -1, Mat() );
+        bestScore = minVal;
         
-        calcHist( &currentPatch, 1, channels, Mat(), hist_current, 2, histSize, ranges, true, false );
-        normalize( hist_current, hist_current, 0, 1, NORM_MINMAX, -1, Mat() );
+        bestScoreYIndex = matchLoc.y;
         
-        double histresult = compareHist( hist_current, hist_template, hist_match_method );
+    }
+    else
+    {
+        matchLoc = maxLoc;
         
-        if( hist_match_method  == CV_COMP_BHATTACHARYYA || hist_match_method == CV_COMP_CHISQR )
-        {
-            
-            if (bestScore == -1 || histresult < bestScore) {
-                
-                bestScore = histresult;
-                bestScoreYIndex = i;
-                
-            } else {
-                
-                stop = true;
-            }
-            
-        }
-        else
-        {
-            
-            if (bestScore == -1 || histresult > bestScore) {
-                
-                bestScore = histresult;
-                bestScoreYIndex = i;
-                
-            } else {
-                
-                stop = true;
-                
-            }
-            
-        }
+        bestScore = maxVal;
         
-        if (stop) {
-            
-            break;
-            
-        }
-        
+        bestScoreYIndex = matchLoc.y;
     }
     
     highScore = bestScore;
     highScoreIndexY = bestScoreYIndex;
+    
+    //    imshow("serach", localisedSearchWindow);
+    //    imshow("template", templatePatch);
+    //    imshow("result mat", resultMat);
+    //
+    //    waitKey(1);
+    
+    
+    // cout << highScore << " : " << highScoreIndexY << endl;
+    
+    //waitKey();
     
 }
 
@@ -527,94 +495,114 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
     
     bool stop = false;
     
-    for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
-    {
-        currentPatch = localisedSearchWindow.clone();
-        currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
+    if (!exhaustiveSearch) {
         
-        // Create the resultMat matrix
-        int resultMat_cols =  currentPatch.cols - templatePatch.cols + 1;
-        int resultMat_rows = currentPatch.rows - templatePatch.rows + 1;
-        
-        resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
-        
-        if (ed) {
+        for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
+        {
+            currentPatch = localisedSearchWindow.clone();
+            currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
             
-            //Calculate Euclidean Distance.
-            double result = TemplateMatching::calcEuclideanDistanceNorm(templatePatch, currentPatch);
+            // Create the resultMat matrix
+            int resultMat_cols =  currentPatch.cols - templatePatch.cols + 1;
+            int resultMat_rows = currentPatch.rows - templatePatch.rows + 1;
             
-            if (bestScore == -1 || result < bestScore) {
+            resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
+            
+            if (match_method == TEST_NORM) {
                 
-                bestScore = result;
-                bestScoreYIndex = i;
+                //Calculate Euclidean Distance.
+                double result = TemplateMatching::calcEuclideanDistanceNorm(templatePatch, currentPatch);
+                
+                if (bestScore == -1 || result < bestScore) {
+                    
+                    bestScore = result;
+                    bestScoreYIndex = i;
+                    
+                } else {
+                    
+                    stop = true;
+                    
+                }
+                
+            } else if (match_method == TEST_CORR) {
+                
+                //Calculate Euclidean Distance.
+                double result = TemplateMatching::calcCorrelaton(templatePatch, currentPatch);
+                
+                if (bestScore == -1 || result > bestScore) {
+                    
+                    bestScore = result;
+                    bestScoreYIndex = i;
+                    
+                } else {
+                    
+                    stop = true;
+                    
+                }
                 
             } else {
                 
-                stop = true;
+                //Do the Matching and Normalize
+                matchTemplate( currentPatch, templatePatch, resultMat, match_method );
                 
-            }
-            
-        } else {
-            
-            //Do the Matching and Normalize
-            matchTemplate( currentPatch, templatePatch, resultMat, match_method );
-            
-            //Localizing the best match with minMaxLoc
-            double minVal, maxVal;
-            
-            //We do not need to pass in any 'Point' objects, as we are not interested in getting the "best match point" location back (as the 'result' matrix is only 1px x 1px in size).
-            minMaxLoc( resultMat, &minVal, &maxVal, NULL, NULL, Mat() );
-            
-            //For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better.
-            if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
-            {
+                //Localizing the best match with minMaxLoc
+                double minVal, maxVal;
                 
-                if (bestScore == -1 || minVal < bestScore) {
+                //We do not need to pass in any 'Point' objects, as we are not interested in getting the "best match point" location back (as the 'result' matrix is only 1px x 1px in size).
+                minMaxLoc( resultMat, &minVal, &maxVal, NULL, NULL, Mat() );
+                
+                //For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better.
+                if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+                {
                     
-                    bestScore = minVal;
-                    bestScoreYIndex = i;
+                    if (bestScore == -1 || minVal < bestScore) {
+                        
+                        bestScore = minVal;
+                        bestScoreYIndex = i;
+                        
+                    } else {
+                        
+                        stop = true;
+                    }
                     
-                } else {
+                    //cout << "I: " << i << " - Min Result: " << minVal << endl;
+                    //myfile << i << " " <<  minVal << "\n";
+                }
+                else
+                {
                     
-                    stop = true;
+                    if (bestScore == -1 || maxVal > bestScore) {
+                        
+                        bestScore = maxVal;
+                        bestScoreYIndex = i;
+                        
+                    } else {
+                        
+                        stop = true;
+                    }
+                    
+                    //cout << "I: " << i << " - Max Result: " << maxVal << endl;
+                    //myfile << i << " " <<  maxVal << "\n";
+                    
+                }
+                
+                if (stop) {
+                    
+                    break;
+                    
                 }
                 
             }
-            else
-            {
-                
-                if (bestScore == -1 || maxVal > bestScore) {
-                    
-                    bestScore = maxVal;
-                    bestScoreYIndex = i;
-                    
-                } else {
-                    
-                    stop = true;
-                }
-                
-            }
-
-        }
-        
-        
-        if (useGUI) {
-            //CG - Allows the output window displaying the current patch to be updated automatically.
-            cv::waitKey(10);
-            resize(resultMat, resultMat, Size(resultMat.cols*100, resultMat.rows*100));
-            imshow("Normalised Result", resultMat);
-        }
-        
-        
-        if (stop) {
-            
-            break;
             
         }
+        
+        highScore = bestScore;
+        highScoreIndexY = bestScoreYIndex;
+        
+    } else {
+        
+        calcPatchMatchScore2(localisedSearchWindow, templatePatch, match_method, highScore, highScoreIndexY);
         
     }
-    
-    highScore = bestScore;
-    highScoreIndexY = bestScoreYIndex;
     
 }
