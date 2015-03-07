@@ -21,7 +21,7 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
 void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "result_patch_");
 void exportTimeResults(vector<double> timeTaken, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "time_test_");
 string getMatchMethodName(int matchMethod);
-void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type);
+void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type, int pairNo);
 vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVal);
 
 Mat img1;
@@ -34,14 +34,8 @@ bool exhaustiveSearch = false;
 
 enum
 {
-    TEST_SQDIFF        =0,
-    TEST_SQDIFF_NORMED =1,
-    TEST_CCORR         =2,
-    TEST_CCORR_NORMED  =3,
-    TEST_CCOEFF        =4,
-    TEST_CCOEFF_NORMED =5,
-    TEST_NORM =6,
-    TEST_CORR =7
+    CUSTOM_NORM =6,
+    CUSTOM_CORR =7
 };
 
 int main(int argc, char** argv) {
@@ -53,54 +47,68 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
-    img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+    vector<int> methods {CUSTOM_NORM};
     
+    string fileRootPath = "../../../eval_data/motion_images/";
     
-    if(img1.empty() || img2.empty())
-    {
-        printf("Can't read one of the images\n");
-        return -1;
-    }
+    //vector<vector<string>> files {{"1.JPG", "2.JPG"}, {"3.JPG", "4.JPG"}, {"5.JPG", "6.JPG"}, {"7.JPG", "8.JPG"}, {"9.JPG", "10.JPG"}, {"11.JPG", "12.JPG"}};
     
-    // resize(img1, img1, Size(floor(img1.cols * negativeScalingFactor), floor(img1.rows * negativeScalingFactor)));
-    // resize(img2, img2, Size(floor(img2.cols * negativeScalingFactor), floor(img2.rows * negativeScalingFactor)));
-    
-    cout << "Image Size: " << img1.cols << "px x " << img1.rows << "px.\n";
-    
-    //BGR2HSV = Hue Range: 0-180
-    //BGR2HSV_FULL = Hue Range: 0-360
-    cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
-    cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
-    
-    Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
-    
-    split(img1ColourTransform, hsvChannelsImg1);
-    split(img2ColourTransform, hsvChannelsImg2);
-    
-    //Set VALUE channel to 0
-    hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
-    hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
-    
-    merge(hsvChannelsImg1,3,img1ColourTransform);
-    merge(hsvChannelsImg2,3,img2ColourTransform);
-    
-    vector<int> methods {CV_TM_CCOEFF_NORMED};
-    
+    vector<vector<string>> files {{"1.JPG", "2.JPG"}};
+
     vector<int> patchSizes{50};
     
     vector<int> roiSizes {40};
     
     double totalElaspedTime = (double)getTickCount();
     
-    startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods);
+    int pairNo = 1;
+    
+    for(vector<vector<string>>::iterator it = files.begin(); it != files.end(); ++it) {
+        
+        vector<string> currentFilePair = (*it);
+        
+        img1 = imread(fileRootPath + currentFilePair[0], CV_LOAD_IMAGE_COLOR);
+        img2 = imread(fileRootPath + currentFilePair[1], CV_LOAD_IMAGE_COLOR);
+        
+        if(img1.empty() || img2.empty())
+        {
+            printf("Can't read one of the images\n");
+            return -1;
+        }
+        
+        cout << "Image Size: " << img1.cols << "px x " << img1.rows << "px.\n";
+        
+        //BGR2HSV = Hue Range: 0-180
+        //BGR2HSV_FULL = Hue Range: 0-360
+        cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
+        cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
+        
+        Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
+        
+        split(img1ColourTransform, hsvChannelsImg1);
+        split(img2ColourTransform, hsvChannelsImg2);
+        
+        //Set VALUE channel to 0
+        hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
+        hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
+        
+        merge(hsvChannelsImg1,3,img1ColourTransform);
+        merge(hsvChannelsImg2,3,img2ColourTransform);
+        
+//        startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
+        
+        double test1 = (TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform) / TemplateMatching::calcNormalisationFactorLoop(img1ColourTransform, img2ColourTransform));
+        
+        double test2 = (TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform) / TemplateMatching::calcNormalisationFactorLoop2(img1ColourTransform, img2ColourTransform));
+        
+        cout << "1: " << test1 << "\n2: " << test2 << endl;
+        
+        pairNo++;
+        
+        
+    }
     
     cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
-    
-    if (useGUI) {
-        imshow("Output", img2);
-        waitKey();
-    }
     
     return 0;
     
@@ -109,38 +117,28 @@ int main(int argc, char** argv) {
 string getMatchMethodName(int matchMethod) {
     
     switch (matchMethod) {
-            /*case CV_TM_SQDIFF_NORMED:
-             return "SQDIFF_NORMED";
-             case CV_TM_SQDIFF:
-             return "SQDIFF";
-             case CV_TM_CCORR_NORMED:
-             return "CCORR_NORMED";
-             case CV_TM_CCORR:
-             return "CCORR";
-             case CV_TM_CCOEFF_NORMED:
-             return "CCOEFF_NORMED";
-             case CV_TM_CCOEFF:
-             return "CCOEFF";*/
-        case TEST_SQDIFF_NORMED:
+        case CV_TM_SQDIFF_NORMED:
             return "SQDIFF_NORMED";
-        case TEST_SQDIFF:
+        case CV_TM_SQDIFF:
             return "SQDIFF";
-        case TEST_CCORR_NORMED:
+        case CV_TM_CCORR_NORMED:
             return "CCORR_NORMED";
-        case TEST_CCORR:
+        case CV_TM_CCORR:
             return "CCORR";
-        case TEST_CCOEFF_NORMED:
+        case CV_TM_CCOEFF_NORMED:
             return "CCOEFF_NORMED";
-        case TEST_CCOEFF:
+        case CV_TM_CCOEFF:
             return "CCOEFF";
-        case TEST_NORM:
+        case CUSTOM_NORM:
             return "NORM";
+        case CUSTOM_CORR:
+            return "CORR";
         default:
             return "UNKNOWN";
     }
 }
 
-void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type) {
+void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type, int pairNo) {
     
     int testCount = 1;
     
@@ -172,9 +170,9 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
             
             for(vector<int>::iterator it3 = match_type.begin(); it3 != match_type.end(); ++it3) {
                 
-                cout << "BEGIN: Test #" << testCount << ": ROI Size = " << *it1 << ", Patch Size = " << *it2 << ", Match Method = " << getMatchMethodName(*it3) << endl;
+                cout << "BEGIN: Test #" << testCount << ": ROI Size: " << *it1 << ", Patch Size: " << *it2 << ", Match Method: " << getMatchMethodName(*it3) << ", Pair No: " << pairNo << endl;
                 
-                cout << "ROI Size: " << image2ROI.cols << "px x " << image2ROI.rows << "px." << endl;
+                cout << "ROI Size: " << image2ROI.cols << "px x " << image2ROI.rows << "px" << endl;
                 
                 double testElaspedTime = (double)getTickCount();
                 
@@ -193,10 +191,20 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
                 
             }
             
+            std::stringstream sstm;
+            sstm << "result_pair" << pairNo;
             
-            exportResults(allResults, result_rows, match_type, *it1, *it2);
+            exportResults(allResults, result_rows, match_type, *it1, *it2, sstm.str());
             
-            exportTimeResults(timeDurations, match_type, *it1, *it2);
+            sstm.str("");
+            sstm.clear();
+            
+            sstm << "tresult_pair" << pairNo;
+            
+            exportTimeResults(timeDurations, match_type, *it1, *it2, sstm.str());
+            
+            sstm.str("");
+            sstm.clear();
             
         }
         
@@ -210,14 +218,14 @@ void exportResults(vector<vector<double > > all_results, vector<int> rows, vecto
     ostringstream oStream;
     ofstream myfile;
     
-    oStream << fileNamePrefix << roiSize << "_" << patchSize << ".dat";
+    oStream << fileNamePrefix << "_roi" << roiSize << "_patch" << patchSize << ".dat";
     
     myfile.open (oStream.str(), ios::out | ios::trunc);
     
     oStream.clear();
     oStream.str("");
     
-    oStream << "descriptor image_row";
+    oStream << "descriptor row";
     
     for(std::vector<int>::size_type i = 0; i != methods.size(); i++) {
         
@@ -255,14 +263,14 @@ void exportTimeResults(vector<double> timeTaken, vector<int> methods, int roiSiz
     ostringstream oStream;
     ofstream myfile;
     
-    oStream << fileNamePrefix << roiSize << "_" << patchSize << ".dat";
+    oStream << fileNamePrefix << "_roi" << roiSize << "_patch" << patchSize << ".dat";
     
     myfile.open (oStream.str(), ios::out | ios::trunc);
     
     oStream.clear();
     oStream.str("");
     
-    myfile << "descriptor match_method time_taken\n";
+    myfile << "descriptor method time\n";
     
     for(std::vector<int>::size_type i = 0; i != timeTaken.size(); i++) {
         
@@ -471,17 +479,6 @@ void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int matc
     highScore = bestScore;
     highScoreIndexY = bestScoreYIndex;
     
-    //    imshow("serach", localisedSearchWindow);
-    //    imshow("template", templatePatch);
-    //    imshow("result mat", resultMat);
-    //
-    //    waitKey(1);
-    
-    
-    // cout << highScore << " : " << highScoreIndexY << endl;
-    
-    //waitKey();
-    
 }
 
 
@@ -508,7 +505,7 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
             
             resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
             
-            if (match_method == TEST_NORM) {
+            if (match_method == CUSTOM_NORM) {
                 
                 //Calculate Euclidean Distance.
                 double result = TemplateMatching::calcEuclideanDistanceNorm(templatePatch, currentPatch);
@@ -524,7 +521,7 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
                     
                 }
                 
-            } else if (match_method == TEST_CORR) {
+            } else if (match_method == CUSTOM_CORR) {
                 
                 //Calculate Euclidean Distance.
                 double result = TemplateMatching::calcCorrelaton(templatePatch, currentPatch);
@@ -564,9 +561,6 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
                         
                         stop = true;
                     }
-                    
-                    //cout << "I: " << i << " - Min Result: " << minVal << endl;
-                    //myfile << i << " " <<  minVal << "\n";
                 }
                 else
                 {
@@ -581,16 +575,13 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
                         stop = true;
                     }
                     
-                    //cout << "I: " << i << " - Max Result: " << maxVal << endl;
-                    //myfile << i << " " <<  maxVal << "\n";
-                    
                 }
                 
-                if (stop) {
-                    
-                    break;
-                    
-                }
+            }
+            
+            if (stop) {
+                
+                break;
                 
             }
             
