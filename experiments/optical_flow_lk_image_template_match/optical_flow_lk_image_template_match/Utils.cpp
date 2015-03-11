@@ -9,6 +9,7 @@
 #include "Utils.h"
 
 using namespace std;
+using namespace cv;
 
 Utils::Utils() {}
 
@@ -60,18 +61,22 @@ double Utils::calcVariance(vector<double> values) {
 
 double Utils::calcMean(vector<double> values) {
     
-//    ofstream myfile;
-//
-//    myfile.open ("data.csv", ios::out | ios::trunc);
-//    
-//    for(int i = 0; i < values.size(); i++){
-//        myfile << values[i] << "\n";
-//    }
-//    
-//    myfile.close();
-    
     double sum = accumulate(values.begin(), values.end(), 0.0);
     
     return sum / values.size();
     
+}
+
+// CG - Arrowed Line drawing method. (PhilLab - http://stackoverflow.com/questions/10161351) (Built into OpenCV v3.0.0)
+void Utils::arrowedLine(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness, int line_type, int shift, double tipLength)
+{
+    const double tipSize = norm(pt1-pt2)*tipLength; // Factor to normalize the size of the tip depending on the length of the arrow
+    line(img, pt1, pt2, color, thickness, line_type, shift);
+    const double angle = atan2( (double) pt1.y - pt2.y, (double) pt1.x - pt2.x );
+    Point p(cvRound(pt2.x + tipSize * cos(angle + CV_PI / 4)),
+            cvRound(pt2.y + tipSize * sin(angle + CV_PI / 4)));
+    line(img, p, pt2, color, thickness, line_type, shift);
+    p.x = cvRound(pt2.x + tipSize * cos(angle - CV_PI / 4));
+    p.y = cvRound(pt2.y + tipSize * sin(angle - CV_PI / 4));
+    line(img, p, pt2, color, thickness, line_type, shift);
 }

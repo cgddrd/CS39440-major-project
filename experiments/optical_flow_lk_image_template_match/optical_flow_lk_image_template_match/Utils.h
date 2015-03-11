@@ -17,6 +17,8 @@
 #include <cmath>
 #include <fstream>
 
+#include <opencv2/highgui/highgui.hpp>
+
 class Utils {
     
 public:
@@ -26,6 +28,7 @@ public:
     static double calcMean(std::vector<double> values);
     static double calcStandardDeviation(std::vector<double> values);
     static std::vector<double> filterOutliers(std::vector<double> inValues);
+    static void arrowedLine(cv::Mat& img, cv::Point pt1, cv::Point pt2, const cv::Scalar& color, int thickness=1, int line_type=8, int shift=0, double tipLength=0.1);
     
 };
 

@@ -28,14 +28,15 @@ Mat img1;
 Mat img2;
 double imgROIStartX = 0;
 
-bool simplePatches = false;
-bool useGUI = false;
+bool simplePatches = true;
+bool useGUI = true;
 bool exhaustiveSearch = false;
 
 enum
 {
     CUSTOM_NORM =6,
-    CUSTOM_CORR =7
+    CUSTOM_CORR =7,
+    CUSTOM_CORR_NORM =8
 };
 
 int main(int argc, char** argv) {
@@ -49,13 +50,17 @@ int main(int argc, char** argv) {
     
     vector<int> methods {CUSTOM_NORM};
     
-    string fileRootPath = "../../../eval_data/motion_images/";
+    //string fileRootPath = "../../../eval_data/motion_images/wiltshire_inside_10cm/";
     
-    //vector<vector<string>> files {{"1.JPG", "2.JPG"}, {"3.JPG", "4.JPG"}, {"5.JPG", "6.JPG"}, {"7.JPG", "8.JPG"}, {"9.JPG", "10.JPG"}, {"11.JPG", "12.JPG"}};
+    string fileRootPath = "../../../eval_data/motion_images/flat_10cm/";
     
-    vector<vector<string>> files {{"1.JPG", "2.JPG"}, {"1.JPG", "TEST.JPG"}};
-
-    vector<int> patchSizes{50};
+    //vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"}, {"IMG3.JPG", "IMG4.JPG"}, {"IMG5.JPG", "IMG6.JPG"}, {"IMG7.JPG", "IMG8.JPG"}, {"IMG9.JPG", "IMG10.JPG"}, {"IMG11.JPG", "IMG12.JPG"}};
+    
+    //vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"},{"IMG1.JPG", "TEST.JPG"}};
+    
+    vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"}};
+    
+    vector<int> patchSizes {50};
     
     vector<int> roiSizes {40};
     
@@ -83,40 +88,51 @@ int main(int argc, char** argv) {
         cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
         cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
         
-        Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
+        //        Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
+        //
+        //        split(img1ColourTransform, hsvChannelsImg1);
+        //        split(img2ColourTransform, hsvChannelsImg2);
+        //
+        //        //Set VALUE channel to 0
+        //        hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
+        //        hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
+        //
+        //        merge(hsvChannelsImg1,3,img1ColourTransform);
+        //        merge(hsvChannelsImg2,3,img2ColourTransform);
         
-        split(img1ColourTransform, hsvChannelsImg1);
-        split(img2ColourTransform, hsvChannelsImg2);
+        if (useGUI) {
+            imshow("Input - Image 1", img1ColourTransform);
+            imshow("Input - Image 2", img2ColourTransform);
+        }
         
-        //Set VALUE channel to 0
-        hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
-        hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
+        startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
         
-        merge(hsvChannelsImg1,3,img1ColourTransform);
-        merge(hsvChannelsImg2,3,img2ColourTransform);
+        //                double test1 = TemplateMatching::calcCorrelation(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test2 = TemplateMatching::calcSSDNormalised(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test3 = TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test4 = TemplateMatching::calcEuclideanDistanceNorm(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test5 = TemplateMatching::calcCorrelationNorm(img1ColourTransform, img2ColourTransform);
+        //
+        // cout << "Correlation: " << test1 << "\nCorrelation Norm: " << test5 << "\nSSD Norm: " << test2 << "\nSSD: " << test3 << "\nEuclidean Distance: " << test4 << "\n" << endl;
         
-        imshow("dhdjfs", img1ColourTransform);
-        imshow("fdfdf", img2ColourTransform);
-       // waitKey();
         
-//        startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
-        
-        double test1 = TemplateMatching::calcCorrelaton(img1ColourTransform, img2ColourTransform);
-        
-        double test2 = TemplateMatching::calcSSDNormalised(img1ColourTransform, img2ColourTransform);
-        
-        double test3 = TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform);
-        
-        double test4 = TemplateMatching::calcEuclideanDistanceNorm(img1ColourTransform, img2ColourTransform);
-        
-        cout << "Correlation: " << test1 << "\nSSD Norm: " << test2 << "\nSSD: " << test3 << "\nEuclidean Distance: " << test4 << "\n" << endl;
+        if (useGUI) {
+            imshow("Output", img2);
+            destroyWindow("Template Patch");
+            destroyWindow("Search Window");
+        }
         
         pairNo++;
-        
         
     }
     
     cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
+    
+    waitKey();
     
     return 0;
     
@@ -138,9 +154,11 @@ string getMatchMethodName(int matchMethod) {
         case CV_TM_CCOEFF:
             return "CCOEFF";
         case CUSTOM_NORM:
-            return "NORM";
+            return "CUSTOM_NORM";
         case CUSTOM_CORR:
-            return "CORR";
+            return "CUSTOM_CORR";
+        case CUSTOM_CORR_NORM:
+            return "CUSTOM_CORR_NORM";
         default:
             return "UNKNOWN";
     }
@@ -333,7 +351,9 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         Point2f originPixelCoords = (*i2);
         
         if (useGUI) {
-            rectangle( img2, Point(imgROIStartX + originPixelCoords.x - (patchSize / 2), originPixelCoords.y - (patchSize / 2)), Point(imgROIStartX + originPixelCoords.x + (patchSize / 2) , originPixelCoords.y + (patchSize / 2)), Scalar(0, 0, 255), 2, 8, 0 );
+            
+            //Draw a circle to represent the "starting pixel position".
+            circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), 2, Scalar(255, 255, 255), 1, 8, 0 );
         }
         
         //Once we reach the end of the row, we need to calculate the average displacement across the entire row.
@@ -358,6 +378,8 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             
             raw_result.clear();
             
+            imshow("Output", img2);
+            
         }
         
         /* if(rowNumber >=(patchSize / 2) + 1) {
@@ -373,20 +395,23 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         
         if (useGUI) {
             
-            rectangle( img2, Point(imgROIStartX + originPixelCoords.x - (patchSize / 2), originPixelCoords.y - (patchSize / 2) + displacement), Point(imgROIStartX + originPixelCoords.x + (patchSize / 2) , originPixelCoords.y + (patchSize / 2) + displacement), Scalar(0, 255, 0), 2, 8, 0 );
+            //Draw a circle to represent the "finishing pixel position".
+            circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), 2, Scalar(0, 255, 0), 1, 8, 0 );
             
-            //CG - Allows the output window displaying the current patch to be updated automatically.
-            cv::waitKey(10);
-            imshow("Search Window", localisedSearchWindow);
-            imshow("Template Patch", templatePatch);
-            
+           // if (displacement >= templatePatch.rows) {
+                
+                Utils::arrowedLine(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), Scalar(255, 0, 0));
+                
+           // }
             
         }
         
-        if (displacement <= (templatePatch.rows*2)) {
-            // break;
-            raw_result.push_back(displacement);
-        }
+//        if (displacement <= (templatePatch.rows*2)) {
+//            // break;
+//            raw_result.push_back(displacement);
+//        }
+        
+        raw_result.push_back(displacement);
         
         patchCount++;
         
@@ -507,17 +532,12 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
             currentPatch = localisedSearchWindow.clone();
             currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
             
-            // Create the resultMat matrix
-            int resultMat_cols =  currentPatch.cols - templatePatch.cols + 1;
-            int resultMat_rows = currentPatch.rows - templatePatch.rows + 1;
-            
-            resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
-            
             if (match_method == CUSTOM_NORM) {
                 
                 //Calculate Euclidean Distance.
                 double result = TemplateMatching::calcEuclideanDistanceNorm(templatePatch, currentPatch);
                 
+                //double result = TemplateMatching::calcEuclideanDistance(templatePatch, currentPatch);
                 if (bestScore == -1 || result < bestScore) {
                     
                     bestScore = result;
@@ -532,7 +552,23 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
             } else if (match_method == CUSTOM_CORR) {
                 
                 //Calculate Euclidean Distance.
-                double result = TemplateMatching::calcCorrelaton(templatePatch, currentPatch);
+                double result = TemplateMatching::calcCorrelation(templatePatch, currentPatch);
+                
+                if (bestScore == -1 || result > bestScore) {
+                    
+                    bestScore = result;
+                    bestScoreYIndex = i;
+                    
+                } else {
+                    
+                    stop = true;
+                    
+                }
+                
+            } else if (match_method == CUSTOM_CORR_NORM) {
+                
+                //Calculate Euclidean Distance.
+                double result = TemplateMatching::calcCorrelationNorm(templatePatch, currentPatch);
                 
                 if (bestScore == -1 || result > bestScore) {
                     
@@ -546,6 +582,12 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
                 }
                 
             } else {
+                
+                // Create the resultMat matrix
+                int resultMat_cols =  currentPatch.cols - templatePatch.cols + 1;
+                int resultMat_rows = currentPatch.rows - templatePatch.rows + 1;
+                
+                resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
                 
                 //Do the Matching and Normalize
                 matchTemplate( currentPatch, templatePatch, resultMat, match_method );
@@ -584,6 +626,19 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
                     }
                     
                 }
+                
+            }
+            
+            if (useGUI) {
+                
+                Mat searchWindowGUI = localisedSearchWindow.clone();
+                
+                rectangle( searchWindowGUI, Point(0, i), Point(templatePatch.cols , i + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
+                
+                //CG - Allows the output window displaying the current patch to be updated automatically.
+                cv::waitKey(50);
+                imshow("Search Window", searchWindowGUI);
+                imshow("Template Patch", templatePatch);
                 
             }
             

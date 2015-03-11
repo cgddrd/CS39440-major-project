@@ -31,6 +31,16 @@ long double TemplateMatching::calcSSDNormalised(Mat& patch1, Mat& patch2) {
     
 }
 
+long double TemplateMatching::calcCorrelationNorm(Mat& patch1, Mat& patch2) {
+    
+    long double correlation = calcCorrelation(patch1, patch2);
+    
+    long double norm = calcNormalisationFactor(patch1, patch2);
+    
+    return correlation / norm;
+    
+}
+
 long double TemplateMatching::calcSSD(Mat& patch1, Mat& patch2) {
     
     // accept only char type matrices
@@ -41,6 +51,10 @@ long double TemplateMatching::calcSSD(Mat& patch1, Mat& patch2) {
     
     // Template patch (patch1) is a ROI from a larger image, therefore it currently CANNOT BE CONTINUOUS!
     // Mat test = patch1.clone();
+    
+//    imshow("patch1", patch1);
+//    imshow("patch2", patch2);
+//    waitKey();
     
     if (patch1.rows == patch2.rows && patch1.cols == patch2.cols) {
         
@@ -154,7 +168,7 @@ long double TemplateMatching::calcNormalisationFactor(Mat& patch1, Mat& patch2) 
     
 }
 
-long double TemplateMatching::calcCorrelaton(Mat& patch1, Mat& patch2) {
+long double TemplateMatching::calcCorrelation(Mat& patch1, Mat& patch2) {
     
     // accept only char type matrices
     CV_Assert(patch1.depth() != sizeof(uchar));
@@ -192,6 +206,8 @@ long double TemplateMatching::calcCorrelaton(Mat& patch1, Mat& patch2) {
                     
                     diff = int(p1[j]) * int(p2[j]);
                     
+                    
+                    // WE MAY NOT NEED TO SQUARE THE RESULT FOR CORRELATION! - CHECK WITH FRED!!
                     ssd += (diff * diff);
                     
                     channelNo++;
