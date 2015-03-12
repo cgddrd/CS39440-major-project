@@ -2,411 +2,659 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+#include <fstream>
+#include <numeric>
+
+#include <cmath>
+
+#include "TemplateMatching.h"
+#include "Utils.h"
 
 using namespace cv;
 using namespace std;
 
-vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSize = 10);
-static void arrowedLine(cv::Mat& img, cv::Point pt1, cv::Point pt2, const cv::Scalar& color, int thickness=1, int line_type=8, int shift=0, double tipLength=0.1);
-static float innerAngle(float px1, float py1, float px2, float py2, float cx1, float cy1);
+vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize = 10);
+void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
+void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
+void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, int& highScoreIndexY);
+vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords, string histFileName);
+void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "result_patch_");
+void exportTimeResults(vector<double> timeTaken, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "time_test_");
+string getMatchMethodName(int matchMethod);
+void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type, int pairNo);
+vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVal);
 
-static void help()
+Mat img1;
+Mat img2;
+double imgROIStartX = 0;
+
+bool simplePatches = true;
+bool useGUI = true;
+bool exhaustiveSearch = false;
+
+enum
 {
-    printf("Usage: ./optical_flow_lk_image_template_match <image1> <image2>\n");
-}
+    CUSTOM_ED_NORM =6,
+    CUSTOM_CORR =7,
+    CUSTOM_CORR_NORM =8,
+    CUSTOM_ED =9
+};
 
 int main(int argc, char** argv) {
     
+    Mat img1ColourTransform, img2ColourTransform;
+    
     if(argc != 3)
     {
-        help();
         return -1;
     }
     
-    static const int match_method = CV_TM_CCOEFF_NORMED;
-    int patchSize = 30;
+    vector<int> methods {CUSTOM_ED, CUSTOM_ED_NORM};
     
-    Mat img1 = imread(argv[1], CV_LOAD_IMAGE_COLOR);
-    Mat img2 = imread(argv[2], CV_LOAD_IMAGE_COLOR);
+    //string fileRootPath = "../../../eval_data/motion_images/wiltshire_inside_10cm/";
     
-    if(img1.empty() || img2.empty())
-    {
-        printf("Can't read one of the images\n");
-        return -1;
-    }
+    string fileRootPath = "../../../eval_data/motion_images/flat_10cm/";
     
+    //vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"}, {"IMG3.JPG", "IMG4.JPG"}, {"IMG5.JPG", "IMG6.JPG"}, {"IMG7.JPG", "IMG8.JPG"}, {"IMG9.JPG", "IMG10.JPG"}, {"IMG11.JPG", "IMG12.JPG"}};
     
-    resize(img1, img1, Size(img1.cols/4, img1.rows/4));
-    resize(img2, img2, Size(img2.cols/4, img2.rows/4));
+    //vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"},{"IMG1.JPG", "TEST.JPG"}};
     
-    Mat result, img1_gray, img2_gray;
+    vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"}};
     
-    cvtColor(img1, img1_gray, cv::COLOR_BGR2GRAY);
-    cvtColor(img2, img2_gray, cv::COLOR_BGR2GRAY);
+    vector<int> patchSizes {50};
     
-    //CG - Calculate a central column through the two images that has a width of 10% of the original images.
-    double centre_point = img1_gray.cols / 2;
-    double width_ten_percent = img1_gray.cols * 0.3;
-    double half_width_ten_percent = width_ten_percent / 2;
+    vector<int> roiSizes {40};
     
-    //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
-    Mat roi = img1_gray( Rect(centre_point - half_width_ten_percent,0,width_ten_percent,img1_gray.rows) );
-    Mat roi2 = img2_gray( Rect(centre_point - half_width_ten_percent,0,width_ten_percent,img2_gray.rows) );
+    double totalElaspedTime = (double)getTickCount();
     
-    Mat opticalFlow = Mat::zeros(img2.rows, img2.cols, CV_8UC3);
+    int pairNo = 1;
     
-    //Mat templ = img1_gray( Rect(centre_point - (windowsize / 2),y,windowsize,windowsize) );
-    
-    int result_cols =  roi.cols - patchSize + 1;
-    int result_rows = roi.rows - patchSize + 1;
-    
-    result.create( result_cols, result_rows, CV_32FC1 );
-    
-    vector<Point2f> points;
-    
-    vector<Mat> test = ScanImagePointer(roi, points, patchSize);
-    
-    std::vector<Mat>::iterator i1;
-    std::vector<Point2f>::iterator i2;
-    
-    int txtcount = 0;
-    
-    
-    for( i1 = test.begin(), i2 = points.begin(); i1 < test.end() && i2 < points.end(); ++i1, ++i2 )
-    {
-        //doSomething( *i1, *i2 );
+    for(vector<vector<string>>::iterator it = files.begin(); it != files.end(); ++it) {
         
-        //cout << "Mat: " << *i1 << ", Point X: " << int((*i2).x) << ", Point Y:" << int((*i2).y) << endl;
+        vector<string> currentFilePair = (*it);
         
+        img1 = imread(fileRootPath + currentFilePair[0], CV_LOAD_IMAGE_COLOR);
+        img2 = imread(fileRootPath + currentFilePair[1], CV_LOAD_IMAGE_COLOR);
         
-        Mat templ = *i1;
-        
-        matchTemplate( roi2, templ, result, match_method );
-        normalize( result, result, 0, 1, NORM_MINMAX, -1, Mat() );
-        
-        // Localizing the best match with minMaxLoc
-        double minVal; double maxVal; Point minLoc; Point maxLoc;
-        Point matchLoc;
-        
-        minMaxLoc( result, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
-        
-        // For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better
-        if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
-        { matchLoc = minLoc; }
-        else
-        { matchLoc = maxLoc; }
-        
-        
-        rectangle( img1, Point(centre_point - half_width_ten_percent, 0), Point(centre_point + half_width_ten_percent , img1.rows), Scalar(0, 0, 255), 2, 8, 0 );
-        rectangle( img2, Point(centre_point - half_width_ten_percent, 0), Point(centre_point + half_width_ten_percent , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
-        
-        rectangle( img1, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point( ((*i2).x + (centre_point - half_width_ten_percent) + templ.cols) , (*i2).y + templ.rows ), Scalar(255, 0, 0), 2, 8, 0 );
-        
-        
-        rectangle( img2, Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Point( matchLoc.x + (centre_point - half_width_ten_percent) + templ.cols , matchLoc.y + templ.rows ), Scalar(0, 255, 0), 2, 8, 0 );
-        
-        
-        //rectangle( result, Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Point( matchLoc.x + (centre_point - half_width_ten_percent) + templ.cols , matchLoc.y + templ.rows ), Scalar::all(0), 2, 8, 0 );
-    
-        char str[10];
-        char str2[10];
-        
-        //sprintf(str,"%d",txtcount);
-        
-        //putText(img1, str, Point((*i2).x + (centre_point - half_width_ten_percent) + (patchSize / 2), (*i2).y + (patchSize / 2)), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
-        
-      //  putText(img2, str, Point(matchLoc.x + (centre_point - half_width_ten_percent) + (patchSize / 2), matchLoc.y + (patchSize / 2)), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
-        
-        
-        
-        Point vectorOF(matchLoc.x - (*i2).x, matchLoc.y - (*i2).y);
-        
-        Point vectorYComponent((*i2).x - (*i2).x, matchLoc.y - (*i2).y);
-        
-        
-        float angle = innerAngle((*i2).x + (centre_point - half_width_ten_percent), matchLoc.y, matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y,  (*i2).x + (centre_point - half_width_ten_percent), (*i2).y);
-        
-        
-        float lengthOFVector = sqrt(pow(vectorOF.x, 2) + pow(vectorOF.y, 2));
-        
-        
-        sprintf(str,"%3.1f",angle);
-        
-        sprintf(str2,"%3.1f",lengthOFVector);
-        
-        
-        if (((*i2).y - matchLoc.y) > 0 || (((*i2).y - matchLoc.y) < (2 * patchSize * -1)) || angle < 45) {
-            
-//            arrowedLine(img2, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(0,0,255));
-//            
-//             arrowedLine(opticalFlow, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(0,0,255));
-//            
-//             arrowedLine(opticalFlow, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point((*i2).x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(255,0,0));
-            
-        } else {
-            
-            arrowedLine(img2, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(0,255,0));
-            
-            
-            //CG - OF motion vector
-            arrowedLine(opticalFlow, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point(matchLoc.x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(0,255,0));
-            
-            
-            //CG - y component
-            arrowedLine(opticalFlow, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), Point((*i2).x + (centre_point - half_width_ten_percent), matchLoc.y), Scalar(255,0,0));
-            
-            
-           // double Angle = atan2(matchLoc.y - (*i2).y,matchLoc.x - (*i2).x) * 180.0 / CV_PI;
-            
-            //if(Angle<0) Angle=Angle+360;
-        
-            
-            //double Angle = atan2(vectorOF.y,vectorOF.x) - atan2(vectorYComponent.y,vectorYComponent.x) * 180.0 / CV_PI;
-            
-           
-            
-          //  putText(img2, str, Point(matchLoc.x matchLoc.y + (patchSize)), FONT_HERSHEY_SIMPLEX, 0.6, Scalar(255,255,255));
-            
-            putText(opticalFlow, str, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(255,255,255));
-            
-            putText(opticalFlow, str2, Point((*i2).x + (centre_point - half_width_ten_percent), (*i2).y - 15), FONT_HERSHEY_SIMPLEX, 0.5, Scalar(0,255,0));
-            
+        if(img1.empty() || img2.empty())
+        {
+            printf("Can't read one of the images\n");
+            return -1;
         }
         
+        cout << "Image Size: " << img1.cols << "px x " << img1.rows << "px.\n";
+        
+        //BGR2HSV = Hue Range: 0-180
+        //BGR2HSV_FULL = Hue Range: 0-360
+        cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
+        cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
+        
+//                Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
+//        
+//                split(img1ColourTransform, hsvChannelsImg1);
+//                split(img2ColourTransform, hsvChannelsImg2);
+//        
+//                //Set VALUE channel to 0
+//                hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
+//                hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
+//        
+//                merge(hsvChannelsImg1,3,img1ColourTransform);
+//                merge(hsvChannelsImg2,3,img2ColourTransform);
+        
+        if (useGUI) {
+            imshow("Input - Image 1", img1ColourTransform);
+            imshow("Input - Image 2", img2ColourTransform);
+        }
+        
+        startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
+        
+        //                double test1 = TemplateMatching::calcCorrelation(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test2 = TemplateMatching::calcSSDNormalised(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test3 = TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test4 = TemplateMatching::calcEuclideanDistanceNorm(img1ColourTransform, img2ColourTransform);
+        //
+        //                double test5 = TemplateMatching::calcCorrelationNorm(img1ColourTransform, img2ColourTransform);
+        //
+        // cout << "Correlation: " << test1 << "\nCorrelation Norm: " << test5 << "\nSSD Norm: " << test2 << "\nSSD: " << test3 << "\nEuclidean Distance: " << test4 << "\n" << endl;
         
         
-        txtcount++;
+        if (useGUI) {
+            imshow("Output", img2);
+            destroyWindow("Template Patch");
+            destroyWindow("Search Window");
+        }
         
+        pairNo++;
         
-        // rectangle( img1, Point(centre_point - (templ.cols / 2), y), Point( centre_point + (templ.cols / 2) , y + templ.rows ), Scalar(0, 255, 0), 2, 8, 0 );
     }
     
-//    resize(img2, img2, Size(img2.cols/2, img2.rows/2));
-//    //resize(result, result, Size(result.cols/2, result.rows/2));
-//    resize(img1, img1, Size(img1.cols/2, img1.rows/2));
-//    resize(roi, roi, Size(roi.cols/2, roi.rows/2));
-//    resize(roi2, roi2, Size(roi2.cols/2, roi2.rows/2));
+    cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
     
-    //resize(opticalFlow, opticalFlow, Size(opticalFlow.cols * 2, opticalFlow.rows * 2));
-    
-    //CG - <0.5 = more balance to 'resultFrame', >0.5 = more balance to 'img1'.
-    double alpha = 0.4;
-    
-    //imshow("Normalised Result", result);
-
-    imshow("ROI1", roi);
-    imshow("ROI2", roi2);
-    
-    imshow("Result", img2);
-    
-    //CG - 'resultFrame' is already set to the second image ('img2') anyway.
-    addWeighted(img1, alpha, img2, 1.0 - alpha , 0.0, img2);
-    
-    imshow("Merged Result", img2);
-    
-    imshow("OPTICAL FLOW", opticalFlow);
-    
-    imshow("Original", img1);
-    
-    waitKey(0);
+    waitKey();
     
     return 0;
     
 }
 
-// CG - Arrowed Line drawing method. (PhilLab - http://stackoverflow.com/questions/10161351) (Built into OpenCV v3.0.0)
-static void arrowedLine(Mat& img, Point pt1, Point pt2, const Scalar& color, int thickness, int line_type, int shift, double tipLength)
-{
-    const double tipSize = norm(pt1-pt2)*tipLength; // Factor to normalize the size of the tip depending on the length of the arrow
-    line(img, pt1, pt2, color, thickness, line_type, shift);
-    const double angle = atan2( (double) pt1.y - pt2.y, (double) pt1.x - pt2.x );
-    Point p(cvRound(pt2.x + tipSize * cos(angle + CV_PI / 4)),
-            cvRound(pt2.y + tipSize * sin(angle + CV_PI / 4)));
-    line(img, p, pt2, color, thickness, line_type, shift);
-    p.x = cvRound(pt2.x + tipSize * cos(angle - CV_PI / 4));
-    p.y = cvRound(pt2.y + tipSize * sin(angle - CV_PI / 4));
-    line(img, p, pt2, color, thickness, line_type, shift);
+string getMatchMethodName(int matchMethod) {
+    
+    switch (matchMethod) {
+        case CV_TM_SQDIFF_NORMED:
+            return "SQDIFF_NORMED";
+        case CV_TM_SQDIFF:
+            return "SQDIFF";
+        case CV_TM_CCORR_NORMED:
+            return "CCORR_NORMED";
+        case CV_TM_CCORR:
+            return "CCORR";
+        case CV_TM_CCOEFF_NORMED:
+            return "CCOEFF_NORMED";
+        case CV_TM_CCOEFF:
+            return "CCOEFF";
+        case CUSTOM_ED_NORM:
+            return "CUSTOM_ED_NORM";
+        case CUSTOM_ED:
+            return "CUSTOM_ED";
+        case CUSTOM_CORR:
+            return "CUSTOM_CORR";
+        case CUSTOM_CORR_NORM:
+            return "CUSTOM_CORR_NORM";
+        default:
+            return "UNKNOWN";
+    }
 }
 
-static float innerAngle(float px1, float py1, float px2, float py2, float cx1, float cy1)
-{
+void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type, int pairNo) {
     
-    float dist1 = sqrt(  (px1-cx1)*(px1-cx1) + (py1-cy1)*(py1-cy1) );
-    float dist2 = sqrt(  (px2-cx1)*(px2-cx1) + (py2-cy1)*(py2-cy1) );
+    int testCount = 1;
     
-    float Ax, Ay;
-    float Bx, By;
-    float Cx, Cy;
-    
-    //find closest point to C
-    //printf("dist = %lf %lf\n", dist1, dist2);
-    
-    Cx = cx1;
-    Cy = cy1;
-    if(dist1 < dist2)
-    {
-        Bx = px1;
-        By = py1;
-        Ax = px2;
-        Ay = py2;
+    for(vector<int>::iterator it1 = roiDimensions.begin(); it1 != roiDimensions.end(); ++it1) {
+        
+        //CG - Extract the central column ROI from the two images ready to perform feature detection and optical flow analysis on them.
+        double imageCentreX = img1ColourTransform.cols / 2;
+        double imageROIWidth = img1ColourTransform.cols * ((double) *it1 / 100);
+        double imageROIHalfWidth = imageROIWidth / 2;
+        imgROIStartX = imageCentreX - imageROIHalfWidth;
+        double imgROIEndX = imageCentreX + imageROIHalfWidth;
+        
+        Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
+        Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img2ColourTransform.rows) );
+        
+        if (useGUI) {
+            rectangle( img2, Point(imgROIStartX, 0), Point(imgROIEndX , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
+        }
+        
+        for(vector<int>::iterator it2 = patchDimensions.begin(); it2 != patchDimensions.end(); ++it2) {
+            
+            vector<int> result_rows;
+            vector<Point2f> template_coords;
+            vector<Mat> patch_templates = getROIPatches(image1ROI, template_coords, result_rows, *it2);
+            
+            vector <vector<double> > allResults;
+            vector <double> timeDurations;
+            
+            
+            for(vector<int>::iterator it3 = match_type.begin(); it3 != match_type.end(); ++it3) {
+                
+                cout << "BEGIN: Test #" << testCount << ": ROI Size: " << *it1 << ", Patch Size: " << *it2 << ", Match Method: " << getMatchMethodName(*it3) << ", Pair No: " << pairNo << endl;
+                
+                cout << "ROI Size: " << image2ROI.cols << "px x " << image2ROI.rows << "px" << endl;
+                
+                double testElaspedTime = (double)getTickCount();
+                
+                ostringstream oStream;
+                
+                oStream << "hist_" << *it1 << "_" << *it2 << "_" << getMatchMethodName(*it3) << ".dat";
+                
+                allResults.push_back(runTestPatch(image2ROI, *it2, *it3, patch_templates, template_coords, oStream.str()));
+                
+                timeDurations.push_back(((double)getTickCount() - testElaspedTime)/getTickFrequency());
+                
+                cout << "END: Test #" << testCount << "\n\n";
+                
+                testCount++;
+                
+                
+            }
+            
+            std::stringstream sstm;
+            sstm << "result_pair" << pairNo;
+            
+            exportResults(allResults, result_rows, match_type, *it1, *it2, sstm.str());
+            
+            sstm.str("");
+            sstm.clear();
+            
+            sstm << "tresult_pair" << pairNo;
+            
+            exportTimeResults(timeDurations, match_type, *it1, *it2, sstm.str());
+            
+            sstm.str("");
+            sstm.clear();
+            
+        }
         
         
-    }else{
-        Bx = px2;
-        By = py2;
-        Ax = px1;
-        Ay = py1;
     }
     
-    
-    float Q1 = Cx - Ax;
-    float Q2 = Cy - Ay;
-    float P1 = Bx - Ax;
-    float P2 = By - Ay;  
-    
-    
-    float A = acos( (P1*Q1 + P2*Q2) / ( sqrt(P1*P1+P2*P2) * sqrt(Q1*Q1+Q2*Q2) ) );
-    
-    A = A*180/M_PI;
-    
-    return A;
 }
 
+void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix) {
+    
+    ostringstream oStream;
+    ofstream myfile;
+    
+    oStream << fileNamePrefix << "_roi" << roiSize << "_patch" << patchSize << ".dat";
+    
+    myfile.open (oStream.str(), ios::out | ios::trunc);
+    
+    oStream.clear();
+    oStream.str("");
+    
+    oStream << "descriptor row";
+    
+    for(std::vector<int>::size_type i = 0; i != methods.size(); i++) {
+        
+        oStream << " " << getMatchMethodName(methods[i]);
+    }
+    
+    oStream << "\n";
+    
+    myfile << oStream.str();
+    
+    oStream.clear();
+    oStream.str("");
+    
+    for (int i = 0; i < all_results[0].size(); i++) {
+        
+        oStream << rows[i];
+        
+        for(std::vector<double>::size_type j = 0; j != all_results.size(); j++) {
+            
+            oStream << " " << all_results[j][i];
+        }
+        
+        oStream << "\n";
+        
+    }
+    
+    myfile << oStream.str();
+    
+    myfile.close();
+    
+}
 
+void exportTimeResults(vector<double> timeTaken, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix) {
+    
+    ostringstream oStream;
+    ofstream myfile;
+    
+    oStream << fileNamePrefix << "_roi" << roiSize << "_patch" << patchSize << ".dat";
+    
+    myfile.open (oStream.str(), ios::out | ios::trunc);
+    
+    oStream.clear();
+    oStream.str("");
+    
+    myfile << "descriptor method time\n";
+    
+    for(std::vector<int>::size_type i = 0; i != timeTaken.size(); i++) {
+        
+        oStream << getMatchMethodName(methods[i]) << " " << timeTaken[i] << "\n";
+        
+        myfile << oStream.str();
+        
+        oStream.clear();
+        oStream.str("");
+    }
+    
+    myfile.close();
+    
+}
 
+vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVal) {
+    
+    int number_of_buckets = (int)ceil(maxVal / bucketSize);
+    
+    vector<int> histogram(number_of_buckets);
+    
+    for(vector<double>::const_iterator it = values.begin(); it != values.end(); ++it) {
+        
+        int bucket = (int)floor(*it / bucketSize);
+        histogram[bucket] += 1;
+        
+    }
+    
+    return histogram;
+    
+}
 
-// CG - Here, we are passing 'inputMat' and 'points' by REFERENCE, NOT BY VALUE.
-vector<Mat> ScanImagePointer(Mat &inputMat, vector<Point2f> &points, int patchSize)
+vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords, string histFileName) {
+    
+    Mat localisedSearchWindow, templatePatch;
+    vector<double> avg_result;
+    vector<double> raw_result;
+    
+    vector<Mat>::iterator i1;
+    vector<Point2f>::iterator i2;
+    
+    int patchCount = 0;
+    int rowNumber = (patchSize / 2);
+    
+    for( i1 = patch_templates.begin(), i2 = patch_template_coords.begin(); i1 < patch_templates.end() && i2 < patch_template_coords.end(); ++i1, ++i2 )
+    {
+        
+        double displacement, highestScore;
+        
+        templatePatch = (*i1);
+        
+        Point2f originPixelCoords = (*i2);
+        
+        if (useGUI) {
+            
+            //Draw a circle to represent the "starting pixel position".
+            circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), 2, Scalar(255, 255, 255), 1, 8, 0 );
+        }
+        
+        //Once we reach the end of the row, we need to calculate the average displacement across the entire row.
+        if (rowNumber != originPixelCoords.y) {
+            
+            if (!raw_result.empty()) {
+                
+                //vector<double> filtered = Utils::filterOutliers(raw_result);
+                
+                double mean = Utils::calcMean(raw_result);
+                // double sdDev = Utils::calcStandardDeviation(filtered);
+                
+                avg_result.push_back(mean);
+                
+            } else {
+                
+                cout << "ERROR: No displacement values obtained for Row #: " << rowNumber;
+                
+            }
+            
+            rowNumber = originPixelCoords.y;
+            
+            raw_result.clear();
+            
+            imshow("Output", img2);
+            
+        }
+        
+        /* if(rowNumber >=(patchSize / 2) + 1) {
+         break;
+         } */
+        
+        int localisedWindowWidth = templatePatch.cols;
+        int localisedWindowHeight = image2ROI.rows - (originPixelCoords.y - (templatePatch.cols / 2));
+        
+        localisedSearchWindow = image2ROI(Rect(originPixelCoords.x - (templatePatch.cols / 2), originPixelCoords.y - (templatePatch.cols / 2), localisedWindowWidth, localisedWindowHeight));
+        
+        calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, highestScore, displacement);
+        
+        if (useGUI) {
+            
+            //Draw a circle to represent the "finishing pixel position".
+            circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), 2, Scalar(0, 255, 0), 1, 8, 0 );
+            
+            Utils::arrowedLine(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), Scalar(255, 0, 0));
+            
+        }
+        
+        //        if (displacement <= (templatePatch.rows*2)) {
+        //            // break;
+        //            raw_result.push_back(displacement);
+        //        }
+        
+        raw_result.push_back(displacement);
+        
+        patchCount++;
+        
+    }
+    
+    return avg_result;
+    
+}
+
+vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize)
 {
     
-    vector<Mat> mats;
-    
- //   int count = 0;
-    
-    // accept only char type matrices
     CV_Assert(inputMat.depth() != sizeof(uchar));
     
-    int channels = inputMat.channels();
-    
+    vector<Mat> mats;
     int nRows = inputMat.rows;
+    int nCols = inputMat.cols;
+    int halfPatchSize = (patchSize / 2);
     
-    //int nRows = 1;
-    
-    // CG - Multiply each row by the colour channels (i.e. 3 for BGR, and 1 for grayscale)
-    int nCols = inputMat.cols * channels;
+    int increment = simplePatches ? patchSize : 1;
     
     int i,j;
     uchar* p;
     
-   // int tempPatch = patchSize;
-    
-    //int newPatchSize = patchSize;
-    
-    for( i = ((patchSize/2) + 1); i < nRows - ((patchSize /2) + 1); i+=patchSize)
+    //CG - Stop extracting patches when we get to the bottom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
+    for(i = halfPatchSize; i < (nRows - halfPatchSize); i+=increment)
     {
-        
-//        if (count == 500) {
-//            
-//            break;
-//            
-//        }
         
         p = inputMat.ptr<uchar>(i);
         
-      //  count++;
+        //CG - Push back the current row number (used for printing results later on).
+        rows.push_back(i);
         
-       // patchSize = tempPatch;
-        
-        // CG - Here we loop through EACH ROW, and EACH COLOUR CHANNEL WITHIN EACH OF THESE ROWS AS WELL!
-        for ( j = ((patchSize/2) + 1); j < nCols - ((patchSize/2) + 1); j+=patchSize)
+        for (j = halfPatchSize; j < (nCols - halfPatchSize); j+=increment)
         {
             
-            //I( Rect(j - (patchSize / 2),i - (patchSize / 2),patchSize,patchSize) );
+            int x = j - halfPatchSize;
             
+            int y = i - halfPatchSize;
             
+            mats.push_back(inputMat(Rect(x,y,patchSize,patchSize)));
             
-           int x = j - (patchSize / 2);
-           
-           int y = i - (patchSize / 2);
-//            
-//            cout << "X: " << x << ", J: " << j << ", Y: " << y << ", I: " << i << endl;
-            
-//            if (x > (patchSize / 2) && x < nCols - (patchSize / 2) && y > (patchSize / 2) && y < nRows - (patchSize / 2) && (x + patchSize) <= nCols) {
-//            
-//                 mats.push_back(inputMat(Rect(x,y,patchSize,patchSize)));
-//                
-//            }
-            
-//            x = x >= 0 ? x : 0;
-//            
-//            y = x >= 0 ? x : 0;
-//            
-//            x = (x+ patchSize) <= nCols ? x : nCols;
-//            
-//            x = (y+ patchSize) <= nRows ? x : nRows;
-            
-            
-//            if (x < 0) {
-//            
-//                //Subtract x from patchSize (patchSize + (-x))
-//                patchSize += x;
-//                
-//                x = 0;
-//                
-//            }
-//            
-//            if ((x + patchSize) > nCols) {
-//                
-//                patchSize -= (x + patchSize);
-//                
-//                x = nCols-patchSize;
-//            }
-//            
-//            if (y < 0) {
-//                
-//                //Subtract x from patchSize (patchSize + (-x)
-//                patchSize += y;
-//                
-//                y = 0;
-//                
-//            }
-//            
-//            if ((y + patchSize) > nRows) {
-//                
-//                patchSize -= (y + patchSize);
-//                
-//                y = nRows-patchSize;
-//            }
-//            
-            //cout << "X: " << x << ", J: " << j << ", Y: " << y << ", I: " << i << endl;
-            
-           // if (x >= 0 && y >= 0 && (x + patchSize) <= nCols && (y + patchSize) <= nRows) {
-            
-           // if (patchSize > 0) {
-                
-                mats.push_back(inputMat(Rect(x,y,patchSize,patchSize)));
-                
-                //CG - Same as Point2f (typename alias)
-                points.push_back(Point_<float>(x, y));
-                
-           // }
-        
-            
-                
-           // }
-            
-        
-            
-//            newPatchSize = patchSize > 0 ? patchSize : 1;
-//            
-//            patchSize = tempPatch;
+            //CG - Same as Point2f (typename alias)
+            points.push_back(Point_<float>(j, i));
             
         }
         
     }
     
-    // CG - We divide by three so we are only returning the total count pixels (and not each of the CHANNELS within EACH PIXEL as well).
     return mats;
+}
+
+void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY) {
+    
+    Mat resultMat, currentPatch;
+    
+    //Set "initialiser" value for best match score.
+    double bestScoreYIndex = -1;
+    double bestScore = -1;
+    
+    // Create the resultMat matrix
+    int resultMat_cols =  localisedSearchWindow.cols - templatePatch.cols + 1;
+    int resultMat_rows = localisedSearchWindow.rows - templatePatch.rows + 1;
+    
+    resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
+    
+    //Do the Matching and Normalize
+    matchTemplate( localisedSearchWindow, templatePatch, resultMat, match_method );
+    normalize( resultMat, resultMat, 0, 1, NORM_MINMAX, -1, Mat() );
+    
+    //Localizing the best match with minMaxLoc
+    double minVal, maxVal;
+    Point minLoc; Point maxLoc;
+    Point matchLoc;
+    
+    //We do not need to pass in any 'Point' objects, as we are not interested in getting the "best match point" location back (as the 'result' matrix is only 1px x 1px in size).
+    minMaxLoc( resultMat, &minVal, &maxVal, &minLoc, &maxLoc, Mat() );
+    
+    if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+    {
+        
+        matchLoc = minLoc;
+        
+        bestScore = minVal;
+        
+        bestScoreYIndex = matchLoc.y;
+        
+    }
+    else
+    {
+        matchLoc = maxLoc;
+        
+        bestScore = maxVal;
+        
+        bestScoreYIndex = matchLoc.y;
+    }
+    
+    highScore = bestScore;
+    highScoreIndexY = bestScoreYIndex;
+    
+}
+
+
+void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY) {
+    
+    Mat resultMat, currentPatch;
+    
+    //Set "initialiser" value for best match score.
+    double bestScoreYIndex = -1;
+    double bestScore = -1;
+    
+    bool stop = false;
+    
+    if (!exhaustiveSearch) {
+        
+        for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
+        {
+            currentPatch = localisedSearchWindow.clone();
+            currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
+            
+            if (match_method == CUSTOM_ED_NORM || match_method == CUSTOM_ED) {
+                
+                //Calculate Euclidean Distance.
+                double result = match_method == CUSTOM_ED_NORM ? TemplateMatching::calcEuclideanDistanceNorm(templatePatch, currentPatch) : TemplateMatching::calcEuclideanDistance(templatePatch, currentPatch);
+                
+                if (bestScore == -1 || result < bestScore) {
+                    
+                    bestScore = result;
+                    bestScoreYIndex = i;
+                    
+                } else {
+                    
+                    stop = true;
+                    
+                }
+                
+            } else if (match_method == CUSTOM_CORR) {
+                
+                //Calculate Euclidean Distance.
+                double result = TemplateMatching::calcCorrelation(templatePatch, currentPatch);
+                
+                if (bestScore == -1 || result > bestScore) {
+                    
+                    bestScore = result;
+                    bestScoreYIndex = i;
+                    
+                } else {
+                    
+                    stop = true;
+                    
+                }
+                
+            } else if (match_method == CUSTOM_CORR_NORM) {
+                
+                //Calculate Euclidean Distance.
+                double result = TemplateMatching::calcCorrelationNorm(templatePatch, currentPatch);
+                
+                if (bestScore == -1 || result > bestScore) {
+                    
+                    bestScore = result;
+                    bestScoreYIndex = i;
+                    
+                } else {
+                    
+                    stop = true;
+                    
+                }
+                
+            } else {
+                
+                // Create the resultMat matrix
+                int resultMat_cols =  currentPatch.cols - templatePatch.cols + 1;
+                int resultMat_rows = currentPatch.rows - templatePatch.rows + 1;
+                
+                resultMat.create(resultMat_cols, resultMat_rows, CV_32FC1);
+                
+                //Do the Matching and Normalize
+                matchTemplate( currentPatch, templatePatch, resultMat, match_method );
+                
+                //Localizing the best match with minMaxLoc
+                double minVal, maxVal;
+                
+                //We do not need to pass in any 'Point' objects, as we are not interested in getting the "best match point" location back (as the 'result' matrix is only 1px x 1px in size).
+                minMaxLoc( resultMat, &minVal, &maxVal, NULL, NULL, Mat() );
+                
+                //For SQDIFF and SQDIFF_NORMED, the best matches are lower values. For all the other methods, the higher the better.
+                if( match_method  == CV_TM_SQDIFF || match_method == CV_TM_SQDIFF_NORMED )
+                {
+                    
+                    if (bestScore == -1 || minVal < bestScore) {
+                        
+                        bestScore = minVal;
+                        bestScoreYIndex = i;
+                        
+                    } else {
+                        
+                        stop = true;
+                    }
+                }
+                else
+                {
+                    
+                    if (bestScore == -1 || maxVal > bestScore) {
+                        
+                        bestScore = maxVal;
+                        bestScoreYIndex = i;
+                        
+                    } else {
+                        
+                        stop = true;
+                    }
+                    
+                }
+                
+            }
+            
+            if (useGUI) {
+                
+                Mat searchWindowGUI = localisedSearchWindow.clone();
+                
+                rectangle( searchWindowGUI, Point(0, i), Point(templatePatch.cols , i + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
+                
+                //CG - Allows the output window displaying the current patch to be updated automatically.
+                cv::waitKey(50);
+                imshow("Search Window", searchWindowGUI);
+                imshow("Template Patch", templatePatch);
+                
+            }
+            
+            if (stop) {
+                
+                break;
+                
+            }
+            
+        }
+        
+        highScore = bestScore;
+        highScoreIndexY = bestScoreYIndex;
+        
+    } else {
+        
+        calcPatchMatchScore2(localisedSearchWindow, templatePatch, match_method, highScore, highScoreIndexY);
+        
+    }
+    
 }
