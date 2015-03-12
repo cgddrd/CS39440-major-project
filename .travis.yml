@@ -35,4 +35,4 @@ script:
   - g++ main.cpp Utils.cpp -o optical_flow_lk_two_images -lopencv_video -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_nonfree -lopencv_features2d
   #- ./optical_flow_lk_two_images ../../eval_data/1.JPG ../../eval_data/2.JPG
   - cd ../../optical_flow_lk_image_template_match/optical_flow_lk_image_template_match
-  - g++ -std=c++0x main.cpp -o optical_flow_lk_image_template_match -lopencv_core -lopencv_highgui -lopencv_imgproc
+  - g++ -std=c++0x main.cpp Utils.cpp TemplateMatching.cpp -o optical_flow_lk_image_template_match -lopencv_core -lopencv_highgui -lopencv_imgproc
