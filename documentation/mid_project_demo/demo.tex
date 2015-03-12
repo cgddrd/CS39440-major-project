@@ -112,7 +112,8 @@ Extract patches of a fixed size around each pixel within the extracted ROI.
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.5]{stage2.png}
+\includegraphics[scale=0.4]{stage2.png}
+\caption{\textbf{Simplified} example of patch extraction within ROI.}
   \end{figure}
   
 \end{frame}
@@ -126,6 +127,7 @@ For each patch extracted from \emph{image one}, move down through a localised se
 \begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.35]{stage3.png}
+\caption{Example of ``best match" search within local column.}
 \end{figure}
   
 \end{frame}
@@ -256,19 +258,6 @@ From the results obtained, we have learned:
 
 \end{frame}
 
-\begin{frame}{Next Steps}
-
-Plan is to move away from multiple small patches instead adopting a single, larger patch to represent a single row. \\ \vspace{0.5cm}
-
-Template patch will be scaled relative to its centre as the search moves down the image. This is to account for perspective distortion (\textbf{i.e.} objects becoming larger as they move closer to the camera).
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[scale=0.4]{scaling.png}
-\end{figure}
-	
-\end{frame}
-
 \begin{frame}{Project Management}
 
 Project is adopting a SCRUM-based approach to project management. \\ \vspace{0.2cm}
@@ -298,6 +287,19 @@ Project is adopting a SCRUM-based approach to project management. \\ \vspace{0.2
 \caption{Burndown chart for Release v1.0. \textbf{Courtesy:} \href{http://burndown.io}{http://burndown.io}}
 \end{figure}
 
+\end{frame}
+
+\begin{frame}{Next Steps}
+
+Plan is to move away from multiple small patches instead adopting a single, larger patch to represent a single row. \\ \vspace{0.5cm}
+
+Template patch will be scaled relative to its centre as the search moves down the image. This is to account for perspective distortion (\textbf{i.e.} objects becoming larger as they move closer to the camera).
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.4]{scaling.png}
+\end{figure}
+	
 \end{frame}
 
 \plain{Any Questions? \\ \vspace{0.2cm} \footnotesize{Slide Design: Matthias Vogelgesang - (\href{https://github.com/matze/mtheme}{Github})}}
