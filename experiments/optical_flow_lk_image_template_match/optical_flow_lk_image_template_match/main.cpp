@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     
     //vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"},{"IMG1.JPG", "TEST.JPG"}};
     
-    vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"}};
+    vector<vector<string> > files {{"IMG1.JPG", "IMG2.JPG"}};
     
     vector<int> patchSizes {50};
     
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
     
     int pairNo = 1;
     
-    for(vector<vector<string>>::iterator it = files.begin(); it != files.end(); ++it) {
+    for(vector<vector<string> >::iterator it = files.begin(); it != files.end(); ++it) {
         
         vector<string> currentFilePair = (*it);
         
