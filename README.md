@@ -1,5 +1,9 @@
 # *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project)
 
+## Throughput
+
+[![Throughput Graph](https://graphs.waffle.io/cgddrd/cs39440-major-project/throughput.svg)](https://waffle.io/cgddrd/cs39440-major-project/metrics)
+
 ## Background
 
 Accurate navigation allows for robot requiring autonomous motion capabilities to make safe, yet objective
