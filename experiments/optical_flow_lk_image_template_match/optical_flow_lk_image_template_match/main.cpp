@@ -28,8 +28,8 @@ Mat img1;
 Mat img2;
 double imgROIStartX = 0;
 
-bool simplePatches = true;
-bool useGUI = true;
+bool simplePatches = false;
+bool useGUI = false;
 bool exhaustiveSearch = false;
 
 enum
@@ -133,7 +133,10 @@ int main(int argc, char** argv) {
     
     cout << "\n\n**********************\nTEST END: Time for entire test (secs): " << (((double)getTickCount() - totalElaspedTime)/getTickFrequency()) << endl;
     
-    waitKey();
+    if (useGUI) {
+        waitKey();
+    }
+    
     
     return 0;
     
@@ -380,8 +383,6 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             rowNumber = originPixelCoords.y;
             
             raw_result.clear();
-            
-            imshow("Output", img2);
             
         }
         
