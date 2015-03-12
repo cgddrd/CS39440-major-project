@@ -60,12 +60,11 @@ int main(int argc, const char * argv[]) {
         circle(opticalFlow, (centreCentre + scalePercentResultPoint), 2, Scalar(255,128,0));
     }
     
+    
+    putText(opticalFlow, "Original", Point(10,15), CV_FONT_HERSHEY_PLAIN, 1, Scalar(0,0,255));
+    
+    
     // Provide additional scope so destructor for ostringstream is called earlier than normal.
-    {
-        putText(opticalFlow, "Original", Point(10,15), CV_FONT_HERSHEY_PLAIN, 1, Scalar(0,0,255));
-    }
-    
-    
     {
         std::ostringstream str;
         str << "Scale Unit: " << scaleUnit;
