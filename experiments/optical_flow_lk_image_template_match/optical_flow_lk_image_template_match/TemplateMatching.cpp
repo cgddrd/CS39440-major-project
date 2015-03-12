@@ -13,7 +13,19 @@ using namespace cv;
 
 TemplateMatching::TemplateMatching() {}
 
-double TemplateMatching::calcEuclideanDistanceNorm(Mat& patch1, Mat& patch2) {
+double TemplateMatching::calcEuclideanDistanceNorm(Mat patch1, Mat patch2) {
+    
+    Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
+    
+    split(patch1, hsvChannelsImg1);
+    split(patch2, hsvChannelsImg2);
+    
+    //Set VALUE channel to 0
+    hsvChannelsImg1[2]=Mat::zeros(patch1.rows, patch1.cols, CV_8UC1);
+    hsvChannelsImg2[2]=Mat::zeros(patch2.rows, patch2.cols, CV_8UC1);
+    
+    merge(hsvChannelsImg1,3,patch1);
+    merge(hsvChannelsImg2,3,patch2);
     
     return norm(patch1, patch2, NORM_L2);
     
@@ -26,7 +38,7 @@ double TemplateMatching::calcEuclideanDistance(Mat& patch1, Mat& patch2) {
 }
 
 long double TemplateMatching::calcSSDNormalised(Mat& patch1, Mat& patch2) {
-
+    
     return (calcSSD(patch1, patch2) / calcNormalisationFactor(patch1, patch2));
     
 }
@@ -52,9 +64,9 @@ long double TemplateMatching::calcSSD(Mat& patch1, Mat& patch2) {
     // Template patch (patch1) is a ROI from a larger image, therefore it currently CANNOT BE CONTINUOUS!
     // Mat test = patch1.clone();
     
-//    imshow("patch1", patch1);
-//    imshow("patch2", patch2);
-//    waitKey();
+    //    imshow("patch1", patch1);
+    //    imshow("patch2", patch2);
+    //    waitKey();
     
     if (patch1.rows == patch2.rows && patch1.cols == patch2.cols) {
         

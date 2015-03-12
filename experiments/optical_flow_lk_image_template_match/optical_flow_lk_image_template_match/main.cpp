@@ -34,9 +34,10 @@ bool exhaustiveSearch = false;
 
 enum
 {
-    CUSTOM_NORM =6,
+    CUSTOM_ED_NORM =6,
     CUSTOM_CORR =7,
-    CUSTOM_CORR_NORM =8
+    CUSTOM_CORR_NORM =8,
+    CUSTOM_ED =9
 };
 
 int main(int argc, char** argv) {
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    vector<int> methods {CUSTOM_NORM};
+    vector<int> methods {CUSTOM_ED, CUSTOM_ED_NORM};
     
     //string fileRootPath = "../../../eval_data/motion_images/wiltshire_inside_10cm/";
     
@@ -88,17 +89,17 @@ int main(int argc, char** argv) {
         cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
         cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
         
-        //        Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
-        //
-        //        split(img1ColourTransform, hsvChannelsImg1);
-        //        split(img2ColourTransform, hsvChannelsImg2);
-        //
-        //        //Set VALUE channel to 0
-        //        hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
-        //        hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
-        //
-        //        merge(hsvChannelsImg1,3,img1ColourTransform);
-        //        merge(hsvChannelsImg2,3,img2ColourTransform);
+//                Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
+//        
+//                split(img1ColourTransform, hsvChannelsImg1);
+//                split(img2ColourTransform, hsvChannelsImg2);
+//        
+//                //Set VALUE channel to 0
+//                hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
+//                hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
+//        
+//                merge(hsvChannelsImg1,3,img1ColourTransform);
+//                merge(hsvChannelsImg2,3,img2ColourTransform);
         
         if (useGUI) {
             imshow("Input - Image 1", img1ColourTransform);
@@ -153,8 +154,10 @@ string getMatchMethodName(int matchMethod) {
             return "CCOEFF_NORMED";
         case CV_TM_CCOEFF:
             return "CCOEFF";
-        case CUSTOM_NORM:
-            return "CUSTOM_NORM";
+        case CUSTOM_ED_NORM:
+            return "CUSTOM_ED_NORM";
+        case CUSTOM_ED:
+            return "CUSTOM_ED";
         case CUSTOM_CORR:
             return "CUSTOM_CORR";
         case CUSTOM_CORR_NORM:
@@ -398,18 +401,14 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             //Draw a circle to represent the "finishing pixel position".
             circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), 2, Scalar(0, 255, 0), 1, 8, 0 );
             
-           // if (displacement >= templatePatch.rows) {
-                
-                Utils::arrowedLine(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), Scalar(255, 0, 0));
-                
-           // }
+            Utils::arrowedLine(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), Scalar(255, 0, 0));
             
         }
         
-//        if (displacement <= (templatePatch.rows*2)) {
-//            // break;
-//            raw_result.push_back(displacement);
-//        }
+        //        if (displacement <= (templatePatch.rows*2)) {
+        //            // break;
+        //            raw_result.push_back(displacement);
+        //        }
         
         raw_result.push_back(displacement);
         
@@ -532,12 +531,11 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
             currentPatch = localisedSearchWindow.clone();
             currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
             
-            if (match_method == CUSTOM_NORM) {
+            if (match_method == CUSTOM_ED_NORM || match_method == CUSTOM_ED) {
                 
                 //Calculate Euclidean Distance.
-                double result = TemplateMatching::calcEuclideanDistanceNorm(templatePatch, currentPatch);
+                double result = match_method == CUSTOM_ED_NORM ? TemplateMatching::calcEuclideanDistanceNorm(templatePatch, currentPatch) : TemplateMatching::calcEuclideanDistance(templatePatch, currentPatch);
                 
-                //double result = TemplateMatching::calcEuclideanDistance(templatePatch, currentPatch);
                 if (bestScore == -1 || result < bestScore) {
                     
                     bestScore = result;

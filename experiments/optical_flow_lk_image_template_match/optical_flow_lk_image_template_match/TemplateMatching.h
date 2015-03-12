@@ -23,7 +23,7 @@ public:
     
     TemplateMatching();
     static double calcEuclideanDistance(cv::Mat& patch1, cv::Mat& patch2);
-    static double calcEuclideanDistanceNorm(cv::Mat& patch1, cv::Mat& patch2);
+    static double calcEuclideanDistanceNorm(cv::Mat patch1, cv::Mat patch2);
     static long double calcSSD(cv::Mat& patch1, cv::Mat& patch2);
     static long double calcCorrelation(cv::Mat& patch1, cv::Mat& patch2);
     static long double calcSSDNormalised(cv::Mat& patch1, cv::Mat& patch2);
