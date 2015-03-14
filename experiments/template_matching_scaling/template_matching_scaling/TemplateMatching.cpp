@@ -241,3 +241,32 @@ long double TemplateMatching::calcCorrelation(Mat& patch1, Mat& patch2) {
     return ssd;
     
 }
+
+vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchHeight)
+{
+    
+    CV_Assert(inputMat.depth() != sizeof(uchar));
+    
+    vector<Mat> mats;
+    int nRows = inputMat.rows;
+    int nCols = inputMat.cols;
+    
+    int i,j;
+    uchar* p;
+    
+    //CG - Stop extracting patches when we get to the bottom of the image (no point doing it on the bottom-bottom patches as they won't move anywhere).
+    for(i = 0; i < (nRows - patchHeight); i+=patchHeight)
+    {
+        
+        //CG - Push back the current row number (used for printing results later on).
+        rows.push_back(i);
+        
+        mats.push_back(inputMat(Rect(0,i,nCols,patchHeight)));
+        
+        //CG - Same as Point2f (typename alias)
+        points.push_back(Point_<float>(0, i));
+        
+    }
+    
+    return mats;
+}

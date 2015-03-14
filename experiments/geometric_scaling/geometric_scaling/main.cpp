@@ -38,9 +38,9 @@ int main(int argc, const char * argv[]) {
 
     double old_size = width;
     
-    double scaleUnit = (old_size + 10) / old_size;
+    double scaleUnit = (old_size + 1) / old_size;
     
-    double scalePercent = 2; //Double the original size.
+    double scalePercent = 1.10; //Double the original size.
     
     
     // Modified from original source: http://stackoverflow.com/questions/18791880/
@@ -58,6 +58,8 @@ int main(int argc, const char * argv[]) {
         // 3) Draw a circle at the point of the scaled (geometrically transformed) position.
         circle(opticalFlow, (centreCentre + scaleUnitResultPoint), 2, Scalar(0,255,0));
         circle(opticalFlow, (centreCentre + scalePercentResultPoint), 2, Scalar(255,128,0));
+        
+        cout << centreCentre + scaleUnitResultPoint;
     }
     
     
