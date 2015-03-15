@@ -28,8 +28,8 @@ Mat img1;
 Mat img2;
 double imgROIStartX = 0;
 
-bool simplePatches = false;
-bool useGUI = false;
+bool simplePatches = true;
+bool useGUI = true;
 bool exhaustiveSearch = false;
 
 enum
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    vector<int> methods {CUSTOM_ED, CUSTOM_ED_NORM};
+    vector<int> methods {CUSTOM_ED_NORM};
     
     //string fileRootPath = "../../../eval_data/motion_images/wiltshire_inside_10cm/";
     
@@ -89,22 +89,22 @@ int main(int argc, char** argv) {
         cvtColor(img1, img1ColourTransform, cv::COLOR_BGR2HSV);
         cvtColor(img2, img2ColourTransform, cv::COLOR_BGR2HSV);
         
-//                Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
-//        
-//                split(img1ColourTransform, hsvChannelsImg1);
-//                split(img2ColourTransform, hsvChannelsImg2);
-//        
-//                //Set VALUE channel to 0
-//                hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
-//                hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
-//        
-//                merge(hsvChannelsImg1,3,img1ColourTransform);
-//                merge(hsvChannelsImg2,3,img2ColourTransform);
+        Mat hsvChannelsImg1[3], hsvChannelsImg2[3];
         
-        if (useGUI) {
-            imshow("Input - Image 1", img1ColourTransform);
-            imshow("Input - Image 2", img2ColourTransform);
-        }
+        split(img1ColourTransform, hsvChannelsImg1);
+        split(img2ColourTransform, hsvChannelsImg2);
+        
+        //Set VALUE channel to 0
+        hsvChannelsImg1[2]=Mat::zeros(img1ColourTransform.rows, img1ColourTransform.cols, CV_8UC1);
+        hsvChannelsImg2[2]=Mat::zeros(img2ColourTransform.rows, img2ColourTransform.cols, CV_8UC1);
+        
+        merge(hsvChannelsImg1,3,img1ColourTransform);
+        merge(hsvChannelsImg2,3,img2ColourTransform);
+        
+//        if (useGUI) {
+//            imshow("Input - Image 1", img1ColourTransform);
+//            imshow("Input - Image 2", img2ColourTransform);
+//        }
         
         startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
         
@@ -403,6 +403,8 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), 2, Scalar(0, 255, 0), 1, 8, 0 );
             
             Utils::arrowedLine(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), Scalar(255, 0, 0));
+            
+            imshow("Output", img2);
             
         }
         
