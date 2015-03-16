@@ -51,13 +51,7 @@ int main(int argc, char** argv) {
     
     vector<int> methods {CUSTOM_ED_NORM};
     
-    //string fileRootPath = "../../../eval_data/motion_images/wiltshire_inside_10cm/";
-    
-    string fileRootPath = "../../../eval_data/motion_images/flat_10cm/";
-    
-    //vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"}, {"IMG3.JPG", "IMG4.JPG"}, {"IMG5.JPG", "IMG6.JPG"}, {"IMG7.JPG", "IMG8.JPG"}, {"IMG9.JPG", "IMG10.JPG"}, {"IMG11.JPG", "IMG12.JPG"}};
-    
-    //vector<vector<string>> files {{"IMG1.JPG", "IMG2.JPG"},{"IMG1.JPG", "TEST.JPG"}};
+    string fileRootPath = "../../../eval_data/motion_images/wiltshire_outside_10cm/";
     
     vector<vector<string> > files {{"IMG1.JPG", "IMG2.JPG"}};
     
@@ -101,25 +95,12 @@ int main(int argc, char** argv) {
         merge(hsvChannelsImg1,3,img1ColourTransform);
         merge(hsvChannelsImg2,3,img2ColourTransform);
         
-//        if (useGUI) {
-//            imshow("Input - Image 1", img1ColourTransform);
-//            imshow("Input - Image 2", img2ColourTransform);
-//        }
+        //        if (useGUI) {
+        //            imshow("Input - Image 1", img1ColourTransform);
+        //            imshow("Input - Image 2", img2ColourTransform);
+        //        }
         
         startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
-        
-        //                double test1 = TemplateMatching::calcCorrelation(img1ColourTransform, img2ColourTransform);
-        //
-        //                double test2 = TemplateMatching::calcSSDNormalised(img1ColourTransform, img2ColourTransform);
-        //
-        //                double test3 = TemplateMatching::calcSSD(img1ColourTransform, img2ColourTransform);
-        //
-        //                double test4 = TemplateMatching::calcEuclideanDistanceNorm(img1ColourTransform, img2ColourTransform);
-        //
-        //                double test5 = TemplateMatching::calcCorrelationNorm(img1ColourTransform, img2ColourTransform);
-        //
-        // cout << "Correlation: " << test1 << "\nCorrelation Norm: " << test5 << "\nSSD Norm: " << test2 << "\nSSD: " << test3 << "\nEuclidean Distance: " << test4 << "\n" << endl;
-        
         
         if (useGUI) {
             imshow("Output", img2);
