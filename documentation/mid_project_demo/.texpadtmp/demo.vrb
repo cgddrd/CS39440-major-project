@@ -1,0 +1,13 @@
+\frametitle{Current Approach}
+
+  Approach focussed on the effects of \textbf{motion parallax}. \\ \vspace{0.5cm}
+
+  \textbf{i.e.} Objects/features that are at a greater distance from the camera appear to  move less from frame-to-frame than those that are closer.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.2]{motion_parallax.png}
+    \caption{Typical example of motion parallax. \textbf{Courtesy}: \href{http://www.infovis.net}{http://www.infovis.net}.}
+  \end{figure}
+
+
