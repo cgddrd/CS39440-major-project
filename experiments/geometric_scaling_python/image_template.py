@@ -50,7 +50,7 @@ def calc_point(start_point, end_point):
     # for i in xrange(0, int(magnitude), 5):
     #
     # # As we want to draw a point on the line BETWEEN the two points, we simply don't add the magnitude of the line between the points onto the coordinate position.
-    #     px = int(float(start_point[0] + (vx * i)))
+    # px = int(float(start_point[0] + (vx * i)))
     #     py = int(float(start_point[1] + (vy * i)))
     #
     #     print px
@@ -59,10 +59,6 @@ def calc_point(start_point, end_point):
     #     cv2.circle(img1, (px, py), 2, (0, 0, 255), -1)
 
     i = start_point[1]
-
-
-
-    print height, width, depth
 
     while i < height:
 
@@ -86,77 +82,33 @@ def calc_point(start_point, end_point):
 
         cv2.line(img1, (int(new_x), new_y), (int(new_x2), new_y), (0, 255, 0), 1)
 
-        i+=1
+        i += 1
 
 
-def get_distance(point1, point2):
+def calc_vec_magnitude(point1, point2):
     return math.sqrt(((point2[0] - point1[0]) ** 2) + ((point2[1] - point1[1]) ** 2))
 
 
-def in_between(point1, point2, targetpoint):
-    # crossproduct = (targetpoint[1] - point1[1]) * (point2[0] - point1[0]) - (targetpoint[0] - point1[0]) * (point2[1] - point1[1])
-    #
-    # epsilon = sys.float_info.epsilon
-    #
-    # print abs(crossproduct)
-    # print epsilon
-    #
-    # if abs(crossproduct) <= epsilon:
-    # print "point matches"
-
-    print point1
-    print point2
-    print targetpoint
-
-    print "\n--------\n"
-
-    dist1 = get_distance(point1, targetpoint)
-    dist2 = get_distance(targetpoint, point2)
-    disttotal = get_distance(point1, point2)
-
-    distcalc = dist1 + dist2
-
-    print distcalc
-    print disttotal
-
-    print distcalc - disttotal
-
-    if distcalc == disttotal:
-        print "point matches"
+def add_new_point(mouseX, mouseY):
+    lineCoords.append((mouseX, mouseY))
 
 
-def draw():
-    global count
-    if count >= 2:
-        cv2.line(img1, lineCoords[0], lineCoords[1], (0, 255, 0), 1)
-        count = 0
-
-
-def draw_circle(event, x, y, flags, param):
+def handle_mouse(event, x, y, flags, other):
     global count
 
     if event == cv2.EVENT_LBUTTONDOWN:
 
-        if count < 2:
+        if count < 4:
+
+            add_new_point(x, y)
             cv2.circle(img1, (x, y), 2, (255, 0, 0), -1)
-            lineCoords.append((x, y))
+
+            if len(lineCoords) % 2 == 0:
+
+                cv2.line(img1, (lineCoords[len(lineCoords) - 1][0], lineCoords[len(lineCoords) - 1][1]),
+                         (lineCoords[len(lineCoords) - 2][0], lineCoords[len(lineCoords) - 2][1]), (0, 255, 0), 1)
+
             count += 1
-            draw()
-
-    if event == cv2.EVENT_RBUTTONDOWN:
-        # cv2.circle(img1, (x, y), 2, (0, 0, 255), -1)
-        # in_between(lineCoords[0], lineCoords[1], (x, y))
-
-        # if count >= 2:
-        #     calc_point(lineCoords[0], lineCoords[1], lineCoords[2], lineCoords[3])
-
-            # count = 0
-
-            calc_point(lineCoords[0], lineCoords[1])
-
-            # Empty the list of coordinates.
-            # lineCoords[:] = []
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument("inputImage", help="the first image")
@@ -165,12 +117,24 @@ args = parser.parse_args()
 img1 = cv2.imread(args.inputImage, cv2.IMREAD_COLOR)
 
 cv2.namedWindow('image')
-cv2.setMouseCallback('image', draw_circle)
+cv2.setMouseCallback('image', handle_mouse)
 
 while 1:
-    cv2.imshow('image', img1)
 
-    if cv2.waitKey(20) & 0xFF == 27:
+    cv2.imshow('image', img1)
+    k = cv2.waitKey(20)
+
+    # Esc key to stop
+    if k == 27:
         break
+
+    elif k == ord('s'):
+        calc_point(lineCoords[0], lineCoords[1])
+
+    # Reset/clear all of the points from the collection ready to begin adding points again.
+    elif k == ord('r'):
+        lineCoords[:] = []
+        count = 0
+        img1 = cv2.imread(args.inputImage, cv2.IMREAD_COLOR)
 
 cv2.destroyAllWindows()
