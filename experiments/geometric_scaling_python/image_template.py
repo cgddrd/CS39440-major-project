@@ -6,6 +6,7 @@ import math
 import cv2
 import argparse
 import matplotlib.pyplot as plt
+from point import Point
 
 line_coords = []
 point_count = 0
@@ -13,7 +14,6 @@ slope = 0
 lock_gui = False
 new_img = 0
 original_img = 0
-
 
 def calc_point(start_point, end_point, start_point2, end_point2):
     global slope
@@ -96,7 +96,9 @@ def calc_vec_magnitude(point_1, point_2):
 
 
 def add_new_point(mouse_x, mouse_y):
-    line_coords.append((mouse_x, mouse_y))
+    new_point = Point(mouse_x, mouse_y)
+
+    line_coords.append(new_point.value())
 
 
 def on_mouse_click(event):
