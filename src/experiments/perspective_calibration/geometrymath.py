@@ -27,6 +27,7 @@ def calc_line_points_reflection(start_point, end_point, image_height, image_widt
         new_y = i
 
         # If we happen to have a perfectly vertical line, then we have no slope (prevents division by 0 error)
+        # As the second line will be a complete reflection of the first, we only need to perform a slope check on the first line.
         if (end_point[0] - start_point[0]) != 0:
 
             slope = float((end_point[1] - start_point[1]) / (end_point[0] - start_point[0]))
@@ -60,21 +61,19 @@ def calc_line_points(start_point, end_point, start_point2, end_point2, image_hei
         new_y = i
 
         # If we happen to have a perfectly vertical line, then we have no slope (prevents division by 0 error)
-        if (end_point[0] - start_point[0]) != 0 and (end_point2[0] - start_point2[0]) != 0:
-
+        if (end_point[0] - start_point[0]) != 0:
             slope = float((end_point[1] - start_point[1]) / (end_point[0] - start_point[0]))
             new_x = (((new_y - start_point[1]) / slope) + start_point[0])
+        else:
+            new_x = start_point[0]
 
+        if (end_point2[0] - start_point2[0]) != 0:
             slope2 = float((end_point2[1] - start_point2[1]) / (end_point2[0] - start_point2[0]))
             new_x2 = (((new_y - start_point2[1]) / slope2) + start_point2[0])
-
         else:
-
-            new_x = start_point[0]
             new_x2 = start_point2[0]
 
         coords1.append((int(new_x), new_y))
-
         coords2.append((int(new_x2), new_y))
 
         i += 1

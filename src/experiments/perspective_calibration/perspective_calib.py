@@ -1,10 +1,11 @@
 from __future__ import division
-from point import Point
-from fileio import FileIO
 
 import cv2
 import argparse
 import matplotlib.pyplot as plt
+
+from point import Point
+from fileio import FileIO
 import geometrymath
 
 
@@ -24,8 +25,6 @@ class PerspectiveCalibration:
 
         self.setup_image_gui(self._new_img)
 
-
-
     def render_line(self, start_point, end_point, start_point2, end_point2):
 
         height, width, depth = self._new_img.shape
@@ -36,7 +35,6 @@ class PerspectiveCalibration:
         file_points = []
 
         for i in range(len(coords1)):
-
             cv2.circle(self._new_img, coords1[i], 2, (0, 0, 255), -1)
 
             cv2.circle(self._new_img, coords2[i], 2, (0, 0, 255), -1)
@@ -60,7 +58,6 @@ class PerspectiveCalibration:
             cv2.circle(self._new_img, coords2[i], 2, (0, 0, 255), -1)
 
             cv2.line(self._new_img, coords1[i], coords2[i], (0, 255, 255), 1)
-
 
     def add_new_point(self, mouse_x, mouse_y):
         new_point = Point(mouse_x, mouse_y)
@@ -91,7 +88,6 @@ class PerspectiveCalibration:
                 self.update_image_gui(self._new_img)
                 self._point_count += 1
 
-
     def on_key_press(self, event):
 
         if event.key == 'r':
@@ -101,7 +97,7 @@ class PerspectiveCalibration:
 
             if self._lock_gui is False and self._point_count == 4:
                 self.render_line(self._point_coords[0], self._point_coords[1], self._point_coords[2],
-                                self._point_coords[3])
+                                 self._point_coords[3])
                 self.update_image_gui(self._new_img)
                 self._lock_gui = True
 
@@ -115,7 +111,6 @@ class PerspectiveCalibration:
         elif event.key == 'q':
             plt.close()
 
-
     def setup_image_gui(self, image):
         plt.axis("off")
 
@@ -126,16 +121,13 @@ class PerspectiveCalibration:
 
         plt.show()
 
-
     def update_image_gui(self, image):
         plt.clf()
         plt.axis("off")
         plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
         plt.draw()
 
-
     def reset_image_gui(self):
-
         self._new_img = self._original_img.copy()
         self.update_image_gui(self._new_img)
 
