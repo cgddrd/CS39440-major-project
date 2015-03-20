@@ -1,10 +1,12 @@
 from __future__ import division
 from point import Point
+from fileio import FileIO
 
 import cv2
 import argparse
 import matplotlib.pyplot as plt
 import geometrymath
+
 
 __author__ = 'connorgoddard'
 
@@ -15,6 +17,7 @@ class PerspectiveCalibration:
         self._point_count = 0
         self._line_slope = 0
         self._lock_gui = False
+        self._file = FileIO()
 
         self._original_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
         self._new_img = self._original_img.copy()
@@ -22,20 +25,27 @@ class PerspectiveCalibration:
         self.setup_image_gui(self._new_img)
 
 
-    def calc_point(self, start_point, end_point, start_point2, end_point2):
+
+    def render_line(self, start_point, end_point, start_point2, end_point2):
 
         height, width, depth = self._new_img.shape
 
         # Here we are unwrapping the TUPLE returned from the function into two separate variables (coords1, coords2)
         coords1, coords2 = geometrymath.calc_line_points(start_point, end_point, start_point2, end_point2, height)
 
+        file_points = []
+
         for i in range(len(coords1)):
+
             cv2.circle(self._new_img, coords1[i], 2, (0, 0, 255), -1)
 
             cv2.circle(self._new_img, coords2[i], 2, (0, 0, 255), -1)
 
             cv2.line(self._new_img, coords1[i], coords2[i], (0, 255, 255), 1)
 
+            file_points.append((coords1[i][1], (coords2[i][0] - coords1[i][0])))
+
+        self._file.write_file("data.txt", "y,displacement", file_points)
 
     def render_line_reflection(self, start_point, end_point):
 
@@ -90,7 +100,7 @@ class PerspectiveCalibration:
         elif event.key == 'c':
 
             if self._lock_gui is False and self._point_count == 4:
-                self.calc_point(self._point_coords[0], self._point_coords[1], self._point_coords[2],
+                self.render_line(self._point_coords[0], self._point_coords[1], self._point_coords[2],
                                 self._point_coords[3])
                 self.update_image_gui(self._new_img)
                 self._lock_gui = True

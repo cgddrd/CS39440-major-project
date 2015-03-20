@@ -60,7 +60,7 @@ def calc_line_points(start_point, end_point, start_point2, end_point2, image_hei
         new_y = i
 
         # If we happen to have a perfectly vertical line, then we have no slope (prevents division by 0 error)
-        if (end_point[0] - start_point[0]) != 0:
+        if (end_point[0] - start_point[0]) != 0 and (end_point2[0] - start_point2[0]) != 0:
 
             slope = float((end_point[1] - start_point[1]) / (end_point[0] - start_point[0]))
             new_x = (((new_y - start_point[1]) / slope) + start_point[0])
