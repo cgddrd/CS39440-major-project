@@ -1,12 +1,13 @@
 from __future__ import division
-from point import Point
-from fileio import FileIO
+import datetime
 
 import cv2
 import argparse
 import matplotlib.pyplot as plt
+
+from point import Point
+from fileio import FileIO
 import geometrymath
-import datetime
 
 
 __author__ = 'connorgoddard'
@@ -19,7 +20,7 @@ class PerspectiveCalibration:
         self._line_slope = 0
         self._lock_gui = False
         self._output_filename = output_filename
-        self._file = FileIO()
+        self._file = FileIO("./data/")
 
         self._original_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
         self._new_img = self._original_img.copy()

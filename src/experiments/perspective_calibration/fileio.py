@@ -1,12 +1,12 @@
 __author__ = 'connorgoddard'
 import os
 
+
 class FileIO:
-    def __init__(self, filepath = "./"):
+    def __init__(self, filepath="./"):
         self._file_path = filepath
 
     def write_file(self, filename, data_prefix, data_collection, append):
-
         self.check_directory(self._file_path)
 
         file_io_op = 'a' if append else 'w'
@@ -21,6 +21,7 @@ class FileIO:
         new_file.close()
 
     @staticmethod
+    # Modified from: http://stackoverflow.com/a/5032238
     def check_directory(directory_path):
         try:
             os.makedirs(directory_path)
