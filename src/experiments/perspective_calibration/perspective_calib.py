@@ -1,23 +1,24 @@
 from __future__ import division
+from point import Point
+from fileio import FileIO
 
 import cv2
 import argparse
 import matplotlib.pyplot as plt
-
-from point import Point
-from fileio import FileIO
 import geometrymath
+import datetime
 
 
 __author__ = 'connorgoddard'
 
 
 class PerspectiveCalibration:
-    def __init__(self, image_path):
+    def __init__(self, image_path, output_filename):
         self._point_coords = []
         self._point_count = 0
         self._line_slope = 0
         self._lock_gui = False
+        self._output_filename = output_filename
         self._file = FileIO()
 
         self._original_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
@@ -43,7 +44,7 @@ class PerspectiveCalibration:
 
             file_points.append((coords1[i][1], (coords2[i][0] - coords1[i][0])))
 
-        self._file.write_file("data.txt", "y,displacement", file_points)
+        self._file.write_file(self._output_filename, "height,calib_width", file_points, False)
 
     def render_line_reflection(self, start_point, end_point):
 
@@ -52,12 +53,18 @@ class PerspectiveCalibration:
         # Here we are unwrapping the TUPLE returned from the function into two separate variables (coords1, coords2)
         coords1, coords2 = geometrymath.calc_line_points_reflection(start_point, end_point, height, width)
 
+        file_points = []
+
         for i in range(len(coords1)):
             cv2.circle(self._new_img, coords1[i], 2, (0, 0, 255), -1)
 
             cv2.circle(self._new_img, coords2[i], 2, (0, 0, 255), -1)
 
             cv2.line(self._new_img, coords1[i], coords2[i], (0, 255, 255), 1)
+
+            file_points.append((coords1[i][1], (coords2[i][0] - coords1[i][0])))
+
+        self._file.write_file(self._output_filename, "height,calib_width", file_points, False)
 
     def add_new_point(self, mouse_x, mouse_y):
         new_point = Point(mouse_x, mouse_y)
@@ -138,10 +145,12 @@ class PerspectiveCalibration:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("inputImage", help="the first image")
+    parser.add_argument("inputImage", help="the image")
     args = parser.parse_args()
 
-    PerspectiveCalibration(args.inputImage)
+    filename = "calibdata_{0}.txt".format(datetime.datetime.utcnow().strftime("%d_%m_%y_%H_%M_%S"))
+
+    PerspectiveCalibration(args.inputImage, filename)
 
 
 if __name__ == '__main__':  # if the function is the main function ...
