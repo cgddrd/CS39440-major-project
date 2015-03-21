@@ -33,7 +33,7 @@ install:
   - ls -l
 
 script:
-  - cd experiments/mat_pixel_iteration/mat_pixel_iteration
+  - cd src/experiments/mat_pixel_iteration/mat_pixel_iteration
   - g++ main.cpp -o mat_pixel_iteration -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_nonfree -lopencv_features2d
   - ./mat_pixel_iteration ../../eval_data/1.JPG
   - cd ../../optical_flow_lk_two_images/optical_flow_lk_two_images
