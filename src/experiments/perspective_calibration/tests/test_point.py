@@ -1,11 +1,11 @@
-from unittest import TestCase
-
-__author__ = 'connorgoddard'
+import unittest
 
 from point import Point
 
+__author__ = 'connorgoddard'
 
-class TestPoint(TestCase):
+
+class TestPoint(unittest.TestCase):
     def setUp(self):
         self.point = Point(1, 2)
 
@@ -31,3 +31,7 @@ class TestPoint(TestCase):
 
     def test_get_value(self):
         self.assertEqual(self.point.get_value(), (1, 2), "Point value should equal (1, 2)")
+
+
+if __name__ == '__main__':
+    unittest.main()
