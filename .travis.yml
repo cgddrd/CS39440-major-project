@@ -21,4 +21,5 @@ script:
   - cd tests
   - ls -l 
   - cd ..
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)
   - python tests/test_point.py
