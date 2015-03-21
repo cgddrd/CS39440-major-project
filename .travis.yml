@@ -14,12 +14,14 @@ before_install:
 
 install:
   - "pip install -r requirements.txt"
+  - "cd src/experiments/perspective_calibration"
+  - "python setup.py install"
 
 script:
-  - cd src/experiments/perspective_calibration/
-  - ls -l
-  - cd tests
-  - ls -l 
-  - cd ..
-  - export PYTHONPATH=$PYTHONPATH:$(pwd)
+ # - cd src/experiments/perspective_calibration/
+ # - ls -l
+ # - cd tests
+ # - ls -l 
+ # - cd ..
+ # - export PYTHONPATH=$PYTHONPATH:$(pwd)
   - python tests/test_point.py
