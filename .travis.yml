@@ -16,5 +16,9 @@ install:
   - "pip install -r requirements.txt"
 
 script:
-  - cd src/experiments/perspective_calibration
+  - cd src/experiments/perspective_calibration/
+  - ls -l
+  - cd tests
+  - ls -l 
+  - cd ..
   - python tests/test_point.py
