@@ -18,15 +18,5 @@ class Point:
         """I'm the 'y' property."""
         return self._y
 
-    @x.setter
-    # e.g. point.x = <value>
-    def x(self, value):
-        self._x = value
-
-    @y.setter
-    # e.g. point.y = <value>
-    def y(self, value):
-        self._y = value
-
     def get_value(self):
-        return (self.x, self.y)
+        return self.x, self.y

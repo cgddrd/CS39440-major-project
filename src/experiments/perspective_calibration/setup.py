@@ -6,6 +6,8 @@ try:
 except ImportError:
     from distutils.core import setup
 
+# Read from 'requirements.txt' file. Modified from: http://stackoverflow.com/a/16624700
+
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
 install_reqs = parse_requirements("./requirements.txt", session=PipSession())
 

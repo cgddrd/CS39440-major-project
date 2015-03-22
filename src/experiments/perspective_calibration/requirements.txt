@@ -1,2 +1,4 @@
-matplotlib
 pip
+matplotlib
+nose
+coverage
