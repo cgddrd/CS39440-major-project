@@ -13,9 +13,10 @@ before_install:
  - sudo dpkg -L python-opencv
 
 install:
-  - "pip install -r requirements.txt"
+  #- "pip install -r requirements.txt"
   - "cd src/experiments/perspective_calibration"
   - "python setup.py install"
+  - "pip install ."
 
 script:
  # - cd src/experiments/perspective_calibration/
