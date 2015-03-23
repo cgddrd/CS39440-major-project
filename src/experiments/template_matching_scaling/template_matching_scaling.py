@@ -4,9 +4,11 @@ import cv2
 
 import argparse
 import matplotlib.pyplot as plt
+import math
 
 from tsefileio import TSEFileIO
 from tseutils import TSEUtils
+from tsegeometry import TSEGeometry
 
 
 __author__ = 'connorgoddard'
@@ -20,7 +22,7 @@ class TemplateMatching:
         self._hsv_img1 = self.convert_hsv_and_remove_luminance(self._raw_img1)
         self._hsv_img2 = self.convert_hsv_and_remove_luminance(self._raw_img2)
 
-        self._lookup_table = self.load_calibration_data(calib_data_file_path)
+        self._calibration_lookup = self.load_calibration_data(calib_data_file_path)
         self._calib_data_file_path = calib_data_file_path
 
         # self.setup_image_gui(self._hsv_img1)
@@ -52,16 +54,24 @@ class TemplateMatching:
 
     def search_image(self, patch_height):
 
-        smallest_key = TSEUtils.get_smallest_key_dict(self._lookup_table)
+        smallest_key = TSEUtils.get_smallest_key_dict(self._calibration_lookup)
 
-        height = self._hsv_img2.shape[0]
+        image_height, image_width = self._hsv_img2.shape[:2]
 
-        for i in range(smallest_key, height - patch_height):
+        image_centre_x = math.floor(image_width / 2)
 
-            roi = self._hsv_img2[i:i + patch_height, 0:self._lookup_table[i]]
+        for i in range(smallest_key, image_height - patch_height):
+
+            calibrated_patch_width = self._calibration_lookup[i]
+            patch_half_width = math.floor(calibrated_patch_width / 2)
+
+            patch_origin_x = (image_centre_x - patch_half_width)
+            patch_end_x = (image_centre_x + patch_half_width)
+
+            roi = self._hsv_img2[i:i + patch_height, patch_origin_x:patch_end_x]
 
             cv2.imshow("ROI", roi)
-            cv2.waitKey(10)
+            cv2.waitKey(100)
 
 
 def main():
