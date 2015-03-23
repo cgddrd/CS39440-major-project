@@ -2,7 +2,7 @@ __author__ = 'connorgoddard'
 import os
 
 
-class FileIO:
+class TSEFileIO:
     def __init__(self, filepath="./"):
         self._file_path = filepath
 
