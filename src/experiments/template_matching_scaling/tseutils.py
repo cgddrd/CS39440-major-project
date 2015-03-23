@@ -12,6 +12,10 @@ class TSEUtils:
         return min(dict, key=dict.get)
 
     @staticmethod
+    def get_largest_key_dict(dict):
+        return max(dict, key=dict.get)
+
+    @staticmethod
     def get_smallest_key_value_dict(dict):
         smallest_dict_key = min(dict, key=dict.get)
         return dict[smallest_dict_key]
