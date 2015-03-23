@@ -8,6 +8,15 @@ class TSEUtils:
         pass
 
     @staticmethod
+    def get_smallest_key_dict(dict):
+        return min(dict, key=dict.get)
+
+    @staticmethod
+    def get_smallest_key_value_dict(dict):
+        smallest_dict_key = min(dict, key=dict.get)
+        return dict[smallest_dict_key]
+
+    @staticmethod
     def string_list_to_int_list(string_list):
         return map(TSEUtils.convert_to_int, string_list)
 
