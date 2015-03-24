@@ -9,6 +9,7 @@ import math
 from tsefileio import TSEFileIO
 from tseutils import TSEUtils
 from tsegeometry import TSEGeometry
+from tseimageutils import TSEImageUtils
 
 
 __author__ = 'connorgoddard'
@@ -64,14 +65,42 @@ class TemplateMatching:
 
             calibrated_patch_width = self._calibration_lookup[i]
             patch_half_width = math.floor(calibrated_patch_width / 2)
-
+            
             patch_origin_x = (image_centre_x - patch_half_width)
             patch_end_x = (image_centre_x + patch_half_width)
+            patch_origin_y = i
+            patch_end_y = (i + patch_height)
 
-            roi = self._hsv_img2[i:i + patch_height, patch_origin_x:patch_end_x]
+            patch_origin_xy = (int(patch_origin_x), int(patch_origin_y))
+            patch_end_xy = (int(patch_end_x), int(patch_end_y))
 
-            cv2.imshow("ROI", roi)
-            cv2.waitKey(100)
+            patch_centre = (image_centre_x, (patch_origin_y + int(patch_height / 2)))
+
+            patch_origin_xy_scaled = TSEGeometry.scale_coordinate_relative_centre(patch_origin_xy, patch_centre, 2)
+
+            patch_end_xy_scaled = TSEGeometry.scale_coordinate_relative_centre(patch_end_xy, patch_centre, 2)
+
+            # roi = self._hsv_img2[patch_origin_y:patch_end_y, patch_origin_x:patch_end_x]
+
+            print patch_origin_xy
+            print patch_origin_xy_scaled
+
+            print patch_centre
+
+            print "\n-----\n"
+            print patch_end_xy
+            print patch_end_xy_scaled
+
+            cv2.rectangle(self._hsv_img2, patch_origin_xy, patch_end_xy, (0, 0, 255), 2)
+            cv2.rectangle(self._hsv_img2, patch_origin_xy_scaled, patch_end_xy_scaled, (0, 255, 255), 2)
+
+            # roi2 = self._hsv_img2[patch_origin_xy_scaled[1]:patch_end_xy_scaled[1], patch_origin_xy_scaled[0]:patch_end_xy_scaled[0]]
+
+            cv2.imshow("ROI", self._hsv_img2)
+
+            cv2.waitKey(0)
+
+
 
 
 def main():

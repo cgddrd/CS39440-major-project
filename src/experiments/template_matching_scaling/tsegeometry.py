@@ -10,6 +10,22 @@ class TSEGeometry:
         pass
 
     @staticmethod
+    def calc_patch_scale_factor(current_width, new_width):
+
+        return float(new_width / current_width)
+
+    @staticmethod
+    def scale_coordinate_relative_centre(coordinate, centre_coordinate, scale_factor):
+
+        # Calculate the vector between the centre coordinate and the target coordinate.
+        vec = (coordinate[0] - centre_coordinate[0], coordinate[1] - centre_coordinate[1])
+
+        newVec = ((vec[0] * scale_factor), (vec[1] * scale_factor))
+
+        # Return scaled coordinate relative to the centre of the patch
+        return int(newVec[0] + centre_coordinate[0]), int(newVec[1] + centre_coordinate[1])
+
+    @staticmethod
     def calc_vec_magnitude(point_1, point_2):
         vx = (point_2[0] - point_1[0])
         vy = (point_2[1] - point_1[1])
