@@ -27,13 +27,6 @@ class TemplateMatching:
         self._calibration_lookup = self.load_calibration_data(calib_data_file_path)
         self._calib_data_file_path = calib_data_file_path
 
-        # self.setup_image_gui(self._hsv_img1)
-        # self.setup_image_gui(self._raw_img2)
-        #
-        # print TSEUtils.get_smallest_key_value_dict(self._lookup_table)
-        #
-        # plt.show()
-
     def load_calibration_data(self, file_path):
         raw_data = TSEFileIO.read_file(file_path, split_delimiter=",", start_position=1)
         return dict(TSEUtils.string_list_to_int_list(raw_data))
@@ -42,9 +35,6 @@ class TemplateMatching:
         plt.figure()
         plt.axis("off")
         canvas = plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-
-        # canvas.figure.canvas.mpl_connect('button_press_event', self.on_mouse_click)
-        # canvas.figure.canvas.mpl_connect('key_press_event', self.on_key_press)
 
     def convert_hsv_and_remove_luminance(self, source_image):
         hsv_image = cv2.cvtColor(source_image, cv2.COLOR_BGR2HSV)
@@ -64,14 +54,23 @@ class TemplateMatching:
 
         localised_window_height, localised_window_width = localised_window.shape[:2]
 
+        best_score = -1
+        best_position = 0
+
         for i in range(0, (localised_window_height - template_patch_height)):
 
             current_window = localised_window[i:(i + template_patch_height), 0:template_patch_width]
 
-            # cv2.imshow("Current Window", current_window)
-            # cv2.imshow("Search Window", localised_window)
+            score = TSEImageUtils.calc_euclidean_distance_norm(template_patch, current_window)
 
-            # cv2.waitKey(1)
+            if best_score == -1 or score < best_score:
+                best_score = score
+                best_position = i
+
+        # print "Best Y: {0} - Score: {1}".format(best_position, best_score)
+
+        # We need to return the 'Y' with the best score (i.e. the displacement)
+        return best_position
 
     def search_image(self, patch_height):
 
@@ -82,6 +81,9 @@ class TemplateMatching:
         image_centre_x = math.floor(image_width / 2)
 
         for i in range(smallest_key, image_height - patch_height):
+
+            if i == (smallest_key + 1):
+                break
 
             calibrated_patch_width = self._calibration_lookup[i]
             patch_half_width = math.floor(calibrated_patch_width / 2)
@@ -99,29 +101,17 @@ class TemplateMatching:
             patch_origin_xy_scaled = TSEGeometry.scale_coordinate_relative_centre(patch_origin_xy, patch_centre, 2)
             patch_end_xy_scaled = TSEGeometry.scale_coordinate_relative_centre(patch_end_xy, patch_centre, 2)
 
-            template_patch = self._hsv_img2[patch_origin_y:patch_end_y, patch_origin_x:patch_end_x]
+            template_patch = self._hsv_img1[patch_origin_y:patch_end_y, patch_origin_x:patch_end_x]
 
             template_patch_origin = TSEPoint(patch_origin_x, patch_origin_y)
 
-            # print patch_origin_xy
-            # print patch_origin_xy_scaled
-            #
-            # print patch_centre
-            #
-            # print "\n-----\n"
-            # print patch_end_xy
-            # print patch_end_xy_scaled
-            #
-            # cv2.rectangle(self._hsv_img2, patch_origin_xy, patch_end_xy, (0, 0, 255), 2)
-            # cv2.rectangle(self._hsv_img2, patch_origin_xy_scaled, patch_end_xy_scaled, (0, 255, 255), 2)
-            #
-            # # roi2 = self._hsv_img2[patch_origin_xy_scaled[1]:patch_end_xy_scaled[1], patch_origin_xy_scaled[0]:patch_end_xy_scaled[0]]
-            #
             cv2.imshow("ROI", template_patch)
-            cv2.waitKey(100)
 
-            self.scan_search_window(template_patch, template_patch_origin)
+            best_position = self.scan_search_window(template_patch, template_patch_origin)
 
+            cv2.rectangle(self._hsv_img2, (int(patch_origin_x), patch_origin_y + best_position), (int(patch_origin_x + calibrated_patch_width), int(patch_origin_y + best_position + patch_height)), (0, 0, 255), 2)
+
+            cv2.imshow("bdsadsa", self._hsv_img2)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -135,6 +125,8 @@ def main():
     match = TemplateMatching(args.input_image_1, args.input_image_2, args.calib_data_file)
 
     match.search_image(40)
+
+    cv2.waitKey()
 
 if __name__ == '__main__':  # if the function is the main function ...
     main()
