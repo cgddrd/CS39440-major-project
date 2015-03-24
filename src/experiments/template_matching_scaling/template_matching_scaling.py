@@ -9,6 +9,7 @@ import math
 from tsefileio import TSEFileIO
 from tseutils import TSEUtils
 from tsegeometry import TSEGeometry
+from tsepoint import TSEPoint
 from tseimageutils import TSEImageUtils
 
 
@@ -53,6 +54,25 @@ class TemplateMatching:
 
         return hsv_image
 
+    def scan_search_window(self, template_patch, template_patch_origin):
+
+        image_height, image_width = self._hsv_img2.shape[:2]
+
+        template_patch_height, template_patch_width = template_patch.shape[:2]
+
+        localised_window = self._hsv_img2[template_patch_origin.y:image_height, template_patch_origin.x:(template_patch_origin.x + template_patch_width)]
+
+        localised_window_height, localised_window_width = localised_window.shape[:2]
+
+        for i in range(0, (localised_window_height - template_patch_height)):
+
+            current_window = localised_window[i:(i + template_patch_height), 0:template_patch_width]
+
+            # cv2.imshow("Current Window", current_window)
+            # cv2.imshow("Search Window", localised_window)
+
+            # cv2.waitKey(1)
+
     def search_image(self, patch_height):
 
         smallest_key = TSEUtils.get_smallest_key_dict(self._calibration_lookup)
@@ -65,7 +85,7 @@ class TemplateMatching:
 
             calibrated_patch_width = self._calibration_lookup[i]
             patch_half_width = math.floor(calibrated_patch_width / 2)
-            
+
             patch_origin_x = (image_centre_x - patch_half_width)
             patch_end_x = (image_centre_x + patch_half_width)
             patch_origin_y = i
@@ -77,30 +97,30 @@ class TemplateMatching:
             patch_centre = (image_centre_x, (patch_origin_y + int(patch_height / 2)))
 
             patch_origin_xy_scaled = TSEGeometry.scale_coordinate_relative_centre(patch_origin_xy, patch_centre, 2)
-
             patch_end_xy_scaled = TSEGeometry.scale_coordinate_relative_centre(patch_end_xy, patch_centre, 2)
 
-            # roi = self._hsv_img2[patch_origin_y:patch_end_y, patch_origin_x:patch_end_x]
+            template_patch = self._hsv_img2[patch_origin_y:patch_end_y, patch_origin_x:patch_end_x]
 
-            print patch_origin_xy
-            print patch_origin_xy_scaled
+            template_patch_origin = TSEPoint(patch_origin_x, patch_origin_y)
 
-            print patch_centre
+            # print patch_origin_xy
+            # print patch_origin_xy_scaled
+            #
+            # print patch_centre
+            #
+            # print "\n-----\n"
+            # print patch_end_xy
+            # print patch_end_xy_scaled
+            #
+            # cv2.rectangle(self._hsv_img2, patch_origin_xy, patch_end_xy, (0, 0, 255), 2)
+            # cv2.rectangle(self._hsv_img2, patch_origin_xy_scaled, patch_end_xy_scaled, (0, 255, 255), 2)
+            #
+            # # roi2 = self._hsv_img2[patch_origin_xy_scaled[1]:patch_end_xy_scaled[1], patch_origin_xy_scaled[0]:patch_end_xy_scaled[0]]
+            #
+            cv2.imshow("ROI", template_patch)
+            cv2.waitKey(100)
 
-            print "\n-----\n"
-            print patch_end_xy
-            print patch_end_xy_scaled
-
-            cv2.rectangle(self._hsv_img2, patch_origin_xy, patch_end_xy, (0, 0, 255), 2)
-            cv2.rectangle(self._hsv_img2, patch_origin_xy_scaled, patch_end_xy_scaled, (0, 255, 255), 2)
-
-            # roi2 = self._hsv_img2[patch_origin_xy_scaled[1]:patch_end_xy_scaled[1], patch_origin_xy_scaled[0]:patch_end_xy_scaled[0]]
-
-            cv2.imshow("ROI", self._hsv_img2)
-
-            cv2.waitKey(0)
-
-
+            self.scan_search_window(template_patch, template_patch_origin)
 
 
 def main():
