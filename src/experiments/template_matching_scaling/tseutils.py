@@ -1,5 +1,6 @@
 __author__ = 'connorgoddard'
 
+import numpy as np
 
 class TSEUtils:
 
@@ -27,3 +28,15 @@ class TSEUtils:
     @staticmethod
     def convert_to_int(value):
         return map(int, value)
+
+    @staticmethod
+    def calc_moving_average(values, window, mode='valid'):
+
+        weights = np.repeat(1.0, window)/window
+
+        # Including valid will REQUIRE there to be enough data points.
+        return np.convolve(values, weights, mode)
+
+    @staticmethod
+    def convert_array_to_numpy_array(original_array):
+        return np.array(original_array)

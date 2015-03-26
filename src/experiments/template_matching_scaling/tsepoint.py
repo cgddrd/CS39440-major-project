@@ -18,5 +18,5 @@ class TSEPoint:
         """I'm the 'y' property."""
         return self._y
 
-    def get_value(self):
+    def to_tuple(self):
         return self.x, self.y
