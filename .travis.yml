@@ -18,12 +18,8 @@ before_install:
  - sudo apt-get install -qq python-numpy python-scipy
  - sudo dpkg -L python-opencv
 
-install:
-  #- "pip install --upgrade pip"
-  # - "cd src/experiments/perspective_calibration"
-  # - "python setup.py install"
-  # - "pip install ."
+# We want to skip the 'install' stage, as this is handled by the project-specific scripts.
+install: true
 
 script:
-  # - nosetests -w tests/ --with-coverage --cover-package point
-  - bash run_tests.sh
+  - bash run_travisci_tests.sh
