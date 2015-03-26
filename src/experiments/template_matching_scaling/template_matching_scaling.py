@@ -6,12 +6,13 @@ import math
 import argparse
 import matplotlib.pyplot as plt
 
-from tsefileio import TSEFileIO
-from tseutils import TSEUtils
-from tsepoint import TSEPoint
-from tseimageutils import TSEImageUtils
-from tseresult import TSEResult
-from tsematch_methods import tse_match_methods
+from tse.tse_fileio import TSEFileIO
+from tse.tse_utils import TSEUtils
+from tse.tse_point import TSEPoint
+from tse.tse_imageutils import TSEImageUtils
+from tse.tse_result import TSEResult
+from tse.tse_match_methods import tse_match_methods
+
 
 __author__ = 'connorgoddard'
 

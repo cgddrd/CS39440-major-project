@@ -1,6 +1,6 @@
 __author__ = 'connorgoddard'
 
-from tseenum import enum
+from tse.tse_enum import enum
 
 tse_match_methods = enum(
     'DISTANCE',
