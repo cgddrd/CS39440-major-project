@@ -15,9 +15,9 @@ install_reqs = parse_requirements("./requirements.txt", session=PipSession())
 reqs = [str(ir.req) for ir in install_reqs]
 
 setup(
-    name='perspective_calibration',
-    version='1.0.1',
-    packages=['', 'tests'],
+    name='template_matching_scaling',
+    version='1.0.0',
+    packages=['', 'tests', 'tse'],
     install_requires=reqs,
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
