@@ -1,6 +1,8 @@
 __author__ = 'connorgoddard'
 
 import cv2
+import numpy as np
+from tse.tse_geometry import TSEGeometry
 
 
 class TSEImageUtils:
@@ -59,3 +61,51 @@ class TSEImageUtils:
         hsv_image[:, :, 2] = 0
 
         return hsv_image
+
+    @staticmethod
+    def scale_image_roi_relative_centre(origin, end, scale_factor):
+
+        height = end[1] - origin[1]
+        width = end[0] - origin[0]
+
+        centre = ((origin[0] + (width / 2)), (origin[1] + (height / 2)))
+
+        scaled_origin = TSEGeometry.scale_coordinate_relative_centre(origin, centre, scale_factor)
+
+        scaled_end = TSEGeometry.scale_coordinate_relative_centre(end, centre, scale_factor)
+
+        return scaled_origin, scaled_end
+
+    @staticmethod
+    # METHOD ASSUMES WE ARE DEALING WITH HSV IMAGES WITH 'V' CHANNEL REMOVED.
+    def scale_image_no_interpolation(source_image, scale_factor):
+
+        source_image_height, source_image_width = source_image.shape[:2]
+
+        scaled_source_image_height = int(source_image_height * scale_factor)
+
+        scaled_source_image_width = int(source_image_width * scale_factor)
+
+        scaled_image_result = np.zeros((scaled_source_image_height, scaled_source_image_width, 3), np.uint8)
+
+        # Loop through each pixel in the template patch, and scale it in the larger scaled image.
+        for i in xrange(source_image_height):
+            for j in xrange(source_image_width):
+
+                # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
+                template_patch_val_hue = source_image.item(i, j, 0)
+                template_patch_val_sat = source_image.item(i, j, 1)
+
+                scaled_image_result.itemset((i * scale_factor, (j * scale_factor), 0), template_patch_val_hue)
+                scaled_image_result.itemset((i * scale_factor, (j * scale_factor), 1), template_patch_val_sat)
+
+        return scaled_image_result
+
+    @staticmethod
+    def scale_image_interpolation(source_image, scale_factor):
+
+        source_image_height, source_image_width = source_image.shape[:2]
+
+        dim = (int(source_image_width * scale_factor), int(source_image_height * scale_factor))
+
+        return cv2.resize(source_image, dim)
