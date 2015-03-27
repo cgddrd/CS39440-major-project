@@ -82,6 +82,7 @@ class TemplateMatching:
         self._plot_axis.set_ylabel('Vertical Displacement (px)')
         self._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_height, self._image_one_file_name,
                                                                            self._image_two_file_name))
+
         for match_method in match_methods:
 
             results = []
@@ -97,12 +98,12 @@ class TemplateMatching:
 
                 template_patch = self._hsv_img1[template_patch_origin_point.y: template_patch_end_point.y, template_patch_origin_point.x: template_patch_end_point.x]
 
-                results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point, match_method)))
+                results.append(TSEResult(i, self.scan_search_window_scaling(template_patch, template_patch_origin_point, match_method)))
 
             self.plot_results(results, match_method)
 
 
-    def scan_search_window(self, template_patch, template_patch_origin, match_method):
+    def scan_search_window_scaling(self, template_patch, template_patch_origin, match_method):
 
         image_height, image_width = self._hsv_img2.shape[:2]
 
@@ -126,9 +127,6 @@ class TemplateMatching:
 
         prev_current_window_scaled_coords = None
 
-        # NEED TO SCALE BOTH THE WIDTH AND HEIGHT!
-
-        # for i in range(0, (localised_window_height - template_patch_height)):
         for i in range(template_patch_origin.y, new_localised_window_height):
 
             # if i == template_patch_origin.y + 2:
@@ -141,11 +139,11 @@ class TemplateMatching:
             calibrated_patch_width = self._calibration_lookup[i]
             patch_half_width = math.floor(calibrated_patch_width / 2)
 
-            print "Last Width: {0}, Current Width: {1}".format(last_width, calibrated_patch_width)
+            # print "Last Width: {0}, Current Width: {1}".format(last_width, calibrated_patch_width)
 
             scale_factor = TSEGeometry.calc_patch_scale_factor(last_width, calibrated_patch_width)
 
-            print "Scale Factor: {0}".format(scale_factor)
+            # print "Scale Factor: {0}".format(scale_factor)
 
             current_window_scaled_coords = None
 
@@ -170,12 +168,8 @@ class TemplateMatching:
 
             self.scale_template(template_patch, current_window)
 
-            cv2.imshow("current search", current_window)
-            cv2.imshow("template patch", template_patch)
-            # cv2.imshow("image1", self._hsv_img1)
-            # cv2.imshow("image2", self._hsv_img2)
-
-            print "Image Height: {0}, Total Localised Window Height: {1}, Template Origin Y: {3}, Current Height: {2}".format(image_height, new_localised_window_height, i, template_patch_origin.y)
+            # cv2.imshow("current search", current_window)
+            # cv2.imshow("template patch", template_patch)
 
             cv2.waitKey(100)
 
@@ -216,68 +210,18 @@ class TemplateMatching:
     def scale_template(self, template_patch, current_window):
 
         template_patch_width = template_patch.shape[1]
-        template_patch_height = template_patch.shape[0]
         current_window_width = current_window.shape[1]
-
-        current_window_height = current_window.shape[0]
-
-        # current_window_width = 200
-        # current_window_height = 99
-        #
-        # # current_window_width = 400
-        # # current_window_height = 198
-        #
-        # # current_window_width = 800
-        # # current_window_height = 396
 
         template_patch_scale_factor = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window_width)
 
-        template_patch_centre = ((0 + (template_patch_width/ 2)), (0 + (template_patch_height / 2)))
+        image = TSEImageUtils.scale_image_no_interpolation(template_patch, template_patch_scale_factor)
 
-        print "Template Patch: {0}px x {1}px".format(template_patch_width, template_patch_height)
-        print "Current Window: {0}px x {1}px".format(current_window_width, current_window_height)
-
-        scaled1 = TSEGeometry.scale_coordinate_relative_centre((0, 0), template_patch_centre, template_patch_scale_factor)
-
-        scaled2 = TSEGeometry.scale_coordinate_relative_centre((template_patch_width, template_patch_height), template_patch_centre, template_patch_scale_factor)
-
-
-        scaled1 = ((0 * template_patch_scale_factor), (0 * template_patch_scale_factor))
-        scaled2 = (int(template_patch_width * template_patch_scale_factor), int(template_patch_height * template_patch_scale_factor))
-
-        print "Template Patch Scaled (0,0): {0}".format(scaled1)
-        print "Template Patch Scaled (END,END): {0}".format(scaled2)
-
-        image = np.zeros((scaled2[1], scaled2[0], 3), np.uint8)
-
-        # Loop through each pixel in the template patch, and scale it in the larger scaled image.
-        for i in xrange(template_patch_height):
-            for j in xrange(template_patch_width):
-
-                # OLD/SLOWER APPROACH USING DIRECT ARRAY ACCESS
-                # template_patch_val = template_patch[i, j]
-                # image[(i * template_patch_scale_factor), (j * template_patch_scale_factor)] = template_patch_val
-
-                # FASTER METHOD USING THE NUMPY METHODS.
-                # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
-                template_patch_val_hue = template_patch.item(i, j, 0)
-                template_patch_val_sat = template_patch.item(i, j, 1)
-                # template_patch_val_val = template_patch.item(i, j, 2)
-
-                image.itemset((i * template_patch_scale_factor, (j * template_patch_scale_factor), 0), template_patch_val_hue)
-                image.itemset((i * template_patch_scale_factor, (j * template_patch_scale_factor), 1), template_patch_val_sat)
-                # image.itemset((i * template_patch_scale_factor, (j * template_patch_scale_factor), 2), template_patch_val_val)
+        resized = TSEImageUtils.scale_image_interpolation(template_patch, template_patch_scale_factor)
 
         cv2.imshow("ORIGINAL TEMPLATE PATCH", template_patch)
 
         cv2.imshow("SCALED TEMPLATE PATCH", image)
 
-        # cv2.waitKey()
-
-        r = current_window_width / template_patch_width
-        dim = (current_window_width, int(template_patch.shape[0] * r))
-
-        resized = cv2.resize(template_patch, dim, interpolation = cv2.INTER_AREA)
         cv2.imshow("resized", resized)
 
     def plot_results(self, results, match_method):
@@ -299,7 +243,8 @@ class TemplateMatching:
 
     def plot(self, data_x, data_y, plot_format, max_boundary_offset, plot_name):
 
-        # self._plot_axis.xlim(0, data_x[(len(data_x) - 1)] + max_boundary_offset)
+        self._plot_axis.set_xlim(0, data_x[(len(data_x) - 1)] + max_boundary_offset)
+
         self._plot_axis.grid(True)
 
         # Actually plot the data and re-draw the single figure.
