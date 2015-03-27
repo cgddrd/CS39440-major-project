@@ -4,6 +4,7 @@ import cv2
 import math
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from tse.tse_fileio import TSEFileIO
 from tse.tse_utils import TSEUtils
@@ -154,10 +155,7 @@ class TemplateMatching:
 
             else:
 
-                # current_window_scaled_coords = TSEGeometry.scale_patch(prev_current_window_scaled_coords[0], prev_current_window_scaled_coords[1], scale_factor)
-
                 current_window_scaled_coords = TSEGeometry.scale_patch((prev_current_window_scaled_coords[0][0], prev_current_window_scaled_coords[0][1] + 1), (prev_current_window_scaled_coords[1][0], prev_current_window_scaled_coords[1][1] + 1), scale_factor)
-              # print prev_current_window_scaled_coords[0][1]
 
 
             prev_current_window_scaled_coords = current_window_scaled_coords
@@ -170,6 +168,7 @@ class TemplateMatching:
 
             score = 0
 
+            self.scale_template(template_patch, current_window)
 
             cv2.imshow("current search", current_window)
             cv2.imshow("template patch", template_patch)
@@ -178,7 +177,7 @@ class TemplateMatching:
 
             print "Image Height: {0}, Total Localised Window Height: {1}, Template Origin Y: {3}, Current Height: {2}".format(image_height, new_localised_window_height, i, template_patch_origin.y)
 
-            cv2.waitKey(10)
+            cv2.waitKey(100)
 
             # if match_method.match_type == tse_match_methods.DISTANCE_ED:
             #     score = TSEImageUtils.calc_euclidean_distance_norm(template_patch, current_window)
@@ -213,6 +212,73 @@ class TemplateMatching:
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
         return best_position
+
+    def scale_template(self, template_patch, current_window):
+
+        template_patch_width = template_patch.shape[1]
+        template_patch_height = template_patch.shape[0]
+        current_window_width = current_window.shape[1]
+
+        current_window_height = current_window.shape[0]
+
+        # current_window_width = 200
+        # current_window_height = 99
+        #
+        # # current_window_width = 400
+        # # current_window_height = 198
+        #
+        # # current_window_width = 800
+        # # current_window_height = 396
+
+        template_patch_scale_factor = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window_width)
+
+        template_patch_centre = ((0 + (template_patch_width/ 2)), (0 + (template_patch_height / 2)))
+
+        print "Template Patch: {0}px x {1}px".format(template_patch_width, template_patch_height)
+        print "Current Window: {0}px x {1}px".format(current_window_width, current_window_height)
+
+        scaled1 = TSEGeometry.scale_coordinate_relative_centre((0, 0), template_patch_centre, template_patch_scale_factor)
+
+        scaled2 = TSEGeometry.scale_coordinate_relative_centre((template_patch_width, template_patch_height), template_patch_centre, template_patch_scale_factor)
+
+
+        scaled1 = ((0 * template_patch_scale_factor), (0 * template_patch_scale_factor))
+        scaled2 = (int(template_patch_width * template_patch_scale_factor), int(template_patch_height * template_patch_scale_factor))
+
+        print "Template Patch Scaled (0,0): {0}".format(scaled1)
+        print "Template Patch Scaled (END,END): {0}".format(scaled2)
+
+        image = np.zeros((scaled2[1], scaled2[0], 3), np.uint8)
+
+        # Loop through each pixel in the template patch, and scale it in the larger scaled image.
+        for i in xrange(template_patch_height):
+            for j in xrange(template_patch_width):
+
+                # OLD/SLOWER APPROACH USING DIRECT ARRAY ACCESS
+                # template_patch_val = template_patch[i, j]
+                # image[(i * template_patch_scale_factor), (j * template_patch_scale_factor)] = template_patch_val
+
+                # FASTER METHOD USING THE NUMPY METHODS.
+                # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
+                template_patch_val_hue = template_patch.item(i, j, 0)
+                template_patch_val_sat = template_patch.item(i, j, 1)
+                # template_patch_val_val = template_patch.item(i, j, 2)
+
+                image.itemset((i * template_patch_scale_factor, (j * template_patch_scale_factor), 0), template_patch_val_hue)
+                image.itemset((i * template_patch_scale_factor, (j * template_patch_scale_factor), 1), template_patch_val_sat)
+                # image.itemset((i * template_patch_scale_factor, (j * template_patch_scale_factor), 2), template_patch_val_val)
+
+        cv2.imshow("ORIGINAL TEMPLATE PATCH", template_patch)
+
+        cv2.imshow("SCALED TEMPLATE PATCH", image)
+
+        # cv2.waitKey()
+
+        r = current_window_width / template_patch_width
+        dim = (current_window_width, int(template_patch.shape[0] * r))
+
+        resized = cv2.resize(template_patch, dim, interpolation = cv2.INTER_AREA)
+        cv2.imshow("resized", resized)
 
     def plot_results(self, results, match_method):
 
