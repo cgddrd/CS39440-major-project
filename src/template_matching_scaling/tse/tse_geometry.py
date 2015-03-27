@@ -26,6 +26,20 @@ class TSEGeometry:
         return int(newVec[0] + centre_coordinate[0]), int(newVec[1] + centre_coordinate[1])
 
     @staticmethod
+    def scale_patch(origin, end, scale_factor):
+
+        height = end[1] - origin[1]
+        width = end[0] - origin[0]
+
+        centre = ((origin[0] + (width / 2)), (origin[1] + (height / 2)))
+
+        scaled_origin = TSEGeometry.scale_coordinate_relative_centre(origin, centre, scale_factor)
+
+        scaled_end = TSEGeometry.scale_coordinate_relative_centre(end, centre, scale_factor)
+
+        return scaled_origin, scaled_end
+
+    @staticmethod
     def calc_vec_magnitude(point_1, point_2):
         vx = (point_2[0] - point_1[0])
         vy = (point_2[1] - point_1[1])
