@@ -2,6 +2,7 @@ __author__ = 'connorgoddard'
 
 import cv2
 import numpy as np
+import math
 from tse.tse_geometry import TSEGeometry
 
 
@@ -13,7 +14,25 @@ class TSEImageUtils:
 
     @staticmethod
     def calc_euclidean_distance_norm(patch1, patch2):
-        return cv2.norm(patch1, patch2, cv2.NORM_L2)
+
+        # cv2.imshow("patch1", patch1)
+        # cv2.imshow("patch2", patch2)
+        #
+        print "Scaled Template Image: {0}".format(patch1.shape)
+        print "Current Window: {0}".format(patch2.shape)
+
+        # print "\n"
+
+        # print patch1.type()
+        # print patch2.type()
+
+        test = cv2.norm(patch1, patch2, cv2.NORM_L2)
+
+        # print test
+
+        # cv2.waitKey()
+
+        return test
 
     @staticmethod
     def calc_cross_correlation_normed(patch1, patch2):
@@ -78,13 +97,24 @@ class TSEImageUtils:
 
     @staticmethod
     # METHOD ASSUMES WE ARE DEALING WITH HSV IMAGES WITH 'V' CHANNEL REMOVED.
-    def scale_image_no_interpolation(source_image, scale_factor):
+    def scale_image_no_interpolation(source_image, current_image, scale_factor):
 
         source_image_height, source_image_width = source_image.shape[:2]
 
-        scaled_source_image_height = int(source_image_height * scale_factor)
+        current_image_height, current_image_width = current_image.shape[:2]
 
-        scaled_source_image_width = int(source_image_width * scale_factor)
+        scale_factor_height = TSEGeometry.calc_patch_scale_factor(source_image_height, current_image_height)
+        scale_factor_width = TSEGeometry.calc_patch_scale_factor(source_image_width, current_image_width)
+
+        # print "Scale Factor: {0}".format(scale_factor)
+        # print "TARGET Height: {0}".format(source_image_height * scale_factor)
+        # print "TARGET Width: {0}".format(source_image_width * scale_factor)
+
+        scaled_source_image_height = round(source_image_height * scale_factor_height)
+        scaled_source_image_width = round(source_image_width * scale_factor_width)
+
+        # print "ACTUAL HEIGHT: {0}".format(scaled_source_image_height)
+        # print "ACTUAL WIDTH: {0}".format(scaled_source_image_width)
 
         scaled_image_result = np.zeros((scaled_source_image_height, scaled_source_image_width, 3), np.uint8)
 
@@ -96,8 +126,8 @@ class TSEImageUtils:
                 template_patch_val_hue = source_image.item(i, j, 0)
                 template_patch_val_sat = source_image.item(i, j, 1)
 
-                scaled_image_result.itemset((i * scale_factor, (j * scale_factor), 0), template_patch_val_hue)
-                scaled_image_result.itemset((i * scale_factor, (j * scale_factor), 1), template_patch_val_sat)
+                scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 0), template_patch_val_hue)
+                scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 1), template_patch_val_sat)
 
         return scaled_image_result
 
