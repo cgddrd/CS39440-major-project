@@ -182,6 +182,7 @@ class TemplateMatching:
         last_width = template_patch_width
 
         prev_current_window_scaled_coords = None
+        current_window_scaled_coords = None
 
         for i in range(template_patch_origin.y, new_localised_window_height):
 
@@ -192,9 +193,7 @@ class TemplateMatching:
             patch_half_width = math.floor(calibrated_patch_width / 2)
             scale_factor = TSEGeometry.calc_patch_scale_factor(last_width, calibrated_patch_width)
 
-            current_window_scaled_coords = None
-
-            if prev_current_window_scaled_coords == None:
+            if prev_current_window_scaled_coords is None:
 
                 current_window_scaled_coords = TSEImageUtils.scale_image_roi_relative_centre(((image_centre_x - patch_half_width), i), ((image_centre_x + patch_half_width), (i + template_patch_height)), scale_factor)
 
@@ -212,29 +211,34 @@ class TemplateMatching:
 
             score = 0
 
-            print "\n"
+            # image = self.scale_template_patch(template_patch, current_window)
 
-            image = self.scale_template_patch(template_patch, current_window)
-
-            print "Image Shape: {0}".format(image.shape)
-
-            cv2.waitKey(100)
+            # print "\n"
+            # print "Image Shape: {0}".format(image.shape)
+            # cv2.imshow("current_window", current_window)
+            # cv2.imshow("template", template_patch)
 
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
-                score = TSEImageUtils.calc_euclidean_distance_norm(image, current_window)
+                # score = TSEImageUtils.calc_euclidean_distance_norm(image, current_window)
 
-            elif match_method.match_type == tse_match_methods.DISTANCE:
-                score = TSEImageUtils.calc_match_compare(image, current_window, match_method.match_id)
+                score = TSEImageUtils.calc_euclidean_distance_scaled(template_patch, current_window)
 
-            elif match_method.match_type == tse_match_methods.HIST:
-                score = TSEImageUtils.hist_compare(image, current_window, match_method.match_id)
+                # print score
+
+            # cv2.waitKey(100)
+
+            # elif match_method.match_type == tse_match_methods.DISTANCE:
+            #     score = TSEImageUtils.calc_match_compare(image, current_window, match_method.match_id)
+            #
+            # elif match_method.match_type == tse_match_methods.HIST:
+            #     score = TSEImageUtils.hist_compare(image, current_window, match_method.match_id)
 
             # If higher score means better match, then the method is a 'reverse' method.
             if match_method.reverse:
 
                 if best_score == -1 or score > best_score:
                     best_score = score
-                    best_position = i
+                    best_position += 1
 
                 else:
                     stop = True
@@ -243,13 +247,14 @@ class TemplateMatching:
 
                 if best_score == -1 or score < best_score:
                     best_score = score
-                    best_position = i
+                    best_position += 1
 
                 else:
+
                     stop = True
 
-            # if stop:
-            #     break
+            if stop:
+                break
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
         return best_position
@@ -259,19 +264,18 @@ class TemplateMatching:
         template_patch_width = template_patch.shape[1]
         current_window_width = current_window.shape[1]
 
-        print "Template Patch: {0}".format(template_patch.shape)
-        print "Current: {0}".format(current_window.shape)
+        # print "Template Patch: {0}".format(template_patch.shape)
+        # print "Current: {0}".format(current_window.shape)
 
         template_patch_width_scale_factor = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window_width)
-        template_patch_height_scale_factor = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window_width)
 
         image = TSEImageUtils.scale_image_no_interpolation(template_patch, current_window, template_patch_width_scale_factor)
 
         # resized = TSEImageUtils.scale_image_interpolation(template_patch, template_patch_width_scale_factor)
 
-        cv2.imshow("current window", current_window)
-        cv2.imshow("ORIGINAL TEMPLATE PATCH", template_patch)
-        cv2.imshow("SCALED TEMPLATE PATCH", image)
+        # cv2.imshow("current window", current_window)
+        # cv2.imshow("ORIGINAL TEMPLATE PATCH", template_patch)
+        # cv2.imshow("SCALED TEMPLATE PATCH", image)
 
         # cv2.imshow("resized", resized)
 
@@ -363,7 +367,7 @@ def main():
 
     image_pairs = [("IMG1.JPG", "IMG2.JPG")]
 
-    patch_sizes = [50]
+    patch_sizes = [100]
 
     match_method1 = MatchMethod("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r")
     match_method2 = MatchMethod("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b", reverse=True)
