@@ -40,3 +40,11 @@ class TSEUtils:
     @staticmethod
     def convert_array_to_numpy_array(original_array):
         return np.array(original_array)
+
+    @staticmethod
+    def calc_cartesian_product(arrays):
+        la = len(arrays)
+        arr = np.empty([len(a) for a in arrays] + [la])
+        for i, a in enumerate(np.ix_(*arrays)):
+            arr[...,i] = a
+        return arr.reshape(-1, la)

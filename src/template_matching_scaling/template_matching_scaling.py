@@ -13,7 +13,7 @@ from tse.tse_imageutils import TSEImageUtils
 from tse.tse_result import TSEResult
 from tse.tse_match_methods import tse_match_methods
 from tse.tse_geometry import TSEGeometry
-
+import test
 
 __author__ = 'connorgoddard'
 
@@ -163,7 +163,6 @@ class TemplateMatching:
         # We need to return the 'Y' with the best score (i.e. the displacement)
         return best_position
 
-
     def scan_search_window_scaling(self, template_patch, template_patch_origin, match_method):
 
         image_height, image_width = self._hsv_img2.shape[:2]
@@ -221,7 +220,33 @@ class TemplateMatching:
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
                 # score = TSEImageUtils.calc_euclidean_distance_norm(image, current_window)
 
-                score = TSEImageUtils.calc_euclidean_distance_scaled(template_patch, current_window)
+                # score1 = TSEImageUtils.calc_euclidean_distance_scaled(template_patch, current_window)
+
+                # scale_factor_width = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window)
+                # scale_factor_height = TSEGeometry.calc_patch_scale_factor(template_patch_height, current_window)
+
+                # template_patch_heights = np.arange(0, template_patch_height)
+                # template_patch_widths = np.arange(0, template_patch_width)
+
+                # scaled_window_heights = template_patch_heights *
+                # score = TSEImageUtils.blah(template_patch, current_window)
+
+                # TSEImageUtils.template = template_patch
+                # TSEImageUtils.current_win = current_window
+
+                score = TSEImageUtils.blah2(template_patch, current_window)
+
+
+
+                # print score
+
+                # print score1
+                #
+                # print type(score1)
+                # print type(score2)
+                # print score2
+
+                # cv2.waitKey()
 
                 # print score
 
@@ -250,7 +275,6 @@ class TemplateMatching:
                     best_position += 1
 
                 else:
-
                     stop = True
 
             if stop:
@@ -332,6 +356,11 @@ def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, 
             else:
                 match = TemplateMatching(image_path, pair[0], pair[1], config_file, axes[column_count])
 
+            # x = np.array([1,2,3])
+            # y = np.array([4,5,6,7,8,9,10,11,12,13,14,15,16,17])
+            #
+            # blah = TSEUtils.calc_cartesian_product([x, y])
+
             match.search_image(patch_size, match_types, use_scaling)
 
             if column_count == (column_max - 1):
@@ -351,7 +380,7 @@ def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, 
 
                 axes[-1].axis('off')
 
-        plt.show()
+        # plt.show()
 
 
 def main():
@@ -367,7 +396,7 @@ def main():
 
     image_pairs = [("IMG1.JPG", "IMG2.JPG")]
 
-    patch_sizes = [100]
+    patch_sizes = [50]
 
     match_method1 = MatchMethod("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r")
     match_method2 = MatchMethod("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b", reverse=True)
@@ -375,7 +404,12 @@ def main():
 
     match_methods = [match_method1]
 
+    # test.greet()
     start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=True)
+
+
+
+
 
 
 if __name__ == '__main__':  # if the function is the main function ...
