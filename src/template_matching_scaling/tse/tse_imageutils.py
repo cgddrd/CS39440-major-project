@@ -44,49 +44,21 @@ class TSEImageUtils:
         template_patch_heights = np.arange(0, template_patch_height)
         template_patch_widths = np.arange(0, template_patch_width)
 
-        scaled_window_heights = template_patch_heights * scale_factor_height
-        scaled_window_widths = template_patch_widths * scale_factor_width
+        scaled_window_heights = np.rint(template_patch_heights * scale_factor_height)
+        scaled_window_widths = np.rint(template_patch_widths * scale_factor_width)
 
-        blah = TSEUtils.calc_cartesian_product([scaled_window_heights, scaled_window_widths])
+        # print scaled_window_heights
+        # print scaled_window_widths
 
-        blah = blah.astype(int)
-
-        # print blah
-
-        # print scaled_current_window
-
-        # test = np.take(scaled_current_window, [[0, 0]])
-
-        # print test
-
-        indices1 = [0, 1, 2, 3, 4]
-        indices2 = [0, 1]
-
-
-
-        # hehe = TSEUtils.calc_cartesian_product([indices1, indices2])
-        #
-        # a1 = np.hsplit(hehe, 2)
-        #
-        # rows = a1[0].astype(int)
-        # cols = a1[1].astype(int)
-        #
-        # print rows
-        #
-        # print cols
-        # twat = scaled_current_window[rows, cols]
-        #
-        # print twat
-        #
-        # print "\n------\n"
-        #
         print scaled_current_window
 
-        result = TSEImageUtils.extract_rows_cols_image(indices1, indices2, scaled_current_window)
+        print "\n------\n\n"
+
+        result = TSEImageUtils.extract_rows_cols_image(scaled_window_heights, scaled_window_widths, scaled_current_window)
 
         print result
 
-        cv2.waitKey()
+        ssd2 = TSEImageUtils.calc_euclidean_distance_norm(template_patch, result)
 
         ssd = 0
 
@@ -110,7 +82,12 @@ class TSEImageUtils:
 
                 ssd += (diff_hue * diff_hue) + (diff_sat * diff_sat)
 
-        # print ssd
+        print "\n"
+        print math.sqrt(ssd)
+        print "\n"
+        print ssd2
+
+        cv2.waitKey()
 
         # cv2.waitKey()
         # ssd = test.calc_ssd_compiled(template_patch, scaled_current_window, template_patch_height, template_patch_width, scale_factor_height, scale_factor_width)
@@ -121,7 +98,34 @@ class TSEImageUtils:
 
     @staticmethod
     def calc_euclidean_distance_norm(patch1, patch2):
-        return cv2.norm(patch1, patch2, cv2.NORM_L2)
+
+        patch1_height, patch1_width, patch1_depth = patch1.shape
+        # patch2_height, patch2_width, patch2_depth = patch2.shape
+
+        patch3 = patch2.reshape(patch1_height, patch1_width, patch1_depth)
+
+        print patch1.shape
+        print patch2.shape
+        print patch3.shape
+
+        print patch1.size
+        print patch2.size
+        print patch3.size
+
+        print patch1.dtype
+        print patch2.dtype
+        print patch3.dtype
+
+        print patch1
+        print "\n"
+        print patch3
+        print "\n"
+        print patch2
+
+        # print patch1.type()
+        # print patch2.type()
+
+        return cv2.norm(patch1, patch3, cv2.NORM_L2)
 
     @staticmethod
     def extract_rows_cols_image(required_rows, required_cols, image):
@@ -129,14 +133,14 @@ class TSEImageUtils:
         # Get the cartesian product between the two then split into one array for all rows, and one array for all cols.
         rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([required_rows, required_cols]), 2)
 
-        print rows_cols_cartesian_product
+        # print rows_cols_cartesian_product
 
         rows_to_extract = rows_cols_cartesian_product[0].astype(int)
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
 
-        print rows_to_extract
-        print "\n ------ \n"
-        print cols_to_extract
+        # print rows_to_extract
+        # print "\n ------ \n"
+        # print cols_to_extract
 
         return image[rows_to_extract, cols_to_extract]
 
