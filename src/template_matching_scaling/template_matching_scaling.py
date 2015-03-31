@@ -3,47 +3,17 @@ from __future__ import division
 import cv2
 import math
 import matplotlib.pyplot as plt
-import timeit
 
 from tse.tse_fileio import TSEFileIO
 from tse.tse_utils import TSEUtils
 from tse.tse_point import TSEPoint
 from tse.tse_imageutils import TSEImageUtils
 from tse.tse_result import TSEResult
-from tse.tse_match_methods import tse_match_methods
 from tse.tse_geometry import TSEGeometry
-
+from tse.tse_matchtype import TSEMatchType
+from tse.tse_matchmethod import tse_match_methods
 
 __author__ = 'connorgoddard'
-
-
-class MatchMethod:
-    def __init__(self, match_name, match_type, match_id, format_string, reverse=False):
-        self._match_name = match_name
-        self._match_type = match_type
-        self._match_id = match_id
-        self._format_string = format_string
-        self._reverse = reverse
-
-    @property
-    def match_name(self):
-        return self._match_name
-
-    @property
-    def match_type(self):
-        return self._match_type
-
-    @property
-    def match_id(self):
-        return self._match_id
-
-    @property
-    def format_string(self):
-        return self._format_string
-
-    @property
-    def reverse(self):
-        return self._reverse
 
 
 class TemplateMatching:
@@ -79,8 +49,7 @@ class TemplateMatching:
 
         self._plot_axis.set_xlabel('Row Number (px)')
         self._plot_axis.set_ylabel('Vertical Displacement (px)')
-        self._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_height, self._image_one_file_name,
-                                                                           self._image_two_file_name))
+        self._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_height, self._image_one_file_name, self._image_two_file_name))
 
         for match_method in match_methods:
 
@@ -129,18 +98,19 @@ class TemplateMatching:
             score = 0
 
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
-                score = TSEImageUtils.calc_euclidean_distance_norm(template_patch, current_window)
+                score = TSEImageUtils.calc_euclidean_distance_cv2_norm(template_patch, current_window)
 
             elif match_method.match_type == tse_match_methods.DISTANCE:
-                score = TSEImageUtils.calc_match_compare(template_patch, current_window, match_method.match_id)
+                score = TSEImageUtils.calc_template_match_compare_cv2_score(template_patch, current_window,
+                                                                            match_method.match_id)
 
             elif match_method.match_type == tse_match_methods.HIST:
-                score = TSEImageUtils.hist_compare(template_patch, current_window, match_method.match_id)
+                score = TSEImageUtils.calc_compare_histogram(template_patch, current_window, match_method.match_id)
 
-            # If higher score means better match, then the method is a 'reverse' method.
+            # If lower score means better match, then the method is a 'reverse' method.
             if match_method.reverse:
 
-                if best_score == -1 or score > best_score:
+                if best_score == -1 or score < best_score:
                     best_score = score
                     best_position = i
 
@@ -149,7 +119,7 @@ class TemplateMatching:
 
             else:
 
-                if best_score == -1 or score < best_score:
+                if best_score == -1 or score > best_score:
                     best_score = score
                     best_position = i
 
@@ -189,15 +159,20 @@ class TemplateMatching:
 
             calibrated_patch_width = self._calibration_lookup[i]
             patch_half_width = math.floor(calibrated_patch_width / 2)
-            scale_factor = TSEGeometry.calc_patch_scale_factor(last_width, calibrated_patch_width)
+            scale_factor = TSEGeometry.calc_measure_scale_factor(last_width, calibrated_patch_width)
 
             if prev_current_window_scaled_coords is None:
 
-                current_window_scaled_coords = TSEImageUtils.scale_image_roi_relative_centre(((image_centre_x - patch_half_width), i), ((image_centre_x + patch_half_width), (i + template_patch_height)), scale_factor)
+                current_window_scaled_coords = TSEImageUtils.scale_image_roi_relative_centre(
+                    ((image_centre_x - patch_half_width), i),
+                    ((image_centre_x + patch_half_width), (i + template_patch_height)), scale_factor)
 
             else:
 
-                current_window_scaled_coords = TSEImageUtils.scale_image_roi_relative_centre((prev_current_window_scaled_coords[0][0], prev_current_window_scaled_coords[0][1] + 1), (prev_current_window_scaled_coords[1][0], prev_current_window_scaled_coords[1][1] + 1), scale_factor)
+                current_window_scaled_coords = TSEImageUtils.scale_image_roi_relative_centre(
+                    (prev_current_window_scaled_coords[0][0], prev_current_window_scaled_coords[0][1] + 1),
+                    (prev_current_window_scaled_coords[1][0], prev_current_window_scaled_coords[1][1] + 1),
+                    scale_factor)
 
             prev_current_window_scaled_coords = current_window_scaled_coords
 
@@ -212,25 +187,25 @@ class TemplateMatching:
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
 
                 # e1 = cv2.getTickCount()
-                # score = TSEImageUtils.blah2(template_patch, current_window)
+                # score = TSEImageUtils.calc_ed_template_match_score_scaled(template_patch, current_window)
                 # e2 = cv2.getTickCount()
                 #
                 # print (e2 - e1) / cv2.getTickFrequency()
                 #
                 # e7 = cv2.getTickCount()
-                # score2 = TSEImageUtils.blah3(template_patch, current_window)
+                # score2 = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, current_window)
                 # e8 = cv2.getTickCount()
                 #
                 # print (e8 - e7) / cv2.getTickFrequency()
                 #
                 # e3 = cv2.getTickCount()
-                # score3 = TSEImageUtils.blah(template_patch, current_window)
+                # score3 = TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(template_patch, current_window)
                 # e4 = cv2.getTickCount()
                 #
                 # print (e4 - e3) / cv2.getTickFrequency()
                 #
                 # e5 = cv2.getTickCount()
-                # score4 = TSEImageUtils.calc_euclidean_distance_scaled(template_patch, current_window)
+                # score4 = TSEImageUtils.calc_ed_template_match_score_scaled_slow(template_patch, current_window)
                 # e6 = cv2.getTickCount()
                 #
                 # print (e6 - e5) / cv2.getTickFrequency()
@@ -239,21 +214,23 @@ class TemplateMatching:
                 # print score2
                 # print score3
                 # print score4
+                #
 
-                # cv2.waitKey()
+                # cv2.imshow("scaled winodw", current_window)
+                # cv2.waitKey(100)
 
-                score = TSEImageUtils.blah3(template_patch, current_window)
+                score = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, current_window)
 
-            # elif match_method.match_type == tse_match_methods.DISTANCE:
-            #     score = TSEImageUtils.calc_match_compare(image, current_window, match_method.match_id)
-            #
+            elif match_method.match_type == tse_match_methods.DISTANCE:
+                score = TSEImageUtils.calc_template_match_compare_cv2_score_scaled(template_patch, current_window, match_method.match_id)
+
             # elif match_method.match_type == tse_match_methods.HIST:
             #     score = TSEImageUtils.hist_compare(image, current_window, match_method.match_id)
 
-            # If higher score means better match, then the method is a 'reverse' method.
+            # If lower score means better match, then the method is a 'reverse' method.
             if match_method.reverse:
 
-                if best_score == -1 or score > best_score:
+                if best_score == -1 or score < best_score:
                     best_score = score
                     best_position += 1
 
@@ -262,7 +239,7 @@ class TemplateMatching:
 
             else:
 
-                if best_score == -1 or score < best_score:
+                if best_score == -1 or score > best_score:
                     best_score = score
                     best_position += 1
 
@@ -275,25 +252,6 @@ class TemplateMatching:
         # We need to return the 'Y' with the best score (i.e. the displacement)
         return best_position
 
-    def scale_template_patch(self, template_patch, current_window):
-
-        template_patch_width = template_patch.shape[1]
-        current_window_width = current_window.shape[1]
-
-        template_patch_width_scale_factor = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window_width)
-
-        image = TSEImageUtils.scale_image_no_interpolation(template_patch, current_window, template_patch_width_scale_factor)
-
-        # resized = TSEImageUtils.scale_image_interpolation(template_patch, template_patch_width_scale_factor)
-
-        # cv2.imshow("current window", current_window)
-        # cv2.imshow("ORIGINAL TEMPLATE PATCH", template_patch)
-        # cv2.imshow("SCALED TEMPLATE PATCH", image)
-
-        # cv2.imshow("resized", resized)
-
-        return image
-
     def plot_results(self, results, match_method):
 
         x = []
@@ -305,7 +263,7 @@ class TemplateMatching:
             x.append(val.row)
             y.append(val.displacement)
 
-        y_moving_average = TSEUtils.calc_moving_average(y, 10)
+        y_moving_average = TSEUtils.calc_moving_average_array(y, 10)
 
         self.plot(x, y, "{0}.".format(plot_format_color), 100, match_method.match_name)
         self.plot(x[len(x) - len(y_moving_average):], y_moving_average, "{0}-".format(plot_format_color), 100,
@@ -382,19 +340,18 @@ def main():
 
     patch_sizes = [100]
 
-    match_method1 = MatchMethod("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r")
-    match_method2 = MatchMethod("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b", reverse=True)
-    match_method3 = MatchMethod("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g")
+    # If lower scores mean a better match, then we say that the score is reversed.
+    match_method1 = TSEMatchType("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r", reverse_score=True)
+    match_method2 = TSEMatchType("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b")
+    match_method3 = TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g")
 
-    match_methods = [match_method1]
+    match_method4 = TSEMatchType("DistanceCorr", tse_match_methods.DISTANCE, cv2.cv.CV_TM_CCORR_NORMED, "b")
 
-    # test.greet()
+    match_methods = [match_method1, match_method4]
+
     start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=True)
+
     # start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=False)
-
-
-
-
 
 if __name__ == '__main__':  # if the function is the main function ...
     main()

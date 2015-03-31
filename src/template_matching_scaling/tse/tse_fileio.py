@@ -1,8 +1,10 @@
-__author__ = 'connorgoddard'
 import os
+
+__author__ = 'connorgoddard'
 
 
 class TSEFileIO:
+
     def __init__(self, filepath="./"):
         self._file_path = filepath
 
@@ -35,7 +37,7 @@ class TSEFileIO:
 
                         if split_delimiter is not None:
 
-                            file_results.append(line.rstrip().split(","))
+                            file_results.append(line.rstrip().split(split_delimiter))
 
                         else:
 

@@ -2,6 +2,7 @@ __author__ = 'connorgoddard'
 
 import numpy as np
 
+
 class TSEUtils:
 
     def __init__(self):
@@ -30,7 +31,7 @@ class TSEUtils:
         return map(int, value)
 
     @staticmethod
-    def calc_moving_average(values, window, mode='valid'):
+    def calc_moving_average_array(values, window, mode='valid'):
 
         weights = np.repeat(1.0, window)/window
 
