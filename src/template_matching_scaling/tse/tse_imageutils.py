@@ -8,6 +8,7 @@ import numpy as np
 from tse_compiled.tse_c_imageutils import TSECImageUtils
 from tse.tse_geometry import TSEGeometry
 from tse_utils import TSEUtils
+from tse_point import TSEPoint
 
 
 __author__ = 'connorgoddard'
@@ -213,11 +214,11 @@ class TSEImageUtils:
 
         scaled_end = TSEGeometry.scale_coordinate_relative_centre(end_coordinate, centre, scale_factor)
 
-        return scaled_origin, scaled_end
+        return TSEPoint(scaled_origin[0], scaled_origin[1]), TSEPoint(scaled_end[0], scaled_end[1])
 
     @staticmethod
     # METHOD ASSUMES WE ARE DEALING WITH HSV IMAGES WITH 'V' CHANNEL REMOVED.
-    def scale_image_no_interpolation(source_image, target_image):
+    def scale_image_no_interpolation_auto(source_image, target_image):
 
         source_image_height, source_image_width = source_image.shape[:2]
         current_image_height, current_image_width = target_image.shape[:2]
@@ -246,10 +247,30 @@ class TSEImageUtils:
         return scaled_image_result
 
     @staticmethod
-    def scale_image_interpolation(source_image, scale_factor):
+    def scale_image_interpolation_auto(source_image, target_image):
+
+        source_image_height, source_image_width = source_image.shape[:2]
+        current_image_height, current_image_width = target_image.shape[:2]
+
+        scale_factor_height = TSEGeometry.calc_measure_scale_factor(source_image_height, current_image_height)
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(source_image_width, current_image_width)
+
+        scaled_source_image_height = round(source_image_height * scale_factor_height)
+        scaled_source_image_width = round(source_image_width * scale_factor_width)
+
+        dim = (int(scaled_source_image_width), int(scaled_source_image_height))
+
+        return cv2.resize(source_image, dim)
+
+    @staticmethod
+    def scale_image_interpolation_man(source_image, scale_factor):
 
         source_image_height, source_image_width = source_image.shape[:2]
 
         dim = (int(source_image_width * scale_factor), int(source_image_height * scale_factor))
 
         return cv2.resize(source_image, dim)
+
+    @staticmethod
+    def extract_image_sub_window(source_image, origin_coordinates, end_coordinates):
+        return source_image[origin_coordinates.y:end_coordinates.y, origin_coordinates.x: end_coordinates.x]

@@ -6,7 +6,7 @@ class TSEMatchType:
         self._match_type = match_type
         self._match_id = match_id
         self._format_string = format_string
-        self._reverse = reverse_score
+        self._reverse_score = reverse_score
 
     @property
     def match_name(self):
@@ -25,6 +25,7 @@ class TSEMatchType:
         return self._format_string
 
     @property
-    def reverse(self):
-        return self._reverse
+    def reverse_score(self):
+        return self._reverse_score
+
 

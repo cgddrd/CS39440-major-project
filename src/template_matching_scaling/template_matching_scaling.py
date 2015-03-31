@@ -39,7 +39,7 @@ class TemplateMatching:
         raw_data = TSEFileIO.read_file(file_path, split_delimiter=",", start_position=1)
         return dict(TSEUtils.string_list_to_int_list(raw_data))
 
-    def search_image(self, patch_height, match_methods, use_scaling=False):
+    def search_image(self, patch_height, match_methods, use_scaling=False, force_cont_search=False):
 
         smallest_key = TSEUtils.get_smallest_key_dict(self._calibration_lookup)
 
@@ -68,15 +68,15 @@ class TemplateMatching:
 
                 if use_scaling is True:
 
-                    results.append(TSEResult(i, self.scan_search_window_scaling(template_patch, template_patch_origin_point, match_method)))
+                    results.append(TSEResult(i, self.scan_search_window_scaling(template_patch, template_patch_origin_point, match_method, force_cont_search)))
 
                 else:
 
-                    results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point, match_method)))
+                    results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point, match_method, force_cont_search)))
 
             self.plot_results(results, match_method)
 
-    def scan_search_window(self, template_patch, template_patch_origin, match_method):
+    def scan_search_window(self, template_patch, template_patch_origin, match_method, force_cont_search=False):
 
         image_height, image_width = self._hsv_img2.shape[:2]
 
@@ -108,7 +108,7 @@ class TemplateMatching:
                 score = TSEImageUtils.calc_compare_histogram(template_patch, current_window, match_method.match_id)
 
             # If lower score means better match, then the method is a 'reverse' method.
-            if match_method.reverse:
+            if match_method.reverse_score:
 
                 if best_score == -1 or score < best_score:
                     best_score = score
@@ -126,13 +126,13 @@ class TemplateMatching:
                 else:
                     stop = True
 
-            if stop:
+            if (force_cont_search is False) and stop:
                 break
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
         return best_position
 
-    def scan_search_window_scaling(self, template_patch, template_patch_origin, match_method):
+    def scan_search_window_scaling(self, template_patch, template_patch_origin, match_method, force_cont_search=False):
 
         image_height, image_width = self._hsv_img2.shape[:2]
 
@@ -150,9 +150,10 @@ class TemplateMatching:
         last_width = template_patch_width
 
         prev_current_window_scaled_coords = None
-        current_window_scaled_coords = None
 
         for i in range(template_patch_origin.y, new_localised_window_height):
+
+            score = 0
 
             if i >= (template_patch_origin.y + 1):
                 last_width = self._calibration_lookup[i - 1]
@@ -169,66 +170,42 @@ class TemplateMatching:
 
             else:
 
+                # We add +1 to the 'Y' coordinate as we are moving the search window down the ROI by one pixel each time we increase the width.
                 current_window_scaled_coords = TSEImageUtils.scale_image_roi_relative_centre(
-                    (prev_current_window_scaled_coords[0][0], prev_current_window_scaled_coords[0][1] + 1),
-                    (prev_current_window_scaled_coords[1][0], prev_current_window_scaled_coords[1][1] + 1),
+                    (prev_current_window_scaled_coords[0].x, prev_current_window_scaled_coords[0].y + 1),
+                    (prev_current_window_scaled_coords[1].x, prev_current_window_scaled_coords[1].y + 1),
                     scale_factor)
 
             prev_current_window_scaled_coords = current_window_scaled_coords
 
-            scaled_origin = current_window_scaled_coords[0]
+            scaled_search_window = TSEImageUtils.extract_image_sub_window(self._hsv_img2, current_window_scaled_coords[0], current_window_scaled_coords[1])
 
-            scaled_end = current_window_scaled_coords[1]
+            cv2.imshow("resize", scaled_search_window)
 
-            current_window = self._hsv_img2[scaled_origin[1]:scaled_end[1], scaled_origin[0]: scaled_end[0]]
+            scale = TSEGeometry.calc_measure_scale_factor(template_patch_width, calibrated_patch_width)
+            scaled_template_patch = TSEImageUtils.scale_image_interpolation_man(template_patch, scale)
+            scaled_template_patch2 = TSEImageUtils.scale_image_no_interpolation_auto(template_patch, scaled_search_window)
+            scaled_template_patch3 = TSEImageUtils.scale_image_interpolation_auto(template_patch, scaled_search_window)
 
-            score = 0
+            cv2.imshow("resize_template", scaled_template_patch)
+            cv2.imshow("resize_template2", scaled_template_patch2)
+            cv2.imshow("resize_template3", scaled_template_patch3)
+
+            cv2.imshow("template", template_patch)
+
+            cv2.waitKey(100)
 
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
-
-                # e1 = cv2.getTickCount()
-                # score = TSEImageUtils.calc_ed_template_match_score_scaled(template_patch, current_window)
-                # e2 = cv2.getTickCount()
-                #
-                # print (e2 - e1) / cv2.getTickFrequency()
-                #
-                # e7 = cv2.getTickCount()
-                # score2 = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, current_window)
-                # e8 = cv2.getTickCount()
-                #
-                # print (e8 - e7) / cv2.getTickFrequency()
-                #
-                # e3 = cv2.getTickCount()
-                # score3 = TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(template_patch, current_window)
-                # e4 = cv2.getTickCount()
-                #
-                # print (e4 - e3) / cv2.getTickFrequency()
-                #
-                # e5 = cv2.getTickCount()
-                # score4 = TSEImageUtils.calc_ed_template_match_score_scaled_slow(template_patch, current_window)
-                # e6 = cv2.getTickCount()
-                #
-                # print (e6 - e5) / cv2.getTickFrequency()
-                #
-                # print score
-                # print score2
-                # print score3
-                # print score4
-                #
-
-                # cv2.imshow("scaled winodw", current_window)
-                # cv2.waitKey(100)
-
-                score = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, current_window)
+                score = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, scaled_search_window)
 
             elif match_method.match_type == tse_match_methods.DISTANCE:
-                score = TSEImageUtils.calc_template_match_compare_cv2_score_scaled(template_patch, current_window, match_method.match_id)
+                score = TSEImageUtils.calc_template_match_compare_cv2_score_scaled(template_patch, scaled_search_window, match_method.match_id)
 
-            # elif match_method.match_type == tse_match_methods.HIST:
-            #     score = TSEImageUtils.hist_compare(image, current_window, match_method.match_id)
+            elif match_method.match_type == tse_match_methods.HIST:
+                score = TSEImageUtils.hist_compare(scaled_template_patch, scaled_search_window, match_method.match_id)
 
             # If lower score means better match, then the method is a 'reverse' method.
-            if match_method.reverse:
+            if match_method.reverse_score:
 
                 if best_score == -1 or score < best_score:
                     best_score = score
@@ -246,7 +223,7 @@ class TemplateMatching:
                 else:
                     stop = True
 
-            if stop:
+            if (force_cont_search is False) and stop:
                 break
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
@@ -281,7 +258,8 @@ class TemplateMatching:
         self._plot_axis.legend(loc='upper left', shadow=True)
 
 
-def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, use_scaling=False):
+def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, use_scaling=False, force_cont_search=False):
+
     for patch_size in patch_sizes:
 
         plot_count = len(image_pairs)
@@ -303,7 +281,7 @@ def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, 
             else:
                 match = TemplateMatching(image_path, pair[0], pair[1], config_file, axes[column_count])
 
-            match.search_image(patch_size, match_types, use_scaling)
+            match.search_image(patch_size, match_types, use_scaling, force_cont_search)
 
             if column_count == (column_max - 1):
                 row_count += 1
@@ -349,7 +327,7 @@ def main():
 
     match_methods = [match_method1, match_method4]
 
-    start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=True)
+    start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=True, force_cont_search=True)
 
     # start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=False)
 
