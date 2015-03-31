@@ -34,7 +34,7 @@ class TSEUtils:
 
         weights = np.repeat(1.0, window)/window
 
-        # Including valid will REQUIRE there to be enough data points.
+        # Including 'valid' MODE will REQUIRE there to be enough data points.
         return np.convolve(values, weights, mode)
 
     @staticmethod
@@ -44,7 +44,10 @@ class TSEUtils:
     @staticmethod
     def calc_cartesian_product(arrays):
         la = len(arrays)
+
         arr = np.empty([len(a) for a in arrays] + [la])
+
         for i, a in enumerate(np.ix_(*arrays)):
-            arr[...,i] = a
+            arr[..., i] = a
+
         return arr.reshape(-1, la)

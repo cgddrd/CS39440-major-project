@@ -1,17 +1,16 @@
 __author__ = 'connorgoddard'
 
+import math
+import test2
+
 import cv2
 import numpy as np
-import math
+
 from tse.tse_geometry import TSEGeometry
 from tse_utils import TSEUtils
-import test
 
 
 class TSEImageUtils:
-
-    template = None
-    current_win = None
 
     def __init__(self):
         # 'pass' is used when a statement is required syntactically but you do not want any command or code to execute.
@@ -26,9 +25,8 @@ class TSEImageUtils:
         scale_factor_width = TSEGeometry.calc_patch_scale_factor(template_patch_width, scaled_current_window_width)
         scale_factor_height = TSEGeometry.calc_patch_scale_factor(template_patch_height, scaled_current_window_height)
 
-        ssd = test.calc_ssd_compiled(template_patch, scaled_current_window, template_patch_height, template_patch_width, scale_factor_height, scale_factor_width)
-
-        # print ssd
+        ssd = test2.calc_ssd_compiled(template_patch, scaled_current_window, template_patch_height, template_patch_width,
+                                     scale_factor_height, scale_factor_width)
 
         return math.sqrt(ssd)
 
@@ -47,85 +45,46 @@ class TSEImageUtils:
         scaled_window_heights = np.rint(template_patch_heights * scale_factor_height)
         scaled_window_widths = np.rint(template_patch_widths * scale_factor_width)
 
-        # print scaled_window_heights
-        # print scaled_window_widths
+        # result = TSEImageUtils.extract_rows_cols_image(scaled_window_heights, scaled_window_widths,scaled_current_window)
 
-        print scaled_current_window
+        result = test2.extract_rows_cols_image(scaled_window_heights, scaled_window_widths, scaled_current_window)
 
-        print "\n------\n\n"
+        reshaped_result = TSEImageUtils.reshape_image_matrix(result, template_patch)
 
-        result = TSEImageUtils.extract_rows_cols_image(scaled_window_heights, scaled_window_widths, scaled_current_window)
+        return TSEImageUtils.calc_euclidean_distance_norm(template_patch, reshaped_result)
 
-        print result
+    @staticmethod
+    def blah3(template_patch, scaled_current_window):
 
-        ssd2 = TSEImageUtils.calc_euclidean_distance_norm(template_patch, result)
+        template_patch_height, template_patch_width = template_patch.shape[:2]
+        scaled_current_window_height, scaled_current_window_width = scaled_current_window.shape[:2]
 
-        ssd = 0
+        scale_factor_width = TSEGeometry.calc_patch_scale_factor(template_patch_width, scaled_current_window_width)
+        scale_factor_height = TSEGeometry.calc_patch_scale_factor(template_patch_height, scaled_current_window_height)
 
-        # Loop through each pixel in the template patch, and scale it in the larger scaled image.
-        # for i in xrange(template_patch_heights):
-        #     for j in xrange(template_patch_width):
+        template_patch_heights = np.arange(0, template_patch_height)
+        template_patch_widths = np.arange(0, template_patch_width)
 
-        for i in xrange(0, len(template_patch_heights)-1):
-            for j in xrange(0, len(template_patch_widths)-1):
+        scaled_window_heights = np.rint(template_patch_heights * scale_factor_height)
+        scaled_window_widths = np.rint(template_patch_widths * scale_factor_width)
 
-                template_patch_val = template_patch[i][j]
+        result = test2.extract_rows_cols_image(scaled_window_heights, scaled_window_widths, scaled_current_window)
 
-                # print template_patch_val
+        reshaped_result = test2.reshape_image_matrix(result, template_patch)
 
-                scaled_current_window_val = scaled_current_window[scaled_window_heights[i]][scaled_window_widths[j]]
-
-                # print scaled_current_window_val
-
-                diff_hue = int(template_patch_val[0]) - int(scaled_current_window_val[0])
-                diff_sat = int(template_patch_val[1]) - int(scaled_current_window_val[1])
-
-                ssd += (diff_hue * diff_hue) + (diff_sat * diff_sat)
-
-        print "\n"
-        print math.sqrt(ssd)
-        print "\n"
-        print ssd2
-
-        cv2.waitKey()
-
-        # cv2.waitKey()
-        # ssd = test.calc_ssd_compiled(template_patch, scaled_current_window, template_patch_height, template_patch_width, scale_factor_height, scale_factor_width)
-
-        # print ssd
-
-        return math.sqrt(ssd)
+        return TSEImageUtils.calc_euclidean_distance_norm(template_patch, reshaped_result)
 
     @staticmethod
     def calc_euclidean_distance_norm(patch1, patch2):
+        return cv2.norm(patch1, patch2, cv2.NORM_L2)
 
-        patch1_height, patch1_width, patch1_depth = patch1.shape
-        # patch2_height, patch2_width, patch2_depth = patch2.shape
+    @staticmethod
+    def reshape_image_matrix(current_matrix, target_matrix):
 
-        patch3 = patch2.reshape(patch1_height, patch1_width, patch1_depth)
+        if current_matrix.shape != target_matrix.shape:
+            return current_matrix.reshape(target_matrix.shape)
 
-        print patch1.shape
-        print patch2.shape
-        print patch3.shape
-
-        print patch1.size
-        print patch2.size
-        print patch3.size
-
-        print patch1.dtype
-        print patch2.dtype
-        print patch3.dtype
-
-        print patch1
-        print "\n"
-        print patch3
-        print "\n"
-        print patch2
-
-        # print patch1.type()
-        # print patch2.type()
-
-        return cv2.norm(patch1, patch3, cv2.NORM_L2)
+        return current_matrix
 
     @staticmethod
     def extract_rows_cols_image(required_rows, required_cols, image):
@@ -133,14 +92,8 @@ class TSEImageUtils:
         # Get the cartesian product between the two then split into one array for all rows, and one array for all cols.
         rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([required_rows, required_cols]), 2)
 
-        # print rows_cols_cartesian_product
-
         rows_to_extract = rows_cols_cartesian_product[0].astype(int)
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
-
-        # print rows_to_extract
-        # print "\n ------ \n"
-        # print cols_to_extract
 
         return image[rows_to_extract, cols_to_extract]
 
@@ -159,13 +112,14 @@ class TSEImageUtils:
         # Loop through each pixel in the template patch, and scale it in the larger scaled image.
         for i in xrange(template_patch_height):
             for j in xrange(template_patch_width):
-
                 # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
                 template_patch_val_hue = template_patch.item(i, j, 0)
                 template_patch_val_sat = template_patch.item(i, j, 1)
 
-                scaled_current_window_val_hue = scaled_current_window.item((i * scale_factor_height), (j * scale_factor_width), 0)
-                scaled_current_window_val_sat = scaled_current_window.item((i * scale_factor_height), (j * scale_factor_width), 1)
+                scaled_current_window_val_hue = scaled_current_window.item((i * scale_factor_height),
+                                                                           (j * scale_factor_width), 0)
+                scaled_current_window_val_sat = scaled_current_window.item((i * scale_factor_height),
+                                                                           (j * scale_factor_width), 1)
 
                 diff_hue = template_patch_val_hue - scaled_current_window_val_hue
 
@@ -257,13 +211,14 @@ class TSEImageUtils:
         # Loop through each pixel in the template patch, and scale it in the larger scaled image.
         for i in xrange(source_image_height):
             for j in xrange(source_image_width):
-
                 # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
                 template_patch_val_hue = source_image.item(i, j, 0)
                 template_patch_val_sat = source_image.item(i, j, 1)
 
-                scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 0), template_patch_val_hue)
-                scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 1), template_patch_val_sat)
+                scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 0),
+                                            template_patch_val_hue)
+                scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 1),
+                                            template_patch_val_sat)
 
         return scaled_image_result
 

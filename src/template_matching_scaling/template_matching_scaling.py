@@ -2,9 +2,8 @@ from __future__ import division
 
 import cv2
 import math
-
 import matplotlib.pyplot as plt
-import numpy as np
+import timeit
 
 from tse.tse_fileio import TSEFileIO
 from tse.tse_utils import TSEUtils
@@ -13,7 +12,7 @@ from tse.tse_imageutils import TSEImageUtils
 from tse.tse_result import TSEResult
 from tse.tse_match_methods import tse_match_methods
 from tse.tse_geometry import TSEGeometry
-import test
+
 
 __author__ = 'connorgoddard'
 
@@ -210,47 +209,40 @@ class TemplateMatching:
 
             score = 0
 
-            # image = self.scale_template_patch(template_patch, current_window)
-
-            # print "\n"
-            # print "Image Shape: {0}".format(image.shape)
-            # cv2.imshow("current_window", current_window)
-            # cv2.imshow("template", template_patch)
-
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
-                # score = TSEImageUtils.calc_euclidean_distance_norm(image, current_window)
 
-                # score1 = TSEImageUtils.calc_euclidean_distance_scaled(template_patch, current_window)
-
-                # scale_factor_width = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window)
-                # scale_factor_height = TSEGeometry.calc_patch_scale_factor(template_patch_height, current_window)
-
-                # template_patch_heights = np.arange(0, template_patch_height)
-                # template_patch_widths = np.arange(0, template_patch_width)
-
-                # scaled_window_heights = template_patch_heights *
-                # score = TSEImageUtils.blah(template_patch, current_window)
-
-                # TSEImageUtils.template = template_patch
-                # TSEImageUtils.current_win = current_window
-
-                score = TSEImageUtils.blah2(template_patch, current_window)
-
-
-
-                # print score
-
-                # print score1
+                # e1 = cv2.getTickCount()
+                # score = TSEImageUtils.blah2(template_patch, current_window)
+                # e2 = cv2.getTickCount()
                 #
-                # print type(score1)
-                # print type(score2)
+                # print (e2 - e1) / cv2.getTickFrequency()
+                #
+                # e7 = cv2.getTickCount()
+                # score2 = TSEImageUtils.blah3(template_patch, current_window)
+                # e8 = cv2.getTickCount()
+                #
+                # print (e8 - e7) / cv2.getTickFrequency()
+                #
+                # e3 = cv2.getTickCount()
+                # score3 = TSEImageUtils.blah(template_patch, current_window)
+                # e4 = cv2.getTickCount()
+                #
+                # print (e4 - e3) / cv2.getTickFrequency()
+                #
+                # e5 = cv2.getTickCount()
+                # score4 = TSEImageUtils.calc_euclidean_distance_scaled(template_patch, current_window)
+                # e6 = cv2.getTickCount()
+                #
+                # print (e6 - e5) / cv2.getTickFrequency()
+                #
+                # print score
                 # print score2
+                # print score3
+                # print score4
 
                 # cv2.waitKey()
 
-                # print score
-
-            # cv2.waitKey(100)
+                score = TSEImageUtils.blah3(template_patch, current_window)
 
             # elif match_method.match_type == tse_match_methods.DISTANCE:
             #     score = TSEImageUtils.calc_match_compare(image, current_window, match_method.match_id)
@@ -287,9 +279,6 @@ class TemplateMatching:
 
         template_patch_width = template_patch.shape[1]
         current_window_width = current_window.shape[1]
-
-        # print "Template Patch: {0}".format(template_patch.shape)
-        # print "Current: {0}".format(current_window.shape)
 
         template_patch_width_scale_factor = TSEGeometry.calc_patch_scale_factor(template_patch_width, current_window_width)
 
@@ -356,11 +345,6 @@ def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, 
             else:
                 match = TemplateMatching(image_path, pair[0], pair[1], config_file, axes[column_count])
 
-            # x = np.array([1,2,3])
-            # y = np.array([4,5,6,7,8,9,10,11,12,13,14,15,16,17])
-            #
-            # blah = TSEUtils.calc_cartesian_product([x, y])
-
             match.search_image(patch_size, match_types, use_scaling)
 
             if column_count == (column_max - 1):
@@ -380,7 +364,7 @@ def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, 
 
                 axes[-1].axis('off')
 
-        # plt.show()
+        plt.show()
 
 
 def main():
@@ -396,7 +380,7 @@ def main():
 
     image_pairs = [("IMG1.JPG", "IMG2.JPG")]
 
-    patch_sizes = [50]
+    patch_sizes = [100]
 
     match_method1 = MatchMethod("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r")
     match_method2 = MatchMethod("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b", reverse=True)
@@ -406,7 +390,7 @@ def main():
 
     # test.greet()
     start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=True)
-
+    # start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=False)
 
 
 

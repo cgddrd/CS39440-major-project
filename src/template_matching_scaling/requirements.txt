@@ -3,3 +3,5 @@ matplotlib
 nose
 coverage
 ipython
+cython
+setuptools_cython
