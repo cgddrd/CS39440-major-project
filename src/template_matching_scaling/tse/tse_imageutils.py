@@ -183,6 +183,7 @@ class TSEImageUtils:
 
 
     @staticmethod
+    # Assumes HSV format.
     def calc_compare_histogram(image_1, image_2, match_method):
 
         hist_patch1 = cv2.calcHist([image_1], [0, 1], None, [180, 256], [0, 180, 0, 256])

@@ -126,7 +126,7 @@ class TemplateMatching:
                 else:
                     stop = True
 
-            if (force_cont_search is False) and stop:
+            if (force_cont_search is False) and (stop is True):
                 break
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
@@ -180,21 +180,6 @@ class TemplateMatching:
 
             scaled_search_window = TSEImageUtils.extract_image_sub_window(self._hsv_img2, current_window_scaled_coords[0], current_window_scaled_coords[1])
 
-            cv2.imshow("resize", scaled_search_window)
-
-            scale = TSEGeometry.calc_measure_scale_factor(template_patch_width, calibrated_patch_width)
-            scaled_template_patch = TSEImageUtils.scale_image_interpolation_man(template_patch, scale)
-            scaled_template_patch2 = TSEImageUtils.scale_image_no_interpolation_auto(template_patch, scaled_search_window)
-            scaled_template_patch3 = TSEImageUtils.scale_image_interpolation_auto(template_patch, scaled_search_window)
-
-            cv2.imshow("resize_template", scaled_template_patch)
-            cv2.imshow("resize_template2", scaled_template_patch2)
-            cv2.imshow("resize_template3", scaled_template_patch3)
-
-            cv2.imshow("template", template_patch)
-
-            cv2.waitKey(100)
-
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
                 score = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, scaled_search_window)
 
@@ -202,7 +187,9 @@ class TemplateMatching:
                 score = TSEImageUtils.calc_template_match_compare_cv2_score_scaled(template_patch, scaled_search_window, match_method.match_id)
 
             elif match_method.match_type == tse_match_methods.HIST:
-                score = TSEImageUtils.hist_compare(scaled_template_patch, scaled_search_window, match_method.match_id)
+                scaled_template_patch = TSEImageUtils.scale_image_interpolation_auto(template_patch, scaled_search_window)
+
+                score = TSEImageUtils.calc_compare_histogram(scaled_template_patch, scaled_search_window, match_method.match_id)
 
             # If lower score means better match, then the method is a 'reverse' method.
             if match_method.reverse_score:
@@ -223,7 +210,7 @@ class TemplateMatching:
                 else:
                     stop = True
 
-            if (force_cont_search is False) and stop:
+            if (force_cont_search is False) and (stop is True):
                 break
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
@@ -321,15 +308,12 @@ def main():
     # If lower scores mean a better match, then we say that the score is reversed.
     match_method1 = TSEMatchType("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r", reverse_score=True)
     match_method2 = TSEMatchType("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b")
-    match_method3 = TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g")
-
+    match_method3 = TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g", reverse_score=True)
     match_method4 = TSEMatchType("DistanceCorr", tse_match_methods.DISTANCE, cv2.cv.CV_TM_CCORR_NORMED, "b")
 
-    match_methods = [match_method1, match_method4]
+    match_methods = [match_method2]
 
     start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=True, force_cont_search=True)
-
-    # start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=False)
 
 if __name__ == '__main__':  # if the function is the main function ...
     main()
