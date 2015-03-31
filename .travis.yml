@@ -5,6 +5,11 @@ python:
 
 virtualenv:
   system_site_packages: true
+  
+branches:
+  only:
+    - master
+    - develop
 
 branches:
   only:
