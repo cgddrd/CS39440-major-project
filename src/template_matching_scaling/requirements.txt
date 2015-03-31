@@ -6,3 +6,4 @@ ipython
 cython
 setuptools_cython
 coveralls
+numpy
