@@ -87,8 +87,10 @@ docs/_build/
 # PyBuilder
 target/
 
-# Latex files
+# iPython
+.ipynb_checkpoints/ 
 
+# Latex files
 *.aux
 *.glo
 *.idx
