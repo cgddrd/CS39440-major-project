@@ -29,7 +29,7 @@ before_install:
 # We want to skip the 'install' stage, as this is handled by the project-specific scripts.
 install: 
   - "cd src/template_matching_scaling"
-  - "python setup.py build_ext --inplace"
+  # - "python setup.py build_ext --inplace"
   - "python setup.py develop"
 
 script: true
