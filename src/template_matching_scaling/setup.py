@@ -1,5 +1,5 @@
-import numpy
-import sys
+# import numpy
+# import sys
 
 from pip.req import parse_requirements
 from pip.download import PipSession
@@ -37,8 +37,8 @@ setup(
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
     author_email='connorlukegoddard@gmail.com',
-    description='',
-    setup_requires=['cython', 'setuptools_cython', 'numpy']
+    description=''
+    # setup_requires=['cython', 'setuptools_cython', 'numpy']
     # ext_modules=[ext]
 )
 
