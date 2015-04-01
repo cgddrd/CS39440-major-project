@@ -29,7 +29,7 @@ before_install:
 install: 
   - "cd src/template_matching_scaling"
   - "python setup.py build_ext --inplace"
-  - "python setup.py install"
+  - "python setup.py develop"
 
 script: true
   # - bash run_travisci_tests.sh
