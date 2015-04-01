@@ -38,7 +38,7 @@ setup(
     author='Connor Goddard',
     author_email='connorlukegoddard@gmail.com',
     description='',
-    setup_requires=['setuptools_cython', 'numpy'],
+    setup_requires=['cython', 'setuptools_cython', 'numpy'],
     ext_modules=[ext]
 )
 
