@@ -27,7 +27,7 @@ before_install:
 
 # We want to skip the 'install' stage, as this is handled by the project-specific scripts.
 install: 
-  - "cd src/experiments/template_matching_scaling"
+  - "cd src/template_matching_scaling"
   - "python setup.py install"
   # - "pip install ."
 
