@@ -1,5 +1,5 @@
-# import numpy as np
-# import sys
+import numpy as np
+import sys
 
 from pip.req import parse_requirements
 from pip.download import PipSession
