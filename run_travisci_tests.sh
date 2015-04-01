@@ -1,5 +1,3 @@
-set -e
-
 # Go into the code source directory.
 cd "src/"
 
