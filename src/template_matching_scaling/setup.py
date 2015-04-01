@@ -6,7 +6,6 @@ from pip.download import PipSession
 
 from setuptools import setup, Extension
 from Cython.Distutils import build_ext
-import numpy as np
 
 # from distutils.extension import Extension
 # Read from 'requirements.txt' file. Modified from: http://stackoverflow.com/a/16624700
@@ -33,7 +32,7 @@ setup(
     version='2.1.0',
     zip_safe=False,
     packages=['tse', 'tse_compiled', 'tests'],
-    setup_requires=['cython'],
+    # setup_requires=['cython'],
     install_requires=reqs,
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
@@ -42,4 +41,3 @@ setup(
     cmdclass={"build_ext": build_ext},
     ext_modules=[ext]
 )
-

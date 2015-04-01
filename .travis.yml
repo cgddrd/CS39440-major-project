@@ -5,12 +5,12 @@ python:
 
 virtualenv:
   system_site_packages: true
-  
+
 branches:
   only:
     - master
     - develop
-    
+
 before_install:
  - sudo apt-get update
  - sudo apt-get install build-essential
@@ -22,15 +22,7 @@ before_install:
 # - sudo pip install setuptools_cython
 
 # We want to skip the 'install' stage, as this is handled by the project-specific scripts.
-install: 
-  - "cd src/template_matching_scaling"
-  - "pip install -r requirements.txt"
-  - "python setup.py build_ext --inplace"
-  - "cd tse_compiled"
-  - "ls -l"
-  - "cd .."
-  - "python setup.py install"
+install: true
 
 script:
-  # - bash run_travisci_tests.sh
-  - nosetests -w tests/ --with-coverage
+  - bash run_travisci_tests.sh
