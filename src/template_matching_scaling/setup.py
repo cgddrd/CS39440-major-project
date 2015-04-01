@@ -34,7 +34,7 @@ ext = Extension("tse_compiled.tse_c_imageutils", ["tse_compiled/tse_c_imageutils
 setup(
     name='template_matching_scaling',
     version='2.1.0',
-    packages=['tse', 'tse_compiled', 'tests'],
+    packages=['', 'tse_compiled', 'tests'],
     # setup_requires=['cython', 'setuptools_cython'],
     install_requires=reqs,
     url='https://github.com/cgddrd/CS39440-major-project',
