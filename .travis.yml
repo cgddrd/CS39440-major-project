@@ -15,11 +15,10 @@ branches:
   only:
     - master
     - develop
-    - spike/travis-ci-auto-script
 
 before_install:
  - sudo apt-get update
-# - sudo apt-get install build-essential
+ - sudo apt-get install build-essential
  - sudo apt-get install python-opencv
  - sudo apt-get install -qq python-numpy python-scipy
  - sudo dpkg -L python-opencv
@@ -29,9 +28,10 @@ before_install:
 # We want to skip the 'install' stage, as this is handled by the project-specific scripts.
 install: 
   - "cd src/template_matching_scaling"
-  - "python setup.py install"
+  # - "python setup.py install"
   # - "pip install ."
+  - "python setup.py build_ext --inplace"
 
 script:
   # - bash run_travisci_tests.sh
-  - nosetests -w tests/ --with-coverage
+  # - nosetests -w tests/ --with-coverage
