@@ -5,5 +5,4 @@ coverage
 ipython==3.0.0
 Cython==0.22
 setuptools_cython==0.2.1
-coveralls
 numpy
