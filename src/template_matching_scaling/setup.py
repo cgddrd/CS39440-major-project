@@ -38,8 +38,8 @@ setup(
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
     author_email='connorlukegoddard@gmail.com',
-    description=''
-    cmdclass={"build_ext": build_ext}
+    description='',
+    cmdclass={"build_ext": build_ext},
     ext_modules=[ext]
 )
 
