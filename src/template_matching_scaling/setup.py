@@ -4,11 +4,9 @@ import sys
 from pip.req import parse_requirements
 from pip.download import PipSession
 
-try:
-    from setuptools import setup, Extension
-except ImportError:
-    from distutils.core import setup
-    from distutils.extension import Extension
+from setuptools import setup, Extension
+from Cython.Distutils import build_ext
+import numpy as np
 
 # from distutils.extension import Extension
 
@@ -34,13 +32,15 @@ reqs = [str(ir.req) for ir in install_reqs]
 setup(
     name='template_matching_scaling',
     version='2.1.0',
+    zip_safe=False,
     packages=['tse', 'tse_compiled', 'tests'],
-    setup_requires=['cython', 'setuptools_cython'],
+    # setup_requires=['cython', 'setuptools_cython'],
     install_requires=reqs,
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
     author_email='connorlukegoddard@gmail.com',
-    description=''
+    description='',
+    cmdclass={"build_ext": build_ext}
     # ext_modules=[ext]
 )
 
