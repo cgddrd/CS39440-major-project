@@ -2,5 +2,4 @@ pip==6.0.8
 matplotlib
 nose
 coverage
-Cython
 setuptools_cython
