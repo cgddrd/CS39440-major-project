@@ -2,6 +2,8 @@
 # python setup.py build_ext --inplace
 
 # Run the 'setup.py' script to install dependencies etc.
+
+echo "MOVING ON..."
 python setup.py install
 
 # Actually install the Python module.
