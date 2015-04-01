@@ -3,5 +3,3 @@ matplotlib
 nose
 coverage
 cython
-numpy
-scipy
