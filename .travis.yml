@@ -30,8 +30,8 @@ before_install:
 install: 
   - "cd src/template_matching_scaling"
   # - "python setup.py build_ext --inplace"
-  - "python setup.py develop"
+  - "python setup.py install"
 
 script: true
   # - bash run_travisci_tests.sh
-  # - nosetests -w tests/ --with-coverage
+  - nosetests -w tests/ --with-coverage
