@@ -40,7 +40,7 @@ setup(
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
     author_email='connorlukegoddard@gmail.com',
-    description='',
-    ext_modules=[ext]
+    description=''
+    # ext_modules=[ext]
 )
 
