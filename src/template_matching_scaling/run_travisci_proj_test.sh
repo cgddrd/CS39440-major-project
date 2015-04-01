@@ -8,5 +8,13 @@ python setup.py install
 # Actually install the Python module.
 pip install .
 
+ls -l
+
+cd tse_compiled
+
+ls -l
+
+cd ..
+
 # Run the automated unti tests with coverage.
 nosetests -w tests/ --with-coverage
