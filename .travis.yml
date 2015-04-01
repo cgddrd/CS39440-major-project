@@ -18,7 +18,7 @@ before_install:
  - sudo apt-get install -qq python-numpy python-scipy
  - sudo dpkg -L python-opencv
 # - sudo pip install coverage
- - sudo pip install cython
+# - sudo pip install cython
 # - sudo pip install setuptools_cython
 
 # We want to skip the 'install' stage, as this is handled by the project-specific scripts.
