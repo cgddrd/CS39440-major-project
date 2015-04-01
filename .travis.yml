@@ -32,6 +32,6 @@ install:
   # - "python setup.py build_ext --inplace"
   - "python setup.py install"
 
-script: true
+script:
   # - bash run_travisci_tests.sh
   - nosetests -w tests/ --with-coverage
