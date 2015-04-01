@@ -5,7 +5,7 @@ python setup.py build_ext --inplace
 python setup.py install
 
 # Actually install the Python module.
-pip install .
+# pip install .
 
 # Just checking the 'Cython' files have been compiled.
 # cd tse_compiled
