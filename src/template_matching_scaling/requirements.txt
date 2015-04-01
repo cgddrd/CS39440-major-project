@@ -2,8 +2,8 @@ pip==6.0.8
 matplotlib
 nose
 coverage
-ipython
-cython
-setuptools_cython
+ipython==3.0.0
+Cython==0.22
+setuptools_cython==0.2.1
 coveralls
 numpy
