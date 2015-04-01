@@ -5,11 +5,10 @@ from pip.req import parse_requirements
 from pip.download import PipSession
 
 from setuptools import setup, Extension
-# from Cython.Distutils import build_ext
+from Cython.Distutils import build_ext
 import numpy as np
 
 # from distutils.extension import Extension
-
 # Read from 'requirements.txt' file. Modified from: http://stackoverflow.com/a/16624700
 
 # parse_requirements() returns generator of pip.req.InstallRequirement objects
@@ -27,7 +26,7 @@ reqs = [str(ir.req) for ir in install_reqs]
 # To install module in package folder, need to use package '.' notation in extension name.
 # See: https://github.com/uci-cbcl/tree-hmm/issues/2
 
-# ext = Extension("tse_compiled.tse_c_imageutils", ["tse_compiled/tse_c_imageutils.pyx"], include_dirs=[np.get_include()])
+ext = Extension("tse_compiled.tse_c_imageutils", ["tse_compiled/tse_c_imageutils.pyx"], include_dirs=[np.get_include()])
 
 setup(
     name='template_matching_scaling',
@@ -40,7 +39,7 @@ setup(
     author='Connor Goddard',
     author_email='connorlukegoddard@gmail.com',
     description=''
-    # cmdclass={"build_ext": build_ext}
-    # ext_modules=[ext]
+    cmdclass={"build_ext": build_ext}
+    ext_modules=[ext]
 )
 
