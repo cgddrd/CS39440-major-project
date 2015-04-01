@@ -35,7 +35,7 @@ setup(
     name='template_matching_scaling',
     version='2.1.0',
     packages=['tse', 'tse_compiled', 'tests'],
-    # setup_requires=['cython', 'setuptools_cython'],
+    setup_requires=['cython', 'setuptools_cython'],
     install_requires=reqs,
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
