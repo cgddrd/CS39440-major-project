@@ -1,5 +1,4 @@
-# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project)
-[![Coverage Status](https://coveralls.io/repos/cgddrd/CS39440-major-project/badge.svg)](https://coveralls.io/r/cgddrd/CS39440-major-project)
+# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project) [![Coverage Status](https://coveralls.io/repos/cgddrd/CS39440-major-project/badge.svg)](https://coveralls.io/r/cgddrd/CS39440-major-project)
 
 ## Project Metrics
 
