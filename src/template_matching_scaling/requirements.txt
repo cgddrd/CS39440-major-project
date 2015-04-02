@@ -3,3 +3,4 @@ matplotlib
 nose
 coverage
 cython
+python-coveralls

@@ -26,3 +26,6 @@ install: true
 
 script:
   - bash run_travisci_tests.sh
+
+after_success:
+  - coveralls
