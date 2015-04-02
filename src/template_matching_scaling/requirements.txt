@@ -1,6 +1,6 @@
 pip==6.0.8
+cython
 matplotlib
 nose
 coverage
-cython
 python-coveralls

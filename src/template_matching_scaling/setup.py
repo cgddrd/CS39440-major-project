@@ -32,7 +32,6 @@ setup(
     version='2.1.0',
     zip_safe=False,
     packages=['tse', 'tse_compiled', 'tests'],
-    # setup_requires=['cython'],
     install_requires=reqs,
     url='https://github.com/cgddrd/CS39440-major-project',
     author='Connor Goddard',
