@@ -13,4 +13,4 @@ ls -l
 cd ..
 
 # Run the automated unti tests with coverage.
-nosetests -w tests/ --with-coverage
+nosetests -w tests/ --with-coverage --cover-package=tse --cover-erase
