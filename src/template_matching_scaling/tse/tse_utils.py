@@ -23,12 +23,12 @@ class TSEUtils:
         return dict[smallest_dict_key]
 
     @staticmethod
-    def string_list_to_int_list(string_list):
-        return map(TSEUtils.convert_to_int, string_list)
+    def string_2d_list_to_int_2d_list(string_list):
+        return map(TSEUtils.convert_list_to_int, string_list)
 
     @staticmethod
-    def convert_to_int(value):
-        return map(int, value)
+    def convert_list_to_int(list_to_convert):
+        return map(int, list_to_convert)
 
     @staticmethod
     def calc_moving_average_array(values, window, mode='valid'):

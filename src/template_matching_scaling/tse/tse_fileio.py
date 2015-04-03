@@ -8,14 +8,16 @@ class TSEFileIO:
     def __init__(self, filepath="./"):
         self._file_path = filepath
 
-    def write_file(self, filename, data_prefix, data_collection, append):
+    def write_tuple_list_to_file(self, filename, data_collection, data_prefix=None, append=True):
+
         self.check_directory(self._file_path)
 
         file_io_op = 'a' if append else 'w'
 
         new_file = open(self._file_path + filename, file_io_op)
 
-        new_file.write(data_prefix + "\n")
+        if data_prefix is not None:
+            new_file.write(data_prefix + "\n")
 
         for data in data_collection:
             new_file.write("{0},{1}\n".format(data[0], data[1]))

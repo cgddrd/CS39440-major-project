@@ -36,8 +36,9 @@ class TemplateMatching:
         self._plot_axis = plot_axis
 
     def load_calibration_data(self, file_path):
+
         raw_data = TSEFileIO.read_file(file_path, split_delimiter=",", start_position=1)
-        return dict(TSEUtils.string_list_to_int_list(raw_data))
+        return dict(TSEUtils.string_2d_list_to_int_2d_list(raw_data))
 
     def search_image(self, patch_height, match_methods, use_scaling=False, force_cont_search=False):
 

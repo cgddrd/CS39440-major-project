@@ -1,5 +1,6 @@
 __author__ = 'connorgoddard'
 
+
 class TSEMatchType:
     def __init__(self, match_name, match_type, match_id, format_string, reverse_score=False):
         self._match_name = match_name
