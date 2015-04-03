@@ -32,27 +32,17 @@ class TSEGeometry:
         return math.sqrt((vx * vx) + (vy * vy))
 
     @staticmethod
-    def calc_line_points_horizontal_reflection(original_start_point, original_end_point, image_height, image_width, stretch_image_height=False):
+    def calc_line_points_horizontal_reflection(original_start_point, original_end_point, reflect_axis_x_coord, max_y):
 
-        half_width = image_width / 2
-
-        reflected_start_point = (half_width + (half_width - original_start_point[0]), original_start_point[1])
-        reflected_end_point = (half_width + (half_width - original_end_point[0]), original_end_point[1])
+        reflected_start_point = (reflect_axis_x_coord + (reflect_axis_x_coord - original_start_point[0]), original_start_point[1])
+        reflected_end_point = (reflect_axis_x_coord + (reflect_axis_x_coord - original_end_point[0]), original_end_point[1])
 
         i = original_start_point[1]
 
         coords1 = []
         coords2 = []
 
-        if stretch_image_height is True:
-
-            max_y = image_height
-
-        else:
-
-            max_y = original_end_point[1]
-
-        while i < max_y:
+        while i <= max_y:
 
             new_y = i
 
@@ -80,13 +70,14 @@ class TSEGeometry:
         return coords1, coords2
 
     @staticmethod
-    def calc_line_points(start_point, end_point, start_point2, end_point2, image_height):
+    def calc_line_points(start_point, end_point, start_point2, end_point2, max_y):
+
         i = start_point[1]
 
         coords1 = []
         coords2 = []
 
-        while i < image_height:
+        while i <= max_y:
 
             new_y = i
 
