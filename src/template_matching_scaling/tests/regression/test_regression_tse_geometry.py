@@ -8,6 +8,7 @@ __author__ = 'connorgoddard'
 
 class TestRegressionTSEGeometry(TestCase):
 
+    # Refs: Fix #93 - https://github.com/cgddrd/CS39440-major-project/issues/93
     def test_calc_line_points_reflection(self):
 
         image_height = 200
@@ -26,6 +27,7 @@ class TestRegressionTSEGeometry(TestCase):
         assert_true(np.array_equal(calculated_lines[0], expected_origin_line))
         assert_true(np.array_equal(calculated_lines[1], expected_origin_line_reflected))
 
+    # Refs: Fix #93 - https://github.com/cgddrd/CS39440-major-project/issues/93
     def test_calc_line_points(self):
 
         startpoint_1 = (75, 0)

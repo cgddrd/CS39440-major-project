@@ -52,9 +52,7 @@ class TestTSEGeometry(TestCase):
 
     def test_calc_line_points_reflection(self):
 
-        image_height = 200
         image_width = 300
-
         image_x_centre = image_width / 2
 
         origin_startpoint = (75, 0)
@@ -67,6 +65,22 @@ class TestTSEGeometry(TestCase):
 
         assert_true(np.array_equal(calculated_lines[0], expected_origin_line))
         assert_true(np.array_equal(calculated_lines[1], expected_origin_line_reflected))
+
+    def test_calc_line_points_reflection_straight_line(self):
+
+        image_width = 300
+        image_x_centre = image_width / 2
+
+        origin_startpoint = (75, 0)
+        origin_endpoint = (75, 5)
+
+        expected_origin_straight_line = [(75, 0), (75, 1), (75, 2), (75, 3), (75, 4), (75, 5)]
+        expected_origin_straight_line_reflected = [(225, 0), (225, 1), (225, 2), (225, 3), (225, 4), (225, 5)]
+
+        calculated_straight_lines = TSEGeometry.calc_line_points_horizontal_reflection(origin_startpoint, origin_endpoint, image_x_centre, origin_endpoint[1])
+
+        assert_true(np.array_equal(calculated_straight_lines[0], expected_origin_straight_line))
+        assert_true(np.array_equal(calculated_straight_lines[1], expected_origin_straight_line_reflected))
 
     def test_calc_line_points(self):
 
@@ -83,3 +97,19 @@ class TestTSEGeometry(TestCase):
 
         assert_true(np.array_equal(calculated_lines[0], expected_origin_line_1))
         assert_true(np.array_equal(calculated_lines[1], expected_origin_line_2))
+
+    def test_calc_line_points_straight_line(self):
+
+        startpoint_1 = (75, 0)
+        endpoint_1 = (75, 5)
+
+        startpoint_2 = (225, 0)
+        endpoint_2 = (225, 5)
+
+        expected_origin_straight_line_1 = [(75, 0), (75, 1), (75, 2), (75, 3), (75, 4), (75, 5)]
+        expected_origin_straight_line_2 = [(225, 0), (225, 1), (225, 2), (225, 3), (225, 4), (225, 5)]
+
+        calculated_straight_lines = TSEGeometry.calc_line_points(startpoint_1, endpoint_1, startpoint_2, endpoint_2, endpoint_2[1])
+
+        assert_true(np.array_equal(calculated_straight_lines[0], expected_origin_straight_line_1))
+        assert_true(np.array_equal(calculated_straight_lines[1], expected_origin_straight_line_2))
