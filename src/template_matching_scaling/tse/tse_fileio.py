@@ -1,4 +1,5 @@
 import os
+import errno
 
 __author__ = 'connorgoddard'
 
@@ -45,8 +46,12 @@ class TSEFileIO:
 
                             file_results.append(line.rstrip())
 
-        except IOError:
-            print "Error: Unable to open file or read data({0})".format(file_path)
+        except IOError as e:
+
+            if e.errno == errno.ENOENT:
+                raise IOError("File not found: {0}".format(file_path))
+
+            print "Error: Unable to read data - {0}".format(file_path)
 
         return file_results
 

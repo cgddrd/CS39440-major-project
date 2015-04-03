@@ -55,3 +55,11 @@ class TestTSEFileIO(TestCase):
         expected_result = ['1', '2', '3']
 
         assert_equal(self.test_fileio.read_file("./data/test_file.txt", None, 0), expected_result)
+
+    def test_read_file_invalid_file(self):
+
+        with assert_raises(IOError) as e:
+            self.test_fileio.read_file("./data/invalid_file.txt", None, 0)
+
+        assert_equal(e.exception.message, 'File not found: ./data/invalid_file.txt')
+
