@@ -32,39 +32,48 @@ class TSEGeometry:
         return math.sqrt((vx * vx) + (vy * vy))
 
     @staticmethod
-    def calc_line_points_reflection(start_point, end_point, image_height, image_width):
+    def calc_line_points_horizontal_reflection(original_start_point, original_end_point, image_height, image_width, stretch_image_height=False):
+
         half_width = image_width / 2
 
-        start_point2 = (half_width + (half_width - start_point[0]), start_point[1])
-        end_point2 = (half_width + (half_width - end_point[0]), end_point[1])
+        reflected_start_point = (half_width + (half_width - original_start_point[0]), original_start_point[1])
+        reflected_end_point = (half_width + (half_width - original_end_point[0]), original_end_point[1])
 
-        i = start_point[1]
+        i = original_start_point[1]
 
         coords1 = []
         coords2 = []
 
-        while i < image_height:
+        if stretch_image_height is True:
+
+            max_y = image_height
+
+        else:
+
+            max_y = original_end_point[1]
+
+        while i < max_y:
 
             new_y = i
 
             # If we happen to have a perfectly vertical line, then we have no slope (prevents division by 0 error)
             # As the second line will be a complete reflection of the first, we only need to perform a slope check on the first line.
-            if (end_point[0] - start_point[0]) != 0:
+            if (original_end_point[0] - original_start_point[0]) != 0:
 
-                slope = float((end_point[1] - start_point[1]) / (end_point[0] - start_point[0]))
-                new_x = (((new_y - start_point[1]) / slope) + start_point[0])
+                slope = float((original_end_point[1] - original_start_point[1]) / (original_end_point[0] - original_start_point[0]))
+                new_x = (((new_y - original_start_point[1]) / slope) + original_start_point[0])
 
-                slope2 = float((end_point2[1] - start_point2[1]) / (end_point2[0] - start_point2[0]))
-                new_x2 = (((new_y - start_point2[1]) / slope2) + start_point2[0])
+                slope2 = float((reflected_end_point[1] - reflected_start_point[1]) / (reflected_end_point[0] - reflected_start_point[0]))
+                new_x2 = (((new_y - reflected_start_point[1]) / slope2) + reflected_start_point[0])
 
             else:
 
-                new_x = start_point[0]
-                new_x2 = start_point2[0]
+                new_x = original_start_point[0]
+                new_x2 = reflected_start_point[0]
 
-            coords1.append((int(new_x), new_y))
+            coords1.append((int(round(new_x)), new_y))
 
-            coords2.append((int(new_x2), new_y))
+            coords2.append((int(round(new_x2)), new_y))
 
             i += 1
 
