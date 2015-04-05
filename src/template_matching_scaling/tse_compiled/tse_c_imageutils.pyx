@@ -27,7 +27,6 @@ cdef class TSECImageUtils:
                 diff_channel_2 = template_patch_val_channel_2 - scaled_current_window_val_channel_2
                 diff_channel_3 = template_patch_val_channel_3 - scaled_current_window_val_channel_3
 
-
                 # For some reason the line below doesn't work.. we have to add each squared value separately.
                 # ssd += (diff_channel_1 * diff_channel_1) + (diff_channel_2 * diff_channel_2) + (diff_channel_3 * diff_channel_3)
 

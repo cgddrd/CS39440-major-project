@@ -287,7 +287,7 @@ class TSEImageUtils:
 
     @staticmethod
     # Assumes HSV format.
-    def calc_compare_histogram(image_1, image_2, match_method):
+    def calc_compare_hsv_histogram(image_1, image_2, match_method):
 
         hist_patch1 = cv2.calcHist([image_1], [0, 1], None, [180, 256], [0, 180, 0, 256])
         hist_patch2 = cv2.calcHist([image_2], [0, 1], None, [180, 256], [0, 180, 0, 256])
@@ -321,7 +321,7 @@ class TSEImageUtils:
         return TSEPoint(scaled_origin[0], scaled_origin[1]), TSEPoint(scaled_end[0], scaled_end[1])
 
     @staticmethod
-    def scale_hsv_image_no_interpolation_auto(source_image, target_image):
+    def scale_image_no_interpolation_auto(source_image, target_image):
 
         source_image_height, source_image_width = source_image.shape[:2]
         current_image_height, current_image_width = target_image.shape[:2]
@@ -338,16 +338,16 @@ class TSEImageUtils:
         for i in xrange(source_image_height):
             for j in xrange(source_image_width):
 
-                template_patch_val_hue = source_image.item(i, j, 0)
-                template_patch_val_sat = source_image.item(i, j, 1)
-                template_patch_val_val = source_image.item(i, j, 2)
+                template_patch_val_channel_1 = source_image.item(i, j, 0)
+                template_patch_val_channel_2 = source_image.item(i, j, 1)
+                template_patch_val_channel_3 = source_image.item(i, j, 2)
 
                 scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 0),
-                                            template_patch_val_hue)
+                                            template_patch_val_channel_1)
                 scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 1),
-                                            template_patch_val_sat)
+                                            template_patch_val_channel_2)
                 scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 2),
-                                            template_patch_val_val)
+                                            template_patch_val_channel_3)
 
         return scaled_image_result
 

@@ -38,6 +38,28 @@ class TestTSEImageUtils(TestCase):
         # Check that for non-matching images, we get a score > 0.
         assert_true(TSEImageUtils.calc_template_match_compare_cv2_score(image_1, image_3, cv2.cv.CV_TM_SQDIFF) > 0)
 
+    def test_calc_compare_histogram_CHISQR(self):
+        image_1 = np.zeros((200, 200, 3), dtype=np.uint8)
+        image_2 = image_1
+        image_3 = np.full((200, 200, 3), [100, 0, 0],  dtype=np.uint8)
+
+        # Check that for perfectly matching images, we get a score of exactly 0.
+        assert_equal(TSEImageUtils.calc_compare_hsv_histogram(image_1, image_2, cv2.cv.CV_COMP_CHISQR), 0)
+
+        # Check that for non-matching images, we get a score > 0.
+        assert_true(TSEImageUtils.calc_compare_hsv_histogram(image_1, image_3, cv2.cv.CV_COMP_CHISQR) > 0)
+
+    def test_calc_compare_histogram_CORREL(self):
+        image_1 = np.zeros((200, 200, 3), dtype=np.uint8)
+        image_2 = image_1
+        image_3 = np.full((200, 200, 3), [100, 0, 0],  dtype=np.uint8)
+
+        matching_result = TSEImageUtils.calc_compare_hsv_histogram(image_1, image_2, cv2.cv.CV_COMP_CORREL)
+        non_matching_result = TSEImageUtils.calc_compare_hsv_histogram(image_1, image_3, cv2.cv.CV_COMP_CORREL)
+
+        # Matching result should be greater than a non-matching result for CORREL matching method.
+        assert_true(matching_result > non_matching_result)
+
     def test_calc_template_match_compare_cv2_score_CCORR(self):
         image_1 = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
         image_2 = image_1
@@ -154,7 +176,7 @@ class TestTSEImageUtils(TestCase):
     def test_calc_ed_template_match_score_scaled(self):
 
         # Create a sample test image that is empty.
-        self._original_image = np.zeros((400, 400, 3), dtype=np.uint8)
+        original_image = np.zeros((400, 400, 3), dtype=np.uint8)
 
         # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
         scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
@@ -168,7 +190,7 @@ class TestTSEImageUtils(TestCase):
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
 
         # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
-        self._original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
 
         # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
         matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
@@ -176,15 +198,15 @@ class TestTSEImageUtils(TestCase):
         non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
 
         # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled(matching_image, self._original_image), 0)
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled(matching_image, original_image), 0)
 
         # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled(non_matching_image, self._original_image) > 0)
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled(non_matching_image, original_image) > 0)
 
     def test_calc_ed_template_match_score_scaled_slow(self):
 
         # Create a sample test image that is empty.
-        self._original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
+        original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
 
         # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
         scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
@@ -198,7 +220,7 @@ class TestTSEImageUtils(TestCase):
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
 
         # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
-        self._original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
 
         # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
         matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
@@ -206,45 +228,15 @@ class TestTSEImageUtils(TestCase):
         non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
 
         # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_slow(matching_image, self._original_image), 0)
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_slow(matching_image, original_image), 0)
 
         # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_slow(non_matching_image, self._original_image) > 0)
-
-    def test_calc_ed_template_match_score_scaled_slow(self):
-
-        # Create a sample test image that is empty.
-        self._original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
-
-        # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
-        scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
-
-        # Calculate the scaled indices to identify the pixels in the larger image that we will want to make GREEN to provide evidence for the test succeeding.
-        original_image_scaled_indices = np.rint((np.arange(0, 200) * scale_factor_width)).astype(int)
-
-        rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([original_image_scaled_indices, original_image_scaled_indices]), 2)
-
-        rows_to_extract = rows_cols_cartesian_product[0].astype(int)
-        cols_to_extract = rows_cols_cartesian_product[1].astype(int)
-
-        # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
-        self._original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
-
-        # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
-        matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
-
-        non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
-
-        # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_slow(matching_image, self._original_image), 0)
-
-        # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_slow(non_matching_image, self._original_image) > 0)
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_slow(non_matching_image, original_image) > 0)
 
     def test_calc_ed_template_match_score_scaled_compiled(self):
 
         # Create a sample test image that is empty.
-        self._original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
+        original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
 
         # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
         scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
@@ -258,7 +250,7 @@ class TestTSEImageUtils(TestCase):
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
 
         # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
-        self._original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
 
         # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
         matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
@@ -266,15 +258,15 @@ class TestTSEImageUtils(TestCase):
         non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
 
         # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(matching_image, self._original_image), 0)
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(matching_image, original_image), 0)
 
         # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(non_matching_image, self._original_image) > 0)
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(non_matching_image, original_image) > 0)
 
     def test_calc_ed_template_match_score_scaled_compiled_slow(self):
 
         # Create a sample test image that is empty.
-        self._original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
+        original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
 
         # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
         scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
@@ -288,7 +280,7 @@ class TestTSEImageUtils(TestCase):
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
 
         # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
-        self._original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
 
         # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
         matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
@@ -296,15 +288,15 @@ class TestTSEImageUtils(TestCase):
         non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
 
         # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(matching_image, self._original_image), 0)
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(matching_image, original_image), 0)
 
         # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(non_matching_image, self._original_image) > 0)
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(non_matching_image, original_image) > 0)
 
-    def test_calc_template_match_compare_cv2_score_scaled(self):
+    def test_calc_ed_template_match_score_scaled_compiled(self):
 
         # Create a sample test image that is empty.
-        self._original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
+        original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
 
         # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
         scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
@@ -318,7 +310,7 @@ class TestTSEImageUtils(TestCase):
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
 
         # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
-        self._original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
 
         # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
         matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
@@ -326,7 +318,157 @@ class TestTSEImageUtils(TestCase):
         non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
 
         # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_template_match_compare_cv2_score_scaled(matching_image, self._original_image, cv2.cv.CV_TM_SQDIFF), 0)
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(matching_image, original_image), 0)
 
         # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_template_match_compare_cv2_score_scaled(non_matching_image, self._original_image, cv2.cv.CV_TM_SQDIFF) > 0)
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(non_matching_image, original_image) > 0)
+
+    def test_calc_ed_template_match_score_scaled_compiled_slow(self):
+
+        # Create a sample test image that is empty.
+        original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
+
+        # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
+
+        # Calculate the scaled indices to identify the pixels in the larger image that we will want to make GREEN to provide evidence for the test succeeding.
+        original_image_scaled_indices = np.rint((np.arange(0, 200) * scale_factor_width)).astype(int)
+
+        rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([original_image_scaled_indices, original_image_scaled_indices]), 2)
+
+        rows_to_extract = rows_cols_cartesian_product[0].astype(int)
+        cols_to_extract = rows_cols_cartesian_product[1].astype(int)
+
+        # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+
+        # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
+        matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
+
+        non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
+
+        # Check that for perfectly matching images, we get a score of exactly 0.
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(matching_image, original_image), 0)
+
+        # Check that for non-matching images, we get a score > 0.
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled_slow(non_matching_image, original_image) > 0)
+
+    def test_calc_template_match_compare_cv2_score_scaled_SQDIFF(self):
+
+        # Create a sample test image that is empty.
+        original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
+
+        # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
+
+        # Calculate the scaled indices to identify the pixels in the larger image that we will want to make GREEN to provide evidence for the test succeeding.
+        original_image_scaled_indices = np.rint((np.arange(0, 200) * scale_factor_width)).astype(int)
+
+        rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([original_image_scaled_indices, original_image_scaled_indices]), 2)
+
+        rows_to_extract = rows_cols_cartesian_product[0].astype(int)
+        cols_to_extract = rows_cols_cartesian_product[1].astype(int)
+
+        # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+
+        # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
+        matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
+
+        non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
+
+        # Check that for perfectly matching images, we get a score of exactly 0.
+        assert_equal(TSEImageUtils.calc_template_match_compare_cv2_score_scaled(matching_image, original_image, cv2.cv.CV_TM_SQDIFF), 0)
+
+        # Check that for non-matching images, we get a score > 0.
+        assert_true(TSEImageUtils.calc_template_match_compare_cv2_score_scaled(non_matching_image, original_image, cv2.cv.CV_TM_SQDIFF) > 0)
+
+    def test_calc_template_match_compare_cv2_score_scaled_CCORR_NORMED(self):
+
+        # Create a sample test image that is empty.
+        original_image = np.full((400, 400, 3), [0, 200, 0],  dtype=np.uint8)
+
+        # Calculate the scale factor (MAKING SURE TO SUBTRACT '1' from the max height/width to account for array index out of bounds issue)
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(200, (400 - 1))
+
+        # Calculate the scaled indices to identify the pixels in the larger image that we will want to make GREEN to provide evidence for the test succeeding.
+        original_image_scaled_indices = np.rint((np.arange(0, 200) * scale_factor_width)).astype(int)
+
+        rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([original_image_scaled_indices, original_image_scaled_indices]), 2)
+
+        rows_to_extract = rows_cols_cartesian_product[0].astype(int)
+        cols_to_extract = rows_cols_cartesian_product[1].astype(int)
+
+        # We now want to set each fo the pixels THAT WE EXPECT TO BE EXTRACTED BY THE TEST to GREEN to show that the test has passed.
+        original_image[rows_to_extract, cols_to_extract] = [0, 200, 0]
+
+        # Once we have performed the pixel extraction, we expect that all of the pixels returned will be GREEN (based ont he setup above)
+        matching_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
+
+        non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
+
+        # Check that for perfectly matching images, we get a score of exactly 1.0 (normalised - higher score = better match).
+        assert_equal(TSEImageUtils.calc_template_match_compare_cv2_score_scaled(matching_image, original_image, cv2.cv.CV_TM_CCORR_NORMED), 1.0)
+
+        # Check that for non-matching images, we get a score < 1.0 (should get a smaller score for non-matchign images).
+        assert_true(TSEImageUtils.calc_template_match_compare_cv2_score_scaled(non_matching_image, original_image, cv2.cv.CV_TM_CCORR_NORMED) < 1.0)
+
+    def test_scale_image_interpolation_auto(self):
+
+        original_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
+
+        # Set the centre pixel fo the original image to a different colour for comparison once scaling is complete.
+        original_image[100, 100] = [200, 0, 0]
+
+        larger_target_image = np.zeros((400, 400, 3),  dtype=np.uint8)
+
+        scaled_result = TSEImageUtils.scale_image_interpolation_auto(original_image, larger_target_image)
+
+        # We would expect the centre pixel of the scaled image NOT to be GREEN, as in the original non-scaled image this was set to RED.
+        assert_false(np.array_equal(scaled_result[200, 200], [0, 200, 0]))
+
+        # We would expect all other pixels (apart from immediate neighbours around the centre pixel due to the interpolation) to still be GREEN.
+        assert_true(np.array_equal(scaled_result[0, 0], [0, 200, 0]))
+        assert_true(np.array_equal(scaled_result[399, 399], [0, 200, 0]))
+        assert_true(np.array_equal(scaled_result[195, 195], [0, 200, 0]))
+        assert_true(np.array_equal(scaled_result[205, 205], [0, 200, 0]))
+
+    def test_scale_hsv_image_no_interpolation_auto(self):
+
+        original_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
+
+        # Set the centre pixel fo the original image to a different colour for comparison once scaling is complete.
+        original_image[100, 100] = [200, 0, 0]
+
+        larger_target_image = np.zeros((400, 400, 3),  dtype=np.uint8)
+
+        scaled_result = TSEImageUtils.scale_image_no_interpolation_auto(original_image, larger_target_image)
+
+        # We would expect the centre pixel of the scaled image to be RED, as in the original non-scaled image this was set to RED.
+        assert_true(np.array_equal(scaled_result[200, 200], [200, 0, 0]))
+
+        # We would expect all other pixels to still be GREEN.
+        assert_true(np.array_equal(scaled_result[0, 0], [0, 200, 0]))
+
+    def test_scale_image_interpolation_man(self):
+
+        original_image = np.full((200, 200, 3), [0, 200, 0],  dtype=np.uint8)
+
+        # Set the centre pixel fo the original image to a different colour for comparison once scaling is complete.
+        original_image[100, 100] = [200, 0, 0]
+
+        larger_target_image = np.zeros((400, 400, 3),  dtype=np.uint8)
+
+        # Calculate the scale factor based on the widths of the two images (as the width/height are equal, we can just use the width)
+        scale_factor = TSEGeometry.calc_measure_scale_factor(original_image.shape[1], (larger_target_image.shape[1]))
+
+        scaled_result = TSEImageUtils.scale_image_interpolation_man(original_image, scale_factor)
+
+        # We would expect the centre pixel of the scaled image NOT to be GREEN, as in the original non-scaled image this was set to RED.
+        assert_false(np.array_equal(scaled_result[200, 200], [0, 200, 0]))
+
+        # We would expect all other pixels (apart from immediate neighbours around the centre pixel due to the interpolation) to still be GREEN.
+        assert_true(np.array_equal(scaled_result[0, 0], [0, 200, 0]))
+        assert_true(np.array_equal(scaled_result[399, 399], [0, 200, 0]))
+        assert_true(np.array_equal(scaled_result[195, 195], [0, 200, 0]))
+        assert_true(np.array_equal(scaled_result[205, 205], [0, 200, 0]))

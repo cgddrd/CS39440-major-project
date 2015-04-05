@@ -8,4 +8,4 @@ python setup.py build_ext --inplace
 python setup.py install
 
 # Run the automated unti tests with coverage.
-nosetests -w tests/ --with-coverage --cover-package=tse --cover-erase
+nosetests -w tests/ --with-coverage --cover-package=tse --cover-package=tse_compiled  --cover-erase

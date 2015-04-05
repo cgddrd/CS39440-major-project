@@ -106,7 +106,7 @@ class TemplateMatching:
                                                                             match_method.match_id)
 
             elif match_method.match_type == tse_match_methods.HIST:
-                score = TSEImageUtils.calc_compare_histogram(template_patch, current_window, match_method.match_id)
+                score = TSEImageUtils.calc_compare_hsv_histogram(template_patch, current_window, match_method.match_id)
 
             # If lower score means better match, then the method is a 'reverse' method.
             if match_method.reverse_score:
@@ -190,7 +190,7 @@ class TemplateMatching:
             elif match_method.match_type == tse_match_methods.HIST:
                 scaled_template_patch = TSEImageUtils.scale_image_interpolation_auto(template_patch, scaled_search_window)
 
-                score = TSEImageUtils.calc_compare_histogram(scaled_template_patch, scaled_search_window, match_method.match_id)
+                score = TSEImageUtils.calc_compare_hsv_histogram(scaled_template_patch, scaled_search_window, match_method.match_id)
 
             # If lower score means better match, then the method is a 'reverse' method.
             if match_method.reverse_score:
