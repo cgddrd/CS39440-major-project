@@ -8,23 +8,32 @@ cdef class TSECImageUtils:
     @staticmethod
     def calc_ssd_slow(np.ndarray[np.uint8_t, ndim=3] template_patch, np.ndarray[np.uint8_t, ndim=3] scaled_current_window, int template_patch_height, int template_patch_width, float scale_factor_height, float scale_factor_width):
 
-        cdef unsigned int i, j, template_patch_val_hue, template_patch_val_sat, scaled_current_window_val_hue, scaled_current_window_val_sat, diff_hue, diff_sat
+        cdef unsigned int i, j, template_patch_val_channel_1, template_patch_val_channel_2, template_patch_val_channel_3, scaled_current_window_val_channel_1, scaled_current_window_val_channel_2, scaled_current_window_val_channel_3, diff_channel_1, diff_channel_2, diff_channel_3
         cdef float ssd = 0
 
         # Loop through each pixel in the template patch, and scale it in the larger scaled image.
         for i in xrange(template_patch_height):
             for j in xrange(template_patch_width):
 
-                template_patch_val_hue = template_patch[i][j][0]
-                template_patch_val_sat = template_patch[i][j][1]
+                template_patch_val_channel_1 = template_patch[i][j][0]
+                template_patch_val_channel_2 = template_patch[i][j][1]
+                template_patch_val_channel_3 = template_patch[i][j][2]
 
-                scaled_current_window_val_hue = scaled_current_window[(i * scale_factor_height)][(j * scale_factor_width)][0]
-                scaled_current_window_val_sat = scaled_current_window[(i * scale_factor_height)][(j * scale_factor_width)][1]
+                scaled_current_window_val_channel_1 = scaled_current_window[(i * scale_factor_height)][(j * scale_factor_width)][0]
+                scaled_current_window_val_channel_2 = scaled_current_window[(i * scale_factor_height)][(j * scale_factor_width)][1]
+                scaled_current_window_val_channel_3 = scaled_current_window[(i * scale_factor_height)][(j * scale_factor_width)][2]
 
-                diff_hue = template_patch_val_hue - scaled_current_window_val_hue
-                diff_sat = template_patch_val_sat - scaled_current_window_val_sat
+                diff_channel_1 = template_patch_val_channel_1 - scaled_current_window_val_channel_1
+                diff_channel_2 = template_patch_val_channel_2 - scaled_current_window_val_channel_2
+                diff_channel_3 = template_patch_val_channel_3 - scaled_current_window_val_channel_3
 
-                ssd += ((diff_hue * diff_hue) + (diff_sat * diff_sat))
+
+                # For some reason the line below doesn't work.. we have to add each squared value separately.
+                # ssd += (diff_channel_1 * diff_channel_1) + (diff_channel_2 * diff_channel_2) + (diff_channel_3 * diff_channel_3)
+
+                ssd += (diff_channel_1 * diff_channel_1)
+                ssd += (diff_channel_2 * diff_channel_2)
+                ssd += (diff_channel_3 * diff_channel_3)
 
         return ssd
 
