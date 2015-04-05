@@ -29,8 +29,27 @@ class TSEImageUtils:
         template_patch_height, template_patch_width = template_patch.shape[:2]
         scaled_search_window_height, scaled_search_window_width = scaled_search_window.shape[:2]
 
-        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, scaled_search_window_width)
-        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, scaled_search_window_height)
+        """
+        We have to subtract '-1' from the width and height of the scaled search window BEFORE calculating the scale factor to multiply by.
+
+        This is to ensure that the scaled pixel coordinates remain INSIDE THE BOUNDS of the array indices. (i.e. for height = 200, max index = 199)
+
+        e.g.
+        ---
+
+        - Search Window Image = (200x200px) (0-199 array index range)
+
+        - Target Template Patch Row Index = 100
+
+        - Scale Factor = 2.0
+
+        - 100 * 2.0 = 200.00 (int: 200)
+
+        - 200 > 199 max image index = ERROR
+
+        """
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, (scaled_search_window_width - 1))
+        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, (scaled_search_window_height - 1))
 
         scaled_window_heights = TSEImageUtils.calc_scaled_image_pixel_dimension_coordinates(template_patch_height, scale_factor_height)
         scaled_window_widths = TSEImageUtils.calc_scaled_image_pixel_dimension_coordinates(template_patch_width, scale_factor_width)
@@ -47,14 +66,34 @@ class TSEImageUtils:
         template_patch_height, template_patch_width = template_patch.shape[:2]
         scaled_search_window_height, scaled_search_window_width = scaled_search_window.shape[:2]
 
-        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, scaled_search_window_width)
-        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, scaled_search_window_height)
+        """
+        We have to subtract '-1' from the width and height of the scaled search window BEFORE calculating the scale factor to multiply by.
+
+        This is to ensure that the scaled pixel coordinates remain INSIDE THE BOUNDS of the array indices. (i.e. for height = 200, max index = 199)
+
+        e.g.
+        ---
+
+        - Search Window Image = (200x200px) (0-199 array index range)
+
+        - Target Template Patch Row Index = 100
+
+        - Scale Factor = 2.0
+
+        - 100 * 2.0 = 200.00 (int: 200)
+
+        - 200 > 199 max image index = ERROR
+
+        """
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, (scaled_search_window_width - 1))
+        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, (scaled_search_window_height - 1))
 
         ssd = 0
 
         # Loop through each pixel in the template patch, and scale it in the larger scaled image.
         for i in xrange(template_patch_height):
             for j in xrange(template_patch_width):
+
                 # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
                 template_patch_val_hue = template_patch.item(i, j, 0)
                 template_patch_val_sat = template_patch.item(i, j, 1)
@@ -80,8 +119,27 @@ class TSEImageUtils:
         template_patch_height, template_patch_width = template_patch.shape[:2]
         scaled_search_window_height, scaled_search_window_width = scaled_search_window.shape[:2]
 
-        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, scaled_search_window_width)
-        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, scaled_search_window_height)
+        """
+        We have to subtract '-1' from the width and height of the scaled search window BEFORE calculating the scale factor to multiply by.
+
+        This is to ensure that the scaled pixel coordinates remain INSIDE THE BOUNDS of the array indices. (i.e. for height = 200, max index = 199)
+
+        e.g.
+        ---
+
+        - Search Window Image = (200x200px) (0-199 array index range)
+
+        - Target Template Patch Row Index = 100
+
+        - Scale Factor = 2.0
+
+        - 100 * 2.0 = 200.00 (int: 200)
+
+        - 200 > 199 max image index = ERROR
+
+        """
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, (scaled_search_window_width - 1))
+        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, (scaled_search_window_height - 1))
 
         scaled_window_heights = TSEImageUtils.calc_scaled_image_pixel_dimension_coordinates(template_patch_height, scale_factor_height)
         scaled_window_widths = TSEImageUtils.calc_scaled_image_pixel_dimension_coordinates(template_patch_width, scale_factor_width)
@@ -98,8 +156,27 @@ class TSEImageUtils:
         template_patch_height, template_patch_width = template_patch.shape[:2]
         scaled_search_window_height, scaled_search_window_width = scaled_search_window.shape[:2]
 
-        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, scaled_search_window_width)
-        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, scaled_search_window_height)
+        """
+        We have to subtract '-1' from the width and height of the scaled search window BEFORE calculating the scale factor to multiply by.
+
+        This is to ensure that the scaled pixel coordinates remain INSIDE THE BOUNDS of the array indices. (i.e. for height = 200, max index = 199)
+
+        e.g.
+        ---
+
+        - Search Window Image = (200x200px) (0-199 array index range)
+
+        - Target Template Patch Row Index = 100
+
+        - Scale Factor = 2.0
+
+        - 100 * 2.0 = 200.00 (int: 200)
+
+        - 200 > 199 max image index = ERROR
+
+        """
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, (scaled_search_window_width - 1))
+        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, (scaled_search_window_height - 1))
 
         ssd = TSECImageUtils.calc_ssd_slow(template_patch, scaled_search_window, template_patch_height, template_patch_width, scale_factor_height, scale_factor_width)
 
@@ -122,6 +199,19 @@ class TSEImageUtils:
     @staticmethod
     def reshape_match_images(current_matrix, target_matrix):
 
+        # print len(current_matrix)
+        # print len(target_matrix)
+        #
+        # print len(current_matrix) / len(target_matrix) % len(target_matrix) == 0
+        #
+        # print len(current_matrix) / len(target_matrix)
+
+        # if (len(current_matrix) > len(target_matrix)) and len(current_matrix) / len(target_matrix) % len(target_matrix) != 0:
+        #
+        #     reduced_target_matrix_length = round(len(current_matrix) / len(target_matrix))
+        #
+        #     target_matrix = target_matrix[0:reduced_target_matrix_length]
+
         if current_matrix.shape != target_matrix.shape:
             return current_matrix.reshape(target_matrix.shape)
 
@@ -130,11 +220,21 @@ class TSEImageUtils:
     @staticmethod
     def extract_rows_cols_pixels_image(required_rows, required_cols, image):
 
+        image_height, image_width = image.shape[:2]
+
         # Get the cartesian product between the two then split into one array for all rows, and one array for all cols.
         rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([required_rows, required_cols]), 2)
 
         rows_to_extract = rows_cols_cartesian_product[0].astype(int)
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
+
+        # print len(rows_to_extract)
+
+        # rows_to_extract = rows_to_extract[rows_to_extract < image_height]
+
+        # print len(rows_to_extract)
+
+        # cols_to_extract = cols_to_extract[cols_to_extract < image_width]
 
         return image[rows_to_extract, cols_to_extract]
 
@@ -153,23 +253,62 @@ class TSEImageUtils:
         # Otherwise (and in most cases), we will want to return the highest score.
         return max_val
 
+    # @staticmethod
+    # def check_image_matrices_lengths(current_image, target_image):
+    #
+    #     # Check if both images have an equal no. of pixels (i.e. equal 2D-array length)
+    #     if (len(target_image) > len(current_image)) and len(target_image) / len(current_image) % len(current_image) != 0:
+    #
+    #         # If not, then we need to trim off the end of the template patch to match.
+    #
+    #         # Calculate the maximum length that the template image can be to match the extracted scaled search window pixel array.
+    #         reduced_target_matrix_length = round(len(target_image) / len(current_image))
+    #
+    #         return current_image[0:reduced_target_matrix_length]
+    #
+    #     return current_image
+
+
     @staticmethod
-    def calc_template_match_compare_cv2_score_scaled(image_1, image_2, match_method):
+    def calc_template_match_compare_cv2_score_scaled(template_image, current_search_window, match_method):
 
-        template_patch_height, template_patch_width = image_1.shape[:2]
-        scaled_search_window_height, scaled_search_window_width = image_2.shape[:2]
+        template_patch_height, template_patch_width = template_image.shape[:2]
+        scaled_search_window_height, scaled_search_window_width = current_search_window.shape[:2]
 
-        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, scaled_search_window_width)
-        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, scaled_search_window_height)
+        """
+        We have to subtract '-1' from the width and height of the scaled search window BEFORE calculating the scale factor to multiply by.
+
+        This is to ensure that the scaled pixel coordinates remain INSIDE THE BOUNDS of the array indices. (i.e. for height = 200, max index = 199)
+
+        e.g.
+        ---
+
+        - Search Window Image = (200x200px) (0-199 array index range)
+
+        - Target Template Patch Row Index = 100
+
+        - Scale Factor = 2.0
+
+        - 100 * 2.0 = 200.00 (int: 200)
+
+        - 200 > 199 max image index = ERROR
+
+        """
+        scale_factor_width = TSEGeometry.calc_measure_scale_factor(template_patch_width, (scaled_search_window_width - 1))
+        scale_factor_height = TSEGeometry.calc_measure_scale_factor(template_patch_height, (scaled_search_window_height - 1))
 
         scaled_window_heights = TSEImageUtils.calc_scaled_image_pixel_dimension_coordinates(template_patch_height, scale_factor_height)
         scaled_window_widths = TSEImageUtils.calc_scaled_image_pixel_dimension_coordinates(template_patch_width, scale_factor_width)
 
-        search_window_target_pixels = TSEImageUtils.extract_rows_cols_pixels_image(scaled_window_heights, scaled_window_widths, image_2)
+        search_window_target_pixels = TSEImageUtils.extract_rows_cols_pixels_image(scaled_window_heights, scaled_window_widths, current_search_window)
 
-        reshaped_search_window_target_pixels = TSEImageUtils.reshape_match_images(search_window_target_pixels, image_1)
+        # Check if we need to trim the length of the template image to match the length of the 'search_window_target_pixels' array.
+        # template_image = TSEImageUtils.check_image_matrices_lengths(template_image, search_window_target_pixels)
 
-        res = cv2.matchTemplate(reshaped_search_window_target_pixels, image_1, match_method)
+        # Extract pixels from the larger current search window that are in the SCALED 2D-coordinates of the pixels in the original template patch.
+        reshaped_search_window_target_pixels = TSEImageUtils.reshape_match_images(search_window_target_pixels, template_image)
+
+        res = cv2.matchTemplate(reshaped_search_window_target_pixels, template_image, match_method)
 
         # '_' is a placeholder convention to indicate we do not want to use these returned values.
         min_val, max_val, _, _ = cv2.minMaxLoc(res)
@@ -219,7 +358,7 @@ class TSEImageUtils:
 
     @staticmethod
     # METHOD ASSUMES WE ARE DEALING WITH HSV IMAGES WITH 'V' CHANNEL REMOVED.
-    def scale_image_no_interpolation_auto(source_image, target_image):
+    def scale_hsv_image_no_interpolation_auto(source_image, target_image):
 
         source_image_height, source_image_width = source_image.shape[:2]
         current_image_height, current_image_width = target_image.shape[:2]
@@ -239,11 +378,14 @@ class TSEImageUtils:
                 # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
                 template_patch_val_hue = source_image.item(i, j, 0)
                 template_patch_val_sat = source_image.item(i, j, 1)
+                template_patch_val_val = source_image.item(i, j, 2)
 
                 scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 0),
                                             template_patch_val_hue)
                 scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 1),
                                             template_patch_val_sat)
+                scaled_image_result.itemset((i * scale_factor_height, (j * scale_factor_width), 2),
+                                            template_patch_val_val)
 
         return scaled_image_result
 
