@@ -94,22 +94,28 @@ class TSEImageUtils:
         for i in xrange(template_patch_height):
             for j in xrange(template_patch_width):
 
-                # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
-                template_patch_val_hue = template_patch.item(i, j, 0)
-                template_patch_val_sat = template_patch.item(i, j, 1)
+                template_patch_val_channel_1 = template_patch.item(i, j, 0)
+                template_patch_val_channel_2 = template_patch.item(i, j, 1)
+                template_patch_val_channel_3 = template_patch.item(i, j, 2)
 
-                scaled_search_window_val_hue = scaled_search_window.item((i * scale_factor_height),
+                scaled_search_window_val_channel_1 = scaled_search_window.item((i * scale_factor_height),
                                                                            (j * scale_factor_width), 0)
-                scaled_search_window_val_sat = scaled_search_window.item((i * scale_factor_height),
+                scaled_search_window_val_channel_2 = scaled_search_window.item((i * scale_factor_height),
                                                                            (j * scale_factor_width), 1)
+                scaled_search_window_val_channel_3 = scaled_search_window.item((i * scale_factor_height),
+                                                                           (j * scale_factor_width), 2)
 
-                diff_hue = template_patch_val_hue - scaled_search_window_val_hue
+                diff_channel_1 = template_patch_val_channel_1 - scaled_search_window_val_channel_1
 
-                diff_sat = template_patch_val_sat - scaled_search_window_val_sat
+                diff_channel_2 = template_patch_val_channel_2 - scaled_search_window_val_channel_2
 
-                ssd += (diff_hue * diff_hue)
+                diff_channel_3 = template_patch_val_channel_3 - scaled_search_window_val_channel_3
 
-                ssd += (diff_sat * diff_sat)
+                ssd += (diff_channel_1 * diff_channel_1)
+
+                ssd += (diff_channel_2 * diff_channel_2)
+
+                ssd += (diff_channel_3 * diff_channel_3)
 
         return math.sqrt(ssd)
 
@@ -199,19 +205,6 @@ class TSEImageUtils:
     @staticmethod
     def reshape_match_images(current_matrix, target_matrix):
 
-        # print len(current_matrix)
-        # print len(target_matrix)
-        #
-        # print len(current_matrix) / len(target_matrix) % len(target_matrix) == 0
-        #
-        # print len(current_matrix) / len(target_matrix)
-
-        # if (len(current_matrix) > len(target_matrix)) and len(current_matrix) / len(target_matrix) % len(target_matrix) != 0:
-        #
-        #     reduced_target_matrix_length = round(len(current_matrix) / len(target_matrix))
-        #
-        #     target_matrix = target_matrix[0:reduced_target_matrix_length]
-
         if current_matrix.shape != target_matrix.shape:
             return current_matrix.reshape(target_matrix.shape)
 
@@ -220,21 +213,11 @@ class TSEImageUtils:
     @staticmethod
     def extract_rows_cols_pixels_image(required_rows, required_cols, image):
 
-        image_height, image_width = image.shape[:2]
-
         # Get the cartesian product between the two then split into one array for all rows, and one array for all cols.
         rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([required_rows, required_cols]), 2)
 
         rows_to_extract = rows_cols_cartesian_product[0].astype(int)
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
-
-        # print len(rows_to_extract)
-
-        # rows_to_extract = rows_to_extract[rows_to_extract < image_height]
-
-        # print len(rows_to_extract)
-
-        # cols_to_extract = cols_to_extract[cols_to_extract < image_width]
 
         return image[rows_to_extract, cols_to_extract]
 
@@ -252,22 +235,6 @@ class TSEImageUtils:
 
         # Otherwise (and in most cases), we will want to return the highest score.
         return max_val
-
-    # @staticmethod
-    # def check_image_matrices_lengths(current_image, target_image):
-    #
-    #     # Check if both images have an equal no. of pixels (i.e. equal 2D-array length)
-    #     if (len(target_image) > len(current_image)) and len(target_image) / len(current_image) % len(current_image) != 0:
-    #
-    #         # If not, then we need to trim off the end of the template patch to match.
-    #
-    #         # Calculate the maximum length that the template image can be to match the extracted scaled search window pixel array.
-    #         reduced_target_matrix_length = round(len(target_image) / len(current_image))
-    #
-    #         return current_image[0:reduced_target_matrix_length]
-    #
-    #     return current_image
-
 
     @staticmethod
     def calc_template_match_compare_cv2_score_scaled(template_image, current_search_window, match_method):
@@ -301,9 +268,6 @@ class TSEImageUtils:
         scaled_window_widths = TSEImageUtils.calc_scaled_image_pixel_dimension_coordinates(template_patch_width, scale_factor_width)
 
         search_window_target_pixels = TSEImageUtils.extract_rows_cols_pixels_image(scaled_window_heights, scaled_window_widths, current_search_window)
-
-        # Check if we need to trim the length of the template image to match the length of the 'search_window_target_pixels' array.
-        # template_image = TSEImageUtils.check_image_matrices_lengths(template_image, search_window_target_pixels)
 
         # Extract pixels from the larger current search window that are in the SCALED 2D-coordinates of the pixels in the original template patch.
         reshaped_search_window_target_pixels = TSEImageUtils.reshape_match_images(search_window_target_pixels, template_image)
@@ -357,7 +321,6 @@ class TSEImageUtils:
         return TSEPoint(scaled_origin[0], scaled_origin[1]), TSEPoint(scaled_end[0], scaled_end[1])
 
     @staticmethod
-    # METHOD ASSUMES WE ARE DEALING WITH HSV IMAGES WITH 'V' CHANNEL REMOVED.
     def scale_hsv_image_no_interpolation_auto(source_image, target_image):
 
         source_image_height, source_image_width = source_image.shape[:2]
@@ -375,7 +338,6 @@ class TSEImageUtils:
         for i in xrange(source_image_height):
             for j in xrange(source_image_width):
 
-                # WE DON'T BOTHER DOING ANYTHING WITH THE 'V' CHANNEL, AS WE ARE IGNORING IT ANYWAY.
                 template_patch_val_hue = source_image.item(i, j, 0)
                 template_patch_val_sat = source_image.item(i, j, 1)
                 template_patch_val_val = source_image.item(i, j, 2)
