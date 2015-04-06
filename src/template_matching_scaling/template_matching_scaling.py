@@ -15,6 +15,9 @@ from tse.tse_matchtype import TSEMatchType
 from tse.tse_matchmethod import tse_match_methods
 
 from collections import OrderedDict
+from pprint import pprint
+
+import json
 
 __author__ = 'connorgoddard'
 
@@ -251,23 +254,36 @@ class TemplateMatching:
 
 def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scaling=False, force_cont_search=False, plot_results=False):
 
-    results = []
+    # Create a dictionary to store the results of all image pairs -> patch sizes -> match methods for a given pair of images.
+    image_dict = {}
 
     if plot_results is False:
 
         for pair in image_pairs:
 
+            patch_dict = {}
+
             match = TemplateMatching(pair[0], pair[1], config_file, None)
 
             for patch_size in patch_sizes:
+
+                match_dict = {}
+
                 for match_method in match_methods:
-                    results.append(match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results))
+                    match_dict[match_method.match_name] = match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results)
+
+                patch_dict[patch_size] = match_dict
+
+            image_dict["{1}_{2}".format(match._image_one_file_name, match._image_two_file_name)] = patch_dict
 
     else:
 
         for pair in image_pairs:
 
-            plot_count = len(image_pairs)
+            # Create a dictionary to store the results of all patch sizes -> match methods for a given pair of images.
+            patch_dict = {}
+
+            plot_count = len(patch_sizes)
 
             column_max = 2
 
@@ -285,6 +301,9 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
 
             for patch_size in patch_sizes:
 
+                # Create a dictionary to store the results of all match_methods for a given patch size.
+                match_dict = {}
+
                 if row_max > 1:
                     match._plot_axis = axes[row_count, column_count]
                 else:
@@ -296,13 +315,16 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
 
                 for match_method in match_methods:
 
-                    results.append(match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results))
+                    # Store the results for a given match method.
+                    match_dict[match_method.match_name] = match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results)
 
                 if column_count == (column_max - 1):
                     row_count += 1
                     column_count = 0
                 else:
                     column_count += 1
+
+                patch_dict[patch_size] = match_dict
 
             # If we do not have an even number of graphs, then we need to remove the last blank one.
             if (plot_count % column_max) != 0:
@@ -315,9 +337,9 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
 
                     axes[-1].axis('off')
 
-        plt.show()
+            image_dict["{0}_{1}".format(match._image_one_file_name, match._image_two_file_name)] = patch_dict
 
-    return results
+    return image_dict
 
 
 def InputImagePair(raw_argument_string):
@@ -366,7 +388,11 @@ def main():
             parser.error("Error: \"{0}\" is not a valid matching method option.\nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\' ".format(method))
 
     # Start the tests using settings passed in as command-line arguments.
-    start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
+    image_dict = start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
+
+    pprint(image_dict)
+
+    plt.show()
 
 if __name__ == '__main__':
     main()
