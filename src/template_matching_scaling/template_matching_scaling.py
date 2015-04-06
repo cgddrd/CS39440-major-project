@@ -4,9 +4,10 @@ import cv2
 import math
 import matplotlib.pyplot as plt
 import argparse
+import numpy as np
 
 from tse.tse_fileio import TSEFileIO
-from tse.tse_utils import TSEUtils
+from tse.tse_datautils import TSEDataUtils
 from tse.tse_point import TSEPoint
 from tse.tse_imageutils import TSEImageUtils
 from tse.tse_result import TSEResult
@@ -46,13 +47,13 @@ class TemplateMatching:
     def load_calibration_data(self, file_path):
 
         raw_data = TSEFileIO.read_file(file_path, split_delimiter=",", start_position=1)
-        return dict(TSEUtils.string_2d_list_to_int_2d_list(raw_data))
+        return dict(TSEDataUtils.string_2d_list_to_int_2d_list(raw_data))
 
     def search_image(self, patch_height, match_method, use_scaling=False, force_cont_search=False, plot_results=False):
 
         run_results = []
 
-        smallest_key = TSEUtils.get_smallest_key_dict(self._calibration_lookup)
+        smallest_key = TSEDataUtils.get_smallest_key_dict(self._calibration_lookup)
 
         image_height, image_width = self._hsv_img2.shape[:2]
 
@@ -235,7 +236,7 @@ class TemplateMatching:
             x.append(val.row)
             y.append(val.displacement)
 
-        y_moving_average = TSEUtils.calc_moving_average_array(y, 10)
+        y_moving_average = TSEDataUtils.calc_moving_average_array(y, 10)
 
         self.plot(x, y, "{0}.".format(plot_format_color), 100, match_method.match_name)
         self.plot(x[len(x) - len(y_moving_average):], y_moving_average, "{0}-".format(plot_format_color), 100, "MVAV_{0}".format(match_method.match_name))
@@ -274,7 +275,7 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
 
                 patch_dict[patch_size] = match_dict
 
-            image_dict["{1}_{2}".format(match._image_one_file_name, match._image_two_file_name)] = patch_dict
+            image_dict["{0}_{1}".format(match._image_one_file_name, match._image_two_file_name)] = patch_dict
 
     else:
 
@@ -342,7 +343,7 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
     return image_dict
 
 
-def InputImagePair(raw_argument_string):
+def InputImagePairArgument(raw_argument_string):
 
     try:
         x, y = raw_argument_string.split(',')
@@ -358,7 +359,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-c','--calibfile', help='Datafile containing the calibration data', dest="calib_file", required=True)
-    parser.add_argument('-i', '--images', help="Images", dest="image_pairs", type=InputImagePair, nargs='+', required=True)
+    parser.add_argument('-i', '--images', help="Images", dest="image_pairs", type=InputImagePairArgument, nargs='+', required=True)
     parser.add_argument('-p', '--patches', nargs='+', dest="patch_sizes", type=int, required=True)
     parser.add_argument('-m', '--methods', nargs='+', dest="match_methods", type=str, required=True)
     parser.add_argument('-s', '--scaling', dest='scaling', action='store_true')
@@ -388,11 +389,58 @@ def main():
             parser.error("Error: \"{0}\" is not a valid matching method option.\nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\' ".format(method))
 
     # Start the tests using settings passed in as command-line arguments.
-    image_dict = start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
+    results_dict = start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
 
-    pprint(image_dict)
+    results_pair1_100 = results_dict['IMG1.JPG_IMG2.JPG'][100]
+
+    raw_results_pair1_100 = []
+    filtered_results_pair1_100 = []
+    image_rows = []
+
+    for key in results_pair1_100:
+
+        # print [o.displacement for o in results_pair1_100[key]]
+        # print TSEUtils.filter_outliers_mean_stdev([o.displacement for o in results_pair1_100[key]])
+        # print TSEUtils.filter_outliers_mean_stdev_alternative([o.displacement for o in results_pair1_100[key]])
+
+        # filtered_results_pair1_100.append(TSEDataUtils.filter_outliers_ab_dist_median([o.displacement for o in results_pair1_100[key]]))
+
+        raw_results_pair1_100.append([o.displacement for o in results_pair1_100[key]])
+        image_rows = [o.row for o in results_pair1_100[key]]
+
+        # print image_rows
+        # print len(image_rows)
+
+    # pprint(filtered_results_pair1_100)
+
+    # averaged_results_pair1_100 = TSEDataUtils.calc_element_wise_average(filtered_results_pair1_100)
+    averaged_results_pair1_100 = TSEDataUtils.calc_element_wise_average(raw_results_pair1_100)
+
+    filtered_results_pair1_100 = TSEDataUtils.filter_outliers_ab_dist_median(averaged_results_pair1_100)
+
+    # data = [[1, 2, 3], [1, 3]]
+    # print TSEUtils.calc_element_wise_average(data)
+
+    # image_rows = TSEDataUtils.numpy_array_indices_subset(image_rows, )
+    # print averaged_results_pair1_100
+    # print len(averaged_results_pair1_100)
+
+    image_rows = np.array(image_rows)[TSEDataUtils.filter_outliers_ab_dist_median_indices(averaged_results_pair1_100)]
+
+    # print image_rows
+
+    # plt.plot(np.arange(0, len(filtered_results_pair1_100)), np.array(filtered_results_pair1_100), "g-")
+    plt.plot(image_rows, np.array(filtered_results_pair1_100), "b.")
+
+    y_moving_average = TSEDataUtils.calc_moving_average_array(np.array(filtered_results_pair1_100), 20)
+
+    plt.plot(image_rows[len(image_rows) - len(y_moving_average):], y_moving_average, "g-")
 
     plt.show()
+
+    if args['plot_results']:
+        plt.show()
+
 
 if __name__ == '__main__':
     main()
