@@ -341,36 +341,7 @@ def main():
 
     args = vars(parser.parse_args())
 
-    # image_path = "../eval_data/motion_images/flat_10cm"
-    #
-    # config_file = "../perspective_calibration/data/calibdata_23_03_15_11_07_04.txt"
-    #
-    # image_pairs = [("IMG1.JPG", "IMG2.JPG")]
-    #
-    # patch_sizes = [100]
-
-    # If lower scores mean a better match, then we say that the score is reversed.
-    # match_method1 = TSEMatchType("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r", reverse_score=True)
-    # match_method2 = TSEMatchType("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b")
-    # match_method3 = TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g", reverse_score=True)
-    # match_method4 = TSEMatchType("DistanceCorr", tse_match_methods.DISTANCE, cv2.cv.CV_TM_CCORR_NORMED, "b")
-
-    # match_methods = [match_method2]
-
     match_methods = []
-
-    # test = ['DistHorizontal', 'DistHorizontal', 'DistHorizontal2']
-    # test2 = [100, 200, 100]
-    #
-    # print list(OrderedDict.fromkeys(test2))
-
-    # print args['calib_file']
-    # print args['image_pairs']
-    # print args['patch_sizes']
-    # print args['match_methods']
-    # print args['scaling']
-    # print args['plot_results']
-    # print args['force_cont_search']
 
     # OrderedDict is used to remove any duplicates.
     for method in list(OrderedDict.fromkeys(args['match_methods'])):
@@ -390,6 +361,7 @@ def main():
         else:
             parser.error("Error: \"{0}\" is not a valid matching method option.\nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\' ".format(method))
 
+    # Start the tests using settings passed in as command-line arguments.
     start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
 
 if __name__ == '__main__':
