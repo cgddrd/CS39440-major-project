@@ -23,8 +23,10 @@ class TemplateMatching:
     def __init__(self, image_one_file_path, image_two_file_path, calib_data_file_path, plot_axis):
 
         self._image_one_file_path = image_one_file_path
-        self._image_one_file_name = image_one_file_path.rsplit('/', 1)[1]
         self._image_two_file_path = image_two_file_path
+
+        # Find the last instance of '/' in the file path, and grab the image name from the split array.
+        self._image_one_file_name = image_one_file_path.rsplit('/', 1)[1]
         self._image_two_file_name = image_two_file_path.rsplit('/', 1)[1]
 
         self._raw_img1 = cv2.imread(image_one_file_path, cv2.IMREAD_COLOR)
@@ -43,9 +45,9 @@ class TemplateMatching:
         raw_data = TSEFileIO.read_file(file_path, split_delimiter=",", start_position=1)
         return dict(TSEUtils.string_2d_list_to_int_2d_list(raw_data))
 
-    def search_image(self, patch_height, match_methods, use_scaling=False, force_cont_search=False, plot_results=False):
+    def search_image(self, patch_height, match_method, use_scaling=False, force_cont_search=False, plot_results=False):
 
-        total_results = []
+        run_results = []
 
         smallest_key = TSEUtils.get_smallest_key_dict(self._calibration_lookup)
 
@@ -53,40 +55,32 @@ class TemplateMatching:
 
         image_centre_x = math.floor(image_width / 2)
 
+        for i in range(smallest_key + 1, image_height - patch_height):
+
+            calibrated_patch_width = self._calibration_lookup[i]
+            patch_half_width = math.floor(calibrated_patch_width / 2)
+
+            # Create points for the current template patch origin, end and centre.
+            template_patch_origin_point = TSEPoint((image_centre_x - patch_half_width), i)
+            template_patch_end_point = TSEPoint((image_centre_x + patch_half_width), (i + patch_height))
+
+            template_patch = self._hsv_img1[template_patch_origin_point.y: template_patch_end_point.y, template_patch_origin_point.x: template_patch_end_point.x]
+
+            if use_scaling is True:
+
+                run_results.append(TSEResult(i, self.scan_search_window_scaling(template_patch, template_patch_origin_point, match_method, force_cont_search)))
+
+            else:
+
+                run_results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point, match_method, force_cont_search)))
+
         if plot_results:
-            self._plot_axis.set_xlabel('Row Number (px)')
-            self._plot_axis.set_ylabel('Vertical Displacement (px)')
-            self._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_height, self._image_one_file_name, self._image_two_file_name))
+            # self._plot_axis.set_xlabel('Row Number (px)')
+            # self._plot_axis.set_ylabel('Vertical Displacement (px)')
+            # self._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_height, self._image_one_file_name, self._image_two_file_name))
+            self.plot_results(run_results, match_method)
 
-        for match_method in match_methods:
-
-            results = []
-
-            for i in range(smallest_key + 1, image_height - patch_height):
-
-                calibrated_patch_width = self._calibration_lookup[i]
-                patch_half_width = math.floor(calibrated_patch_width / 2)
-
-                # Create points for the current template patch origin, end and centre.
-                template_patch_origin_point = TSEPoint((image_centre_x - patch_half_width), i)
-                template_patch_end_point = TSEPoint((image_centre_x + patch_half_width), (i + patch_height))
-
-                template_patch = self._hsv_img1[template_patch_origin_point.y: template_patch_end_point.y, template_patch_origin_point.x: template_patch_end_point.x]
-
-                if use_scaling is True:
-
-                    results.append(TSEResult(i, self.scan_search_window_scaling(template_patch, template_patch_origin_point, match_method, force_cont_search)))
-
-                else:
-
-                    results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point, match_method, force_cont_search)))
-
-            if plot_results:
-                self.plot_results(results, match_method)
-
-            total_results.append(results)
-
-        return total_results
+        return run_results
 
     def scan_search_window(self, template_patch, template_patch_origin, match_method, force_cont_search=False):
 
@@ -94,8 +88,7 @@ class TemplateMatching:
 
         template_patch_height, template_patch_width = template_patch.shape[:2]
 
-        localised_window = self._hsv_img2[template_patch_origin.y:image_height,
-                           template_patch_origin.x:(template_patch_origin.x + template_patch_width)]
+        localised_window = self._hsv_img2[template_patch_origin.y:image_height, template_patch_origin.x:(template_patch_origin.x + template_patch_width)]
 
         localised_window_height, localised_window_width = localised_window.shape[:2]
 
@@ -242,8 +235,7 @@ class TemplateMatching:
         y_moving_average = TSEUtils.calc_moving_average_array(y, 10)
 
         self.plot(x, y, "{0}.".format(plot_format_color), 100, match_method.match_name)
-        self.plot(x[len(x) - len(y_moving_average):], y_moving_average, "{0}-".format(plot_format_color), 100,
-                  "MVAV_{0}".format(match_method.match_name))
+        self.plot(x[len(x) - len(y_moving_average):], y_moving_average, "{0}-".format(plot_format_color), 100, "MVAV_{0}".format(match_method.match_name))
 
     def plot(self, data_x, data_y, plot_format, max_boundary_offset, plot_name):
 
@@ -257,21 +249,23 @@ class TemplateMatching:
         self._plot_axis.legend(loc='upper left', shadow=True)
 
 
-def start_tests(image_pairs, patch_sizes, match_types, config_file, use_scaling=False, force_cont_search=False, plot_results=False):
+def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scaling=False, force_cont_search=False, plot_results=False):
 
     results = []
 
     if plot_results is False:
 
-        for patch_size in patch_sizes:
-            for pair in image_pairs:
+        for pair in image_pairs:
 
-                match = TemplateMatching(pair[0], pair[1], config_file, None)
-                results.append(match.search_image(patch_size, match_types, use_scaling, force_cont_search, plot_results))
+            match = TemplateMatching(pair[0], pair[1], config_file, None)
+
+            for patch_size in patch_sizes:
+                for match_method in match_methods:
+                    results.append(match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results))
 
     else:
 
-        for patch_size in patch_sizes:
+        for pair in image_pairs:
 
             plot_count = len(image_pairs)
 
@@ -284,15 +278,25 @@ def start_tests(image_pairs, patch_sizes, match_types, config_file, use_scaling=
             column_count = 0
             row_count = 0
 
-            for pair in image_pairs:
+            if row_max > 1:
+                match = TemplateMatching(pair[0], pair[1], config_file, axes[row_count, column_count])
+            else:
+                match = TemplateMatching(pair[0], pair[1], config_file, axes[column_count])
+
+            for patch_size in patch_sizes:
 
                 if row_max > 1:
-                    match = TemplateMatching(pair[0], pair[1], config_file, axes[row_count, column_count])
-
+                    match._plot_axis = axes[row_count, column_count]
                 else:
-                    match = TemplateMatching(pair[0], pair[1], config_file, axes[column_count])
+                    match._plot_axis = axes[column_count]
 
-                results.append(match.search_image(patch_size, match_types, use_scaling, force_cont_search, plot_results))
+                match._plot_axis.set_xlabel('Row Number (px)')
+                match._plot_axis.set_ylabel('Vertical Displacement (px)')
+                match._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_size, match._image_one_file_name, match._image_two_file_name))
+
+                for match_method in match_methods:
+
+                    results.append(match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results))
 
                 if column_count == (column_max - 1):
                     row_count += 1
@@ -311,7 +315,7 @@ def start_tests(image_pairs, patch_sizes, match_types, config_file, use_scaling=
 
                     axes[-1].axis('off')
 
-            plt.show()
+        plt.show()
 
     return results
 
