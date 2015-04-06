@@ -3,6 +3,7 @@ from __future__ import division
 import cv2
 import math
 import matplotlib.pyplot as plt
+import argparse
 
 from tse.tse_fileio import TSEFileIO
 from tse.tse_utils import TSEUtils
@@ -13,19 +14,21 @@ from tse.tse_geometry import TSEGeometry
 from tse.tse_matchtype import TSEMatchType
 from tse.tse_matchmethod import tse_match_methods
 
+from collections import OrderedDict
+
 __author__ = 'connorgoddard'
 
 
 class TemplateMatching:
-    def __init__(self, image_root_file_path, image_one_file_name, image_two_file_name, calib_data_file_path, plot_axis):
+    def __init__(self, image_one_file_path, image_two_file_path, calib_data_file_path, plot_axis):
 
-        self._image_root_file_patch = image_root_file_path
+        self._image_one_file_path = image_one_file_path
+        self._image_one_file_name = image_one_file_path.rsplit('/', 1)[1]
+        self._image_two_file_path = image_two_file_path
+        self._image_two_file_name = image_two_file_path.rsplit('/', 1)[1]
 
-        self._image_one_file_name = image_one_file_name
-        self._image_two_file_name = image_two_file_name
-
-        self._raw_img1 = cv2.imread("{0}/{1}".format(image_root_file_path, image_one_file_name), cv2.IMREAD_COLOR)
-        self._raw_img2 = cv2.imread("{0}/{1}".format(image_root_file_path, image_two_file_name), cv2.IMREAD_COLOR)
+        self._raw_img1 = cv2.imread(image_one_file_path, cv2.IMREAD_COLOR)
+        self._raw_img2 = cv2.imread(image_two_file_path, cv2.IMREAD_COLOR)
 
         self._hsv_img1 = TSEImageUtils.convert_hsv_and_remove_luminance(self._raw_img1)
         self._hsv_img2 = TSEImageUtils.convert_hsv_and_remove_luminance(self._raw_img2)
@@ -40,7 +43,9 @@ class TemplateMatching:
         raw_data = TSEFileIO.read_file(file_path, split_delimiter=",", start_position=1)
         return dict(TSEUtils.string_2d_list_to_int_2d_list(raw_data))
 
-    def search_image(self, patch_height, match_methods, use_scaling=False, force_cont_search=False):
+    def search_image(self, patch_height, match_methods, use_scaling=False, force_cont_search=False, plot_results=False):
+
+        total_results = []
 
         smallest_key = TSEUtils.get_smallest_key_dict(self._calibration_lookup)
 
@@ -48,9 +53,10 @@ class TemplateMatching:
 
         image_centre_x = math.floor(image_width / 2)
 
-        self._plot_axis.set_xlabel('Row Number (px)')
-        self._plot_axis.set_ylabel('Vertical Displacement (px)')
-        self._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_height, self._image_one_file_name, self._image_two_file_name))
+        if plot_results:
+            self._plot_axis.set_xlabel('Row Number (px)')
+            self._plot_axis.set_ylabel('Vertical Displacement (px)')
+            self._plot_axis.set_title('Patch: {0}px - Images: {1}, {2}'.format(patch_height, self._image_one_file_name, self._image_two_file_name))
 
         for match_method in match_methods:
 
@@ -75,7 +81,12 @@ class TemplateMatching:
 
                     results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point, match_method, force_cont_search)))
 
-            self.plot_results(results, match_method)
+            if plot_results:
+                self.plot_results(results, match_method)
+
+            total_results.append(results)
+
+        return total_results
 
     def scan_search_window(self, template_patch, template_patch_origin, match_method, force_cont_search=False):
 
@@ -246,75 +257,140 @@ class TemplateMatching:
         self._plot_axis.legend(loc='upper left', shadow=True)
 
 
-def start_tests(image_path, image_pairs, patch_sizes, match_types, config_file, use_scaling=False, force_cont_search=False):
+def start_tests(image_pairs, patch_sizes, match_types, config_file, use_scaling=False, force_cont_search=False, plot_results=False):
 
-    for patch_size in patch_sizes:
+    results = []
 
-        plot_count = len(image_pairs)
+    if plot_results is False:
 
-        column_max = 2
+        for patch_size in patch_sizes:
+            for pair in image_pairs:
 
-        row_max = int(math.ceil(plot_count / float(column_max)))
+                match = TemplateMatching(pair[0], pair[1], config_file, None)
+                results.append(match.search_image(patch_size, match_types, use_scaling, force_cont_search, plot_results))
 
-        fig, axes = plt.subplots(row_max, column_max)
+    else:
 
-        column_count = 0
-        row_count = 0
+        for patch_size in patch_sizes:
 
-        for pair in image_pairs:
+            plot_count = len(image_pairs)
 
-            if row_max > 1:
-                match = TemplateMatching(image_path, pair[0], pair[1], config_file, axes[row_count, column_count])
+            column_max = 2
 
-            else:
-                match = TemplateMatching(image_path, pair[0], pair[1], config_file, axes[column_count])
+            row_max = int(math.ceil(plot_count / float(column_max)))
 
-            match.search_image(patch_size, match_types, use_scaling, force_cont_search)
+            fig, axes = plt.subplots(row_max, column_max)
 
-            if column_count == (column_max - 1):
-                row_count += 1
-                column_count = 0
-            else:
-                column_count += 1
+            column_count = 0
+            row_count = 0
 
-        # If we do not have an even number of graphs, then we need to remove the last blank one.
-        if (plot_count % column_max) != 0:
+            for pair in image_pairs:
 
-            if row_max > 1:
+                if row_max > 1:
+                    match = TemplateMatching(pair[0], pair[1], config_file, axes[row_count, column_count])
 
-                axes[-1, -1].axis('off')
+                else:
+                    match = TemplateMatching(pair[0], pair[1], config_file, axes[column_count])
 
-            else:
+                results.append(match.search_image(patch_size, match_types, use_scaling, force_cont_search, plot_results))
 
-                axes[-1].axis('off')
+                if column_count == (column_max - 1):
+                    row_count += 1
+                    column_count = 0
+                else:
+                    column_count += 1
 
-        plt.show()
+            # If we do not have an even number of graphs, then we need to remove the last blank one.
+            if (plot_count % column_max) != 0:
+
+                if row_max > 1:
+
+                    axes[-1, -1].axis('off')
+
+                else:
+
+                    axes[-1].axis('off')
+
+            plt.show()
+
+    return results
+
+
+def InputImagePair(raw_argument_string):
+
+    try:
+        x, y = raw_argument_string.split(',')
+
+        # Strip out any whitespace either side of arguments.
+        return x.strip(), y.strip()
+    except:
+        raise argparse.ArgumentTypeError("Image pairs expect format \"<image_1_path>, <image_2_path>\"")
 
 
 def main():
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("calib_data_file", help="the file containing the calibration data")
-    # parser.add_argument("input_image_1", help="the first image")
-    # parser.add_argument("input_image_2", help="the second image")
-    # args = parser.parse_args()
 
-    image_path = "../eval_data/motion_images/flat_10cm"
+    parser = argparse.ArgumentParser()
 
-    config_file = "../perspective_calibration/data/calibdata_23_03_15_11_07_04.txt"
+    parser.add_argument('-c','--calibfile', help='Datafile containing the calibration data', dest="calib_file", required=True)
+    parser.add_argument('-i', '--images', help="Images", dest="image_pairs", type=InputImagePair, nargs='+', required=True)
+    parser.add_argument('-p', '--patches', nargs='+', dest="patch_sizes", type=int, required=True)
+    parser.add_argument('-m', '--methods', nargs='+', dest="match_methods", type=str, required=True)
+    parser.add_argument('-s', '--scaling', dest='scaling', action='store_true')
+    parser.add_argument('-d', '--drawplot', dest='plot_results', action='store_true')
+    parser.add_argument('-f', '--forcecontsearch', dest='force_cont_search', action='store_true')
 
-    image_pairs = [("IMG1.JPG", "IMG2.JPG")]
+    args = vars(parser.parse_args())
 
-    patch_sizes = [100]
+    # image_path = "../eval_data/motion_images/flat_10cm"
+    #
+    # config_file = "../perspective_calibration/data/calibdata_23_03_15_11_07_04.txt"
+    #
+    # image_pairs = [("IMG1.JPG", "IMG2.JPG")]
+    #
+    # patch_sizes = [100]
 
     # If lower scores mean a better match, then we say that the score is reversed.
-    match_method1 = TSEMatchType("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r", reverse_score=True)
-    match_method2 = TSEMatchType("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b")
-    match_method3 = TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g", reverse_score=True)
-    match_method4 = TSEMatchType("DistanceCorr", tse_match_methods.DISTANCE, cv2.cv.CV_TM_CCORR_NORMED, "b")
+    # match_method1 = TSEMatchType("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r", reverse_score=True)
+    # match_method2 = TSEMatchType("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b")
+    # match_method3 = TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g", reverse_score=True)
+    # match_method4 = TSEMatchType("DistanceCorr", tse_match_methods.DISTANCE, cv2.cv.CV_TM_CCORR_NORMED, "b")
 
-    match_methods = [match_method2]
+    # match_methods = [match_method2]
 
-    start_tests(image_path, image_pairs, patch_sizes, match_methods, config_file, use_scaling=True, force_cont_search=True)
+    match_methods = []
 
-if __name__ == '__main__':  # if the function is the main function ...
+    # test = ['DistHorizontal', 'DistHorizontal', 'DistHorizontal2']
+    # test2 = [100, 200, 100]
+    #
+    # print list(OrderedDict.fromkeys(test2))
+
+    # print args['calib_file']
+    # print args['image_pairs']
+    # print args['patch_sizes']
+    # print args['match_methods']
+    # print args['scaling']
+    # print args['plot_results']
+    # print args['force_cont_search']
+
+    # OrderedDict is used to remove any duplicates.
+    for method in list(OrderedDict.fromkeys(args['match_methods'])):
+
+        if method == "DistanceEuclidean":
+            match_methods.append(TSEMatchType("DistanceEuclidean", tse_match_methods.DISTANCE_ED, None, "r", reverse_score=True))
+
+        elif method == "DistanceCorr":
+            match_methods.append(TSEMatchType("DistanceCorr", tse_match_methods.DISTANCE, cv2.cv.CV_TM_CCORR_NORMED, "b"))
+
+        elif method == "HistCorrel":
+            match_methods.append(TSEMatchType("HistCorrel", tse_match_methods.HIST, cv2.cv.CV_COMP_CORREL, "b"))
+
+        elif method == "HistChiSqr":
+            match_methods.append(TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g", reverse_score=True))
+
+        else:
+            parser.error("Error: \"{0}\" is not a valid matching method option.\nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\' ".format(method))
+
+    start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
+
+if __name__ == '__main__':
     main()
