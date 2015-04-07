@@ -89,6 +89,7 @@ target/
 
 # iPython
 .ipynb_checkpoints/ 
+*.pkl
 
 # Latex files
 *.aux

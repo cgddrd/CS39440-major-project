@@ -391,52 +391,37 @@ def main():
     # Start the tests using settings passed in as command-line arguments.
     results_dict = start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
 
+    pprint(results_dict)
+
     results_pair1_100 = results_dict['IMG1.JPG_IMG2.JPG'][100]
 
     raw_results_pair1_100 = []
-    filtered_results_pair1_100 = []
     image_rows = []
 
     for key in results_pair1_100:
-
-        # print [o.displacement for o in results_pair1_100[key]]
-        # print TSEUtils.filter_outliers_mean_stdev([o.displacement for o in results_pair1_100[key]])
-        # print TSEUtils.filter_outliers_mean_stdev_alternative([o.displacement for o in results_pair1_100[key]])
-
-        # filtered_results_pair1_100.append(TSEDataUtils.filter_outliers_ab_dist_median([o.displacement for o in results_pair1_100[key]]))
-
         raw_results_pair1_100.append([o.displacement for o in results_pair1_100[key]])
         image_rows = [o.row for o in results_pair1_100[key]]
 
-        # print image_rows
-        # print len(image_rows)
+    print raw_results_pair1_100
 
-    # pprint(filtered_results_pair1_100)
-
-    # averaged_results_pair1_100 = TSEDataUtils.calc_element_wise_average(filtered_results_pair1_100)
     averaged_results_pair1_100 = TSEDataUtils.calc_element_wise_average(raw_results_pair1_100)
 
-    filtered_results_pair1_100 = TSEDataUtils.filter_outliers_ab_dist_median(averaged_results_pair1_100)
+    print averaged_results_pair1_100
 
-    # data = [[1, 2, 3], [1, 3]]
-    # print TSEUtils.calc_element_wise_average(data)
+    print len(raw_results_pair1_100[0])
+    print len(averaged_results_pair1_100)
 
-    # image_rows = TSEDataUtils.numpy_array_indices_subset(image_rows, )
-    # print averaged_results_pair1_100
-    # print len(averaged_results_pair1_100)
-
-    image_rows = np.array(image_rows)[TSEDataUtils.filter_outliers_ab_dist_median_indices(averaged_results_pair1_100)]
-
-    # print image_rows
-
-    # plt.plot(np.arange(0, len(filtered_results_pair1_100)), np.array(filtered_results_pair1_100), "g-")
-    plt.plot(image_rows, np.array(filtered_results_pair1_100), "b.")
-
-    y_moving_average = TSEDataUtils.calc_moving_average_array(np.array(filtered_results_pair1_100), 20)
-
-    plt.plot(image_rows[len(image_rows) - len(y_moving_average):], y_moving_average, "g-")
-
-    plt.show()
+    # filtered_results_pair1_100 = TSEDataUtils.filter_outliers_ab_dist_median(averaged_results_pair1_100)
+    #
+    # image_rows = np.array(image_rows)[TSEDataUtils.filter_outliers_ab_dist_median_indices(averaged_results_pair1_100)]
+    #
+    # plt.plot(image_rows, np.array(filtered_results_pair1_100), "b.")
+    #
+    # y_moving_average = TSEDataUtils.calc_moving_average_array(np.array(filtered_results_pair1_100), 20)
+    #
+    # plt.plot(image_rows[len(image_rows) - len(y_moving_average):], y_moving_average, "g-")
+    #
+    # plt.show()
 
     if args['plot_results']:
         plt.show()
