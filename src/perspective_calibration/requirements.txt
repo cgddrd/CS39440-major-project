@@ -1,0 +1,4 @@
+pip==6.0.8
+matplotlib
+nose
+coverage

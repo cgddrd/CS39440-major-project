@@ -1,8 +1,28 @@
-# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project)
+# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project) [![Coverage Status](https://coveralls.io/repos/cgddrd/CS39440-major-project/badge.svg?branch=develop)](https://coveralls.io/r/cgddrd/CS39440-major-project?branch=develop)
 
-## Throughput
+## Project Metrics
 
+### Average Throughput 
 [![Throughput Graph](https://graphs.waffle.io/cgddrd/cs39440-major-project/throughput.svg)](https://waffle.io/cgddrd/cs39440-major-project/metrics)
+
+## Installation
+
+**Please note:** Instructions should be followed at a **project-level** (i.e. not at repo root). Please ```cd``` into the appropiate project folder within the `src` folder.
+
+1. Install dependencies using **pip**.
+
+    **Please note:** Due to Cython requiring installation **prior to running** `setup.py`, this step must be followed (i.e. do not simply try to install dependencies as part of the `setup.py` installation).
+
+        pip install -r requirements.txt
+        
+2. Compile 'C' extension modules (`.pyx`) using [Cython](https://github.com/cython/cython).
+
+        python setup.py build_ext --inplace
+
+3. Install project module.
+
+        python setup.py install
+
 
 ## Background
 
