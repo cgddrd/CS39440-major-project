@@ -29,7 +29,7 @@ ext = Extension("tse_compiled.tse_c_imageutils", ["tse_compiled/tse_c_imageutils
 
 setup(
     name='template_matching_scaling',
-    version='2.1.0',
+    version='2.2.0',
     zip_safe=False,
     packages=['tse', 'tse_compiled', 'tests'],
     install_requires=reqs,
