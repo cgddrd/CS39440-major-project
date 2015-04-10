@@ -7,7 +7,7 @@ import numpy as np
 
 from tse_compiled.tse_c_imageutils import TSECImageUtils
 from tse.tse_geometry import TSEGeometry
-from tse_utils import TSEUtils
+from tse_datautils import TSEDataUtils
 from tse_point import TSEPoint
 
 
@@ -214,7 +214,7 @@ class TSEImageUtils:
     def extract_rows_cols_pixels_image(required_rows, required_cols, image):
 
         # Get the cartesian product between the two then split into one array for all rows, and one array for all cols.
-        rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([required_rows, required_cols]), 2)
+        rows_cols_cartesian_product = np.hsplit(TSEDataUtils.calc_cartesian_product([required_rows, required_cols]), 2)
 
         rows_to_extract = rows_cols_cartesian_product[0].astype(int)
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)

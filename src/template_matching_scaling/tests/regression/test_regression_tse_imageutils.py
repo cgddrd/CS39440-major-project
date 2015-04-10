@@ -2,7 +2,7 @@ from unittest import TestCase
 from nose.tools import *
 from tse.tse_imageutils import TSEImageUtils
 from tse.tse_geometry import TSEGeometry
-from tse.tse_utils import TSEUtils
+from tse.tse_datautils import TSEDataUtils
 import numpy as np
 
 __author__ = 'connorgoddard'
@@ -22,7 +22,7 @@ class TestRegressionTSEImageUtils(TestCase):
         # Calculate the scaled indices to identify the pixels in the larger image that we will want to make GREEN to provide evidence for the test succeeding.
         original_image_scaled_indices = np.rint((np.arange(0, 200) * scale_factor_width)).astype(int)
 
-        rows_cols_cartesian_product = np.hsplit(TSEUtils.calc_cartesian_product([original_image_scaled_indices, original_image_scaled_indices]), 2)
+        rows_cols_cartesian_product = np.hsplit(TSEDataUtils.calc_cartesian_product([original_image_scaled_indices, original_image_scaled_indices]), 2)
 
         rows_to_extract = rows_cols_cartesian_product[0].astype(int)
         cols_to_extract = rows_cols_cartesian_product[1].astype(int)
