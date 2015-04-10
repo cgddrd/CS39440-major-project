@@ -1,21 +1,33 @@
 \chapter{Background \& Objectives}
 
-This section should discuss your preparation for the project, including background reading, your analysis of the problem and the process or method you have followed to help structure your work.  It is likely that you will reuse part of your outline project specification, but at this point in the project you should have more to talk about. 
-
-\textbf{Note}: 
-
-\begin{itemize}
-   \item All of the sections and text in this example are for illustration purposes. The main Chapters are a good starting point, but the content and actual sections that you include are likely to be different.
-   
-   \item Look at the document on the Structure of the Final Report for additional guidance. 
-   
-\end {itemize}
+%This section should discuss your preparation for the project, including background reading, your analysis of the problem and the process or method you have followed to help structure your work.  It is likely that you will reuse part of your outline project specification, but at this point in the project you should have more to talk about. 
+%
+%\textbf{Note}: 
+%
+%\begin{itemize}
+%   \item All of the sections and text in this example are for illustration purposes. The main Chapters are a good starting point, but the content and actual sections that you include are likely to be different.
+%   
+%   \item Look at the document on the Structure of the Final Report for additional guidance. 
+%   
+%\end {itemize}
+%
+%\section{Background}
+%What was your background preparation for the project? What similar systems or research techniques did you assess? What was your motivation and interest in this project? 
+%
+%\section{Analysis}
+%Taking into account the problem and what you learned from the background work, what was your analysis of the problem? How did your analysis help to decompose the problem into the main tasks that you would undertake? Were there alternative approaches? Why did you choose one approach compared to the alternatives? %%There should be a clear statement of the research questions, which you will evaluate at the end of the work. %%In most cases, the agreed objectives or requirements will be the result of a compromise between what would ideally have been produced and what was felt to be possible in the time available. A discussion of the process of arriving at the final list is usually appropriate.
+%
+%\section{Research Method}
+%You need to describe briefly the life cycle model or research method that you used. You do not need to write about all of the different process models that you are aware of. Focus on the process model or research method that you have used. It is possible that you needed to adapt an existing method to suit your project; clearly identify what you used and how you adapted it for your needs.
 
 \section{Background}
-What was your background preparation for the project? What similar systems or research techniques did you assess? What was your motivation and interest in this project? 
 
-\section{Analysis}
-Taking into account the problem and what you learned from the background work, what was your analysis of the problem? How did your analysis help to decompose the problem into the main tasks that you would undertake? Were there alternative approaches? Why did you choose one approach compared to the alternatives? There should be a clear statement of the research questions, which you will evaluate at the end of the work. In most cases, the agreed objectives or requirements will be the result of a compromise between what would ideally have been produced and what was felt to be possible in the time available. A discussion of the process of arriving at the final list is usually appropriate.
+ Accurate and efficient navigation plays a crucial role in allowing robots that require autonomous motion capabilities to make safe, yet objective decisions on how best to traverse from a starting location to a target location over typically uneven and/or poorly modelled terrain. 
 
-\section{Research Method}
-You need to describe briefly the life cycle model or research method that you used. You do not need to write about all of the different process models that you are aware of. Focus on the process model or research method that you have used. It is possible that you needed to adapt an existing method to suit your project; clearly identify what you used and how you adapted it for your needs.
+As a problem-space, autonomous navigation can be decomposed into two key areas of focus; one is that of \textit{reactive} navigation, and the other of \textit{deliberative} navigation. Reactive, or local navigation is concerned with controlling the path of the robot through the immediate surrounding area, focussing in particular on the safe traversal around potentially dangerous terrain hazards including obstacles, steep slopes and precipices. In contrast, deliberative or global navigation is tasked with planning the ``high-level" path that a robot will follow in order to reach its destination. As a consequence, deliberative navigation tends to adopt a greater level of focus on calculating the most \textit{optimal} path through the environment over necessarily the one that is ``safest" for the robot. Traditionally within autonomous navigation systems, feedback from both the reactive and deliberative components is combined in order to arrive at final path that balances both safety and objectivity. 
+
+The identification and subsequent avoidance of obstacles is naturally a crucial ability for an autonomous mobile robot to possess in order to help to maximise its own chances of survival. As a result, it is a keen and well-explored area of robotics research, with a variety of approaches now available adopting many types of sensor including sonar and laser scanning. An alternative approach that has enjoyed increasingly greater research focus over the past decade is that of vision-based obstacle avoidance, involving the analysis of images captured from one or more digital cameras in order to identify possible dangers currently situated within the robot's field of view. 
+
+Cameras are becoming an increasingly favourable sensor for use on robotic systems, due primarily to the impressive variety and quantity of potential data that can be captured \textit{simultaneously} from a single device. They are also one of few sensors that have experienced a consistent reduction in price over the past decade, making them viable for many types of project application and budget. 
+
+Many solutions to vision-based obstacle avoidance have been suggested and published, with the majority proposing novel approaches of combining ``standard" computer-vision algorithms (e.g. optical flow, feature tracking or patch tracking) with a variety of hardware configurations (e.g. monocular systems, stereo cameras, vision and 3D hybrid). Typically these improve on previously published performance results, or to focus on specific types of obstacle avoidance (e.g. precipice or animal detection).
