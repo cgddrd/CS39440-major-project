@@ -6,97 +6,7 @@ import matplotlib.pyplot as plt
 import itertools
 import math
 
-from circular_buffer import CircularBuffer
-
-
-class TrackedFeature(CircularBuffer):
-
-    _history_threshold = 7
-    _is_smooth = False
-    _smooth_transition_limit = 0.25
-    _smooth_rotation_limit = math.radians(30)
-    _smooth_score = 0
-    _smooth_score_change = 0
-
-    def __init__(self):
-        CircularBuffer.__init__(self, self._history_threshold)
-
-    def add(self, new_value):
-
-        super(TrackedFeature, self).add(new_value)
-
-        if self.is_full():
-            self.grade_smoothness()
-
-    def grade_smoothness(self):
-
-        current_point = self.get_history_value(0)
-        prev_point = self.get_history_value(-1)
-        second_point = self.get_history_value(-2)
-        sixth_point = self.get_history_value(-6)
-
-        # One back in history
-        dx1 = current_point[0] - prev_point[0]
-        dy1 = current_point[1] - prev_point[1]
-        direction1 = math.atan2(dy1, dx1)
-
-        # Two back in history
-        dx2 = current_point[0] - second_point[0]
-        dy2 = current_point[1] - second_point[1]
-        direction2 = math.atan2(dy2, dx2)
-
-        # Six back in history
-        dx6 = current_point[0] - sixth_point[0]
-        dy6 = current_point[1] - sixth_point[1]
-        direction6 = math.atan2(dy6, dx6)
-
-        # simple distance (approximation of real Euclidean distance)
-        distance2 = abs(dx2) + abs(dy2)
-        distance1 = abs(dx1) + abs(dy1)
-
-        direction_change_6_to_2 = abs(self.subtract_angles(direction6, direction2))
-        direction_change_2_to_1 = abs(self.subtract_angles(direction2, direction1))
-
-        prev_change_is_smooth = (distance2 < self._smooth_transition_limit) or (direction_change_6_to_2 < self._smooth_rotation_limit)
-        current_change_is_smooth = (distance1 < self._smooth_transition_limit) or (direction_change_2_to_1 < self._smooth_rotation_limit)
-
-        if prev_change_is_smooth and current_change_is_smooth:
-
-            self._is_smooth = True
-            self._smooth_score_change = -1
-
-        else:
-
-            self._is_smooth = False
-
-            if (current_change_is_smooth is True) and (prev_change_is_smooth is False):
-
-                self._smooth_score_change = 5
-
-            else:
-
-                self._smooth_score_change = 8
-
-    @staticmethod
-    def subtract_angles(angle_1, angle_2):
-
-        delta = angle_1 - angle_2
-
-        while delta >= math.pi:
-            delta -= math.pi
-
-        while delta < math.pi:
-            delta += math.pi
-
-        return delta
-
-    def apply_score_change(self):
-
-        self._smooth_score += self._smooth_score_change
-
-    def is_out(self):
-
-        return self._smooth_score > 10
+from optical_flow import OpticalFlow
 
 def calc_moving_average_array(values, window, mode='valid'):
 
@@ -376,7 +286,6 @@ def filter_angle(old_points, new_points, vectors):
         vectors[i] = new_vector
 
     return bool_result
-
 
 def run_sim(images, feature_params, lk_params, subpix_params):
 
