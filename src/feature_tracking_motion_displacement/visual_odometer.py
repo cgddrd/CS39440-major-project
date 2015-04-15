@@ -7,7 +7,6 @@ import numpy as np
 
 from optical_flow import OpticalFlow
 from tracked_feature import TrackedFeature
-# from circular_buffer import CircularBuffer
 
 
 class VisualOdometer:
@@ -207,7 +206,6 @@ def main():
               "../eval_data/motion_images/flat_10cm/IMG11.JPG",
               "../eval_data/motion_images/flat_10cm/IMG12.JPG"]
 
-
     vo = VisualOdometer()
 
     for image_filepath in images:
@@ -223,60 +221,6 @@ def main():
         cv2.waitKey(2000)
 
     cv2.waitKey()
-
-    # buffer = CircularBuffer(7)
-    #
-    # print buffer._history
-    #
-    # buffer.add(1)
-    #
-    # print buffer._history
-    #
-    # buffer.add(2)
-    #
-    # print buffer._history
-    #
-    # buffer.add(3)
-    #
-    # print buffer._history
-    #
-    # buffer.add(4)
-    # buffer.add(5)
-    # buffer.add(6)
-    # buffer.add(7)
-    # buffer.add(8)
-    #
-    #
-    # # buffer.add(9)
-    #
-    # # print buffer.get_value(buffer._current_index)
-    #
-    # # print buffer._history[buffer._current_index]
-    # # print buffer._history[buffer._current_index - 1]
-    #
-    # buffer.add(9)
-    #
-    # print buffer._history[buffer._current_index]buffer.add(9)
-    #
-    # print buffer._history[buffer._current_index]
-    # print buffer._history[buffer._current_index - 1]
-    #
-    # print buffer.get_value_current(0)
-    # print buffer.get_value_current(-1)
-    # print buffer._history[buffer._current_index - 1]
-    #
-    # print buffer.get_value_current(0)
-    # print buffer.get_value_current(-1)
-    #
-    # # print buffer.get_value(-1)
-    # # print buffer.get_value(-2)
-    #
-    # # print buffer._history[buffer.get_next_index() - 1]
-    # # print buffer._history[buffer.get_next_index() - 2]
-    # # print buffer._history[buffer.get_next_index() - 3]
-    #
-    # print buffer._history
-
 
 
 if __name__ == "__main__":

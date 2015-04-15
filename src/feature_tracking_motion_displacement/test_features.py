@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import itertools
 import math
 
-from optical_flow import OpticalFlow
-
 def calc_moving_average_array(values, window, mode='valid'):
 
     weights = np.repeat(1.0, window)/window
@@ -30,9 +28,8 @@ def filter_outliers_ab_dist_median_indices(data, ab_dist_median_factor=2.):
 
     return indices
 
+# Modified from original source: http://mlikihazar.blogspot.com.au/2013/02/draw-arrow-opencv.html
 def draw_arrow(image, p, q, color, arrow_magnitude=9, thickness=1, line_type=8, shift=0):
-
-# adapted from http://mlikihazar.blogspot.com.au/2013/02/draw-arrow-opencv.html
 
     # draw arrow tail
     cv2.line(image, p, q, color, thickness, line_type, shift)
@@ -389,24 +386,6 @@ def main():
     lk_params = dict(winSize=(40, 40), maxLevel=10, criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.03))
 
     subpix_params = dict(winSize=(20, 20), zeroZone=(-1, -1), criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 20, 0.1))
-
-    # cv2.imshow("Flat", calc_lk_tracking_flow(image1_flat, image2_flat, feature_params, lk_params))
-    # cv2.imshow("Outside", calc_lk_tracking_flow(image1_wiltshire_outside, image2_wiltshire_outside, feature_params, lk_params))
-    # cv2.imshow("Inside", calc_lk_tracking_flow(image1_wiltshire_inside, image2_wiltshire_inside, feature_params, lk_params))
-    #
-    # cv2.imshow("Inside_Patches", calc_lk_patches_flow(image1_flat, image2_flat, feature_params, 100, 0.5))
-    #
-    # cv2.imshow("Outside_Patches", calc_lk_patches_flow(image1_wiltshire_outside, image2_wiltshire_outside, dict(maxCorners=1000, qualityLevel=0.005, minDistance=20), 100, 0.2))
-    #
-    # plt.show()
-
-    # x,y,split = cut_array2d(image1_flat, (2, 1))
-    #
-    # cv2.imshow("sddas", split[0])
-    #
-    # cv2.imshow("sddas2", split[1])
-    #
-    # cv2.imshow("image1", image1_flat)
 
     images = ["../eval_data/motion_images/wiltshire_outside_10cm/IMG1.JPG",
               "../eval_data/motion_images/wiltshire_outside_10cm/IMG2.JPG",
