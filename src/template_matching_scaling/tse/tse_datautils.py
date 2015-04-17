@@ -33,11 +33,21 @@ class TSEDataUtils:
         return map(int, list_to_convert)
 
     @staticmethod
-    def calc_moving_average_array(values, window, mode='valid'):
+    def calc_centered_moving_average(values, window):
+
+        # Using 'same' mode for the 'numpy.convolve' function will centre the convolution window at each point of the array overlap.
+        # WARNING: Boundary effects will be observed at the ends as a result of the arrays not fully overlapping.
+        return TSEDataUtils.calc_moving_average(values, window, 'same')
+
+
+    @staticmethod
+    def calc_moving_average(values, window, mode='valid'):
 
         weights = np.repeat(1.0, window)/window
 
-        # Including 'valid' MODE will REQUIRE there to be enough data points.
+        # Including 'valid' MODE will REQUIRE there to be enough data points before beginning convolution.
+        # 'valid' mode only convolve where points overlap exactly. This is equivalent to a Simple Moving Average.
+        # See: http://docs.scipy.org/doc/numpy/reference/generated/numpy.convolve.html
         return np.convolve(values, weights, mode)
 
     @staticmethod

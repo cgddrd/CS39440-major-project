@@ -55,8 +55,8 @@ class TestTSEDataUtils(TestCase):
         expected_result = np.array([float((2+1) / 2.0), float((3+2)/2.0), float((4+3)/2.0), float((5+4)/2.0), float((6+5)/2.0)])
 
         # Using both Numpy test asserts and nosetest asserts.
-        np.testing.assert_equal(TSEDataUtils.calc_moving_average_array(test_data, points_to_average), expected_result)
-        assert_true(np.array_equal(TSEDataUtils.calc_moving_average_array(test_data, points_to_average), expected_result))
+        np.testing.assert_equal(TSEDataUtils.calc_moving_average(test_data, points_to_average), expected_result)
+        assert_true(np.array_equal(TSEDataUtils.calc_moving_average(test_data, points_to_average), expected_result))
 
     def test_convert_array_to_numpy_array(self):
         test_data = [1, 2, 3, 4, 5, 6]

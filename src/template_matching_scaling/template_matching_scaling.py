@@ -4,7 +4,6 @@ import cv2
 import math
 import matplotlib.pyplot as plt
 import argparse
-import numpy as np
 
 from tse.tse_fileio import TSEFileIO
 from tse.tse_datautils import TSEDataUtils
@@ -17,8 +16,6 @@ from tse.tse_matchmethod import tse_match_methods
 
 from collections import OrderedDict
 from pprint import pprint
-
-import json
 
 __author__ = 'connorgoddard'
 
@@ -49,7 +46,7 @@ class TemplateMatching:
         raw_data = TSEFileIO.read_file(file_path, split_delimiter=",", start_position=1)
         return dict(TSEDataUtils.string_2d_list_to_int_2d_list(raw_data))
 
-    def search_image(self, patch_height, match_method, use_scaling=False, force_cont_search=False, plot_results=False):
+    def search_image(self, patch_height, match_method, use_scaling=False, exhaustive_search=False, plot_results=False):
 
         run_results = []
 
@@ -72,11 +69,14 @@ class TemplateMatching:
 
             if use_scaling is True:
 
-                run_results.append(TSEResult(i, self.scan_search_window_scaling(template_patch, template_patch_origin_point, match_method, force_cont_search)))
+                run_results.append(TSEResult(i, self.scan_search_window_scaling(template_patch,
+                                                                                template_patch_origin_point,
+                                                                                match_method, exhaustive_search)))
 
             else:
 
-                run_results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point, match_method, force_cont_search)))
+                run_results.append(TSEResult(i, self.scan_search_window(template_patch, template_patch_origin_point,
+                                                                        match_method, exhaustive_search)))
 
         if plot_results:
             # self._plot_axis.set_xlabel('Row Number (px)')
@@ -86,7 +86,7 @@ class TemplateMatching:
 
         return run_results
 
-    def scan_search_window(self, template_patch, template_patch_origin, match_method, force_cont_search=False):
+    def scan_search_window(self, template_patch, template_patch_origin, match_method, exhaustive_search=False):
 
         image_height, image_width = self._hsv_img2.shape[:2]
 
@@ -135,13 +135,13 @@ class TemplateMatching:
                 else:
                     stop = True
 
-            if (force_cont_search is False) and (stop is True):
+            if (exhaustive_search is False) and (stop is True):
                 break
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
         return best_position
 
-    def scan_search_window_scaling(self, template_patch, template_patch_origin, match_method, force_cont_search=False):
+    def scan_search_window_scaling(self, template_patch, template_patch_origin, match_method, exhaustive_search=False):
 
         image_height, image_width = self._hsv_img2.shape[:2]
 
@@ -219,7 +219,7 @@ class TemplateMatching:
                 else:
                     stop = True
 
-            if (force_cont_search is False) and (stop is True):
+            if (exhaustive_search is False) and (stop is True):
                 break
 
         # We need to return the 'Y' with the best score (i.e. the displacement)
@@ -236,7 +236,7 @@ class TemplateMatching:
             x.append(val.row)
             y.append(val.displacement)
 
-        y_moving_average = TSEDataUtils.calc_moving_average_array(y, 10)
+        y_moving_average = TSEDataUtils.calc_moving_average(y, 10)
 
         self.plot(x, y, "{0}.".format(plot_format_color), 100, match_method.match_name)
         self.plot(x[len(x) - len(y_moving_average):], y_moving_average, "{0}-".format(plot_format_color), 100, "MVAV_{0}".format(match_method.match_name))
@@ -253,7 +253,8 @@ class TemplateMatching:
         self._plot_axis.legend(loc='upper left', shadow=True)
 
 
-def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scaling=False, force_cont_search=False, plot_results=False):
+def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scaling=False, exhaustive_search=False,
+                plot_results=False):
 
     # Create a dictionary to store the results of all image pairs -> patch sizes -> match methods for a given pair of images.
     image_dict = {}
@@ -271,7 +272,8 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
                 match_dict = {}
 
                 for match_method in match_methods:
-                    match_dict[match_method.match_name] = match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results)
+                    match_dict[match_method.match_name] = match.search_image(patch_size, match_method, use_scaling,
+                                                                             exhaustive_search, plot_results)
 
                 patch_dict[patch_size] = match_dict
 
@@ -317,7 +319,8 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
                 for match_method in match_methods:
 
                     # Store the results for a given match method.
-                    match_dict[match_method.match_name] = match.search_image(patch_size, match_method, use_scaling, force_cont_search, plot_results)
+                    match_dict[match_method.match_name] = match.search_image(patch_size, match_method, use_scaling,
+                                                                             exhaustive_search, plot_results)
 
                 if column_count == (column_max - 1):
                     row_count += 1
@@ -364,7 +367,7 @@ def main():
     parser.add_argument('-m', '--methods', nargs='+', dest="match_methods", type=str, required=True)
     parser.add_argument('-s', '--scaling', dest='scaling', action='store_true')
     parser.add_argument('-d', '--drawplot', dest='plot_results', action='store_true')
-    parser.add_argument('-f', '--forcecontsearch', dest='force_cont_search', action='store_true')
+    parser.add_argument('-es', '--exhaustivesearch', dest='exhaustive_search', action='store_true')
 
     args = vars(parser.parse_args())
 
@@ -389,7 +392,9 @@ def main():
             parser.error("Error: \"{0}\" is not a valid matching method option.\nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\' ".format(method))
 
     # Start the tests using settings passed in as command-line arguments.
-    results_dict = start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], force_cont_search=args['force_cont_search'], plot_results=args['plot_results'])
+    results_dict = start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods,
+                               args['calib_file'], use_scaling=args['scaling'],
+                               exhaustive_search=args['exhaustive_search'], plot_results=args['plot_results'])
 
     pprint(results_dict)
 
@@ -425,6 +430,36 @@ def main():
 
     if args['plot_results']:
         plt.show()
+
+
+def ipython_plot(results_data, image_pairs=None, patch_sizes=None, match_methods=None, filter_results=False, average_results=False):
+
+    raw_results = {}
+
+    pairs = image_pairs if (image_pairs is not None) else raw_results
+
+    for pair in pairs:
+
+        patches = patch_sizes if (patch_sizes is not None) else raw_results[pair]
+
+        for patch in patches:
+
+            methods = match_methods if (match_methods is not None) else raw_results[pair][patch]
+
+            for method in methods:
+
+                current_data = results_data[pair][patch][method]
+
+                current_data_displacement = []
+                current_data_rows = []
+
+                current_data_displacement.append([o.displacement for o in current_data])
+                current_data_rows.append([o.row for o in current_data])
+
+
+
+                # averaged_filtered_current_data_displacement = TSEDataUtils.calc_element_wise_average(current_data_displacement)
+
 
 
 if __name__ == '__main__':
