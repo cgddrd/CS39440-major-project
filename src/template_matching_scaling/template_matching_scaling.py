@@ -15,7 +15,6 @@ from tse.tse_matchtype import TSEMatchType
 from tse.tse_matchmethod import tse_match_methods
 
 from collections import OrderedDict
-from pprint import pprint
 
 __author__ = 'connorgoddard'
 

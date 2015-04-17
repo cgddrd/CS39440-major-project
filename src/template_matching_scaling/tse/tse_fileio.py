@@ -63,10 +63,3 @@ class TSEFileIO:
         except OSError:
             if not os.path.isdir(directory_path):
                 raise
-
-
-
-
-
-
-
