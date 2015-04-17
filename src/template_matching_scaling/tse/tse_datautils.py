@@ -100,7 +100,6 @@ class TSEDataUtils:
     @staticmethod
     # Modified from original source: http://stackoverflow.com/a/16562028
     def filter_outliers_ab_dist_median_indices(data, ab_dist_median_factor=2.):
-
         # Ensure we are dealing with a numpy array before operating.
         data = TSEDataUtils.convert_array_to_numpy_array(data)
 
