@@ -396,71 +396,8 @@ def main():
                                args['calib_file'], use_scaling=args['scaling'],
                                exhaustive_search=args['exhaustive_search'], plot_results=args['plot_results'])
 
-    pprint(results_dict)
-
-    results_pair1_100 = results_dict['IMG1.JPG_IMG2.JPG'][100]
-
-    raw_results_pair1_100 = []
-    image_rows = []
-
-    for key in results_pair1_100:
-        raw_results_pair1_100.append([o.displacement for o in results_pair1_100[key]])
-        image_rows = [o.row for o in results_pair1_100[key]]
-
-    print raw_results_pair1_100
-
-    averaged_results_pair1_100 = TSEDataUtils.calc_element_wise_average(raw_results_pair1_100)
-
-    print averaged_results_pair1_100
-
-    print len(raw_results_pair1_100[0])
-    print len(averaged_results_pair1_100)
-
-    # filtered_results_pair1_100 = TSEDataUtils.filter_outliers_ab_dist_median(averaged_results_pair1_100)
-    #
-    # image_rows = np.array(image_rows)[TSEDataUtils.filter_outliers_ab_dist_median_indices(averaged_results_pair1_100)]
-    #
-    # plt.plot(image_rows, np.array(filtered_results_pair1_100), "b.")
-    #
-    # y_moving_average = TSEDataUtils.calc_moving_average_array(np.array(filtered_results_pair1_100), 20)
-    #
-    # plt.plot(image_rows[len(image_rows) - len(y_moving_average):], y_moving_average, "g-")
-    #
-    # plt.show()
-
     if args['plot_results']:
         plt.show()
-
-
-def ipython_plot(results_data, image_pairs=None, patch_sizes=None, match_methods=None, filter_results=False, average_results=False):
-
-    raw_results = {}
-
-    pairs = image_pairs if (image_pairs is not None) else raw_results
-
-    for pair in pairs:
-
-        patches = patch_sizes if (patch_sizes is not None) else raw_results[pair]
-
-        for patch in patches:
-
-            methods = match_methods if (match_methods is not None) else raw_results[pair][patch]
-
-            for method in methods:
-
-                current_data = results_data[pair][patch][method]
-
-                current_data_displacement = []
-                current_data_rows = []
-
-                current_data_displacement.append([o.displacement for o in current_data])
-                current_data_rows.append([o.row for o in current_data])
-
-
-
-                # averaged_filtered_current_data_displacement = TSEDataUtils.calc_element_wise_average(current_data_displacement)
-
-
 
 if __name__ == '__main__':
     main()
