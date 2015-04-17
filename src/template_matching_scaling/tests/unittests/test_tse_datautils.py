@@ -58,12 +58,96 @@ class TestTSEDataUtils(TestCase):
         np.testing.assert_equal(TSEDataUtils.calc_moving_average(test_data, points_to_average), expected_result)
         assert_true(np.array_equal(TSEDataUtils.calc_moving_average(test_data, points_to_average), expected_result))
 
+    def test_calc_centered_moving_average_array(self):
+        test_data = [1, 2, 3, 4, 5, 6]
+
+        points_to_average = 3
+
+        expected_result = np.array([float((0+1+2) / 3.0), float((1+2+3)/3.0), float((2+3+4)/3.0), float((3+4+5)/3.0), float((4+5+6)/3.0), float((5+6+0)/3.0)])
+
+        # Here we can assert floating point values in the arrays within a certain tolerance to prevent false failures due to floating point notation.
+        np.testing.assert_allclose(TSEDataUtils.calc_centered_moving_average(test_data, points_to_average), expected_result, rtol=1e-5, atol=0)
+
     def test_convert_array_to_numpy_array(self):
         test_data = [1, 2, 3, 4, 5, 6]
 
         expected_result = np.array(test_data)
 
         assert_true(np.array_equal(TSEDataUtils.convert_array_to_numpy_array(test_data), expected_result))
+
+    def test_calc_1d_array_average(self):
+        test_data = [1, 2, 3, 4, 5, 6]
+
+        assert_equal(TSEDataUtils.calc_1d_array_average(test_data), ((1+2+3+4+5+6) / 6.0))
+
+    def test_numpy_array_indices_subset(self):
+        test_data = [1, 2, 3, 4, 5, 6]
+        indices = [0, 5, 1]
+
+        assert_true(np.array_equal(TSEDataUtils.numpy_array_indices_subset(test_data, indices), [1, 6, 2]))
+
+    def test_filter_outliers_mean_stdev(self):
+        test_data = np.array([1, 2, 3, 4, 5, 6, 200])
+
+        mean = np.mean(test_data)
+        stdev = np.std(test_data)
+        stdev_filter_factor = 2
+
+        # Here we want to filter the results to be within <stdev_filter_factor> * standard deviation of the mean of the data collection.
+        filter = np.logical_and((mean - (stdev * stdev_filter_factor)) < test_data, test_data < (mean + (stdev * stdev_filter_factor)))
+
+        expected_result = test_data[filter]
+
+        assert_true(np.array_equal(TSEDataUtils.filter_outliers_mean_stdev(test_data, stdev_filter_factor), expected_result))
+
+    def test_filter_outliers_ab_dist_median(self):
+        test_data = np.array([1, 2, 3, 4, 5, 6, 200])
+
+        median = np.median(test_data)
+        median_filter_factor = 2
+
+        # Here we want to filter the results to be within <median_filter_factor> * median of the median of the data collection.
+        filter = np.logical_and((median - (median * 2)) < test_data, test_data < (median + (median * 2)))
+
+        expected_result = test_data[filter]
+
+        assert_true(np.array_equal(TSEDataUtils.filter_outliers_ab_dist_median(test_data, median_filter_factor), expected_result))
+
+    def test_filter_outliers_ab_dist_median_indices(self):
+        test_data = np.array([1, 2, 3, 4, 5, 6, 200])
+
+        median = np.median(test_data)
+        median_filter_factor = 2
+
+        # Here we want to filter the results to be within <median_filter_factor> * median of the median of the data collection.
+        filter = np.logical_and((median - (median * 2)) < test_data, test_data < (median + (median * 2)))
+
+        expected_result = np.where(filter)[0]
+
+        assert_true(np.array_equal(TSEDataUtils.filter_outliers_ab_dist_median_indices(test_data, median_filter_factor), expected_result))
+
+    def test_extract_tuple_elements_list(self):
+        test_data = [(1, 2), (3, 4), (5, 6)]
+
+        assert_true(np.array_equal(TSEDataUtils.extract_tuple_elements_list(test_data, 0), [1, 3, 5]))
+        assert_true(np.array_equal(TSEDataUtils.extract_tuple_elements_list(test_data, 1), [2, 4, 6]))
+
+        # Here we expect a 'TypeError' as we are dealing with integers and not tuples in the input array.
+        assert_raises(TypeError, TSEDataUtils.extract_tuple_elements_list, [1, 2, 3], 2)
+
+        # Here we expect an 'IndexError' as we are passing in a tuple index > 1 (tuple has a max length of 2).
+        assert_raises(IndexError, TSEDataUtils.extract_tuple_elements_list, test_data, 2)
+
+    def test_calc_element_wise_average(self):
+        test_data = [[1, 2, 3], [1, 3, 4], [2, 4, 5]]
+
+        mean_index_0 = (test_data[0][0] + test_data[1][0] + test_data[2][0]) / 3.0
+        mean_index_1 = (test_data[0][1] + test_data[1][1] + test_data[2][1]) / 3.0
+        mean_index_2 = (test_data[0][2] + test_data[1][2] + test_data[2][2]) / 3.0
+
+        expected_result = np.array([mean_index_0, mean_index_1, mean_index_2])
+
+        assert_true(np.array_equal(TSEDataUtils.calc_element_wise_average(test_data), expected_result))
 
     def test_calc_cartesian_product(self):
         test_data1 = [1, 2]

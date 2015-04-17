@@ -77,7 +77,6 @@ class TSEDataUtils:
 
         # Ensure we are dealing with a numpy array before operating.
         data = TSEDataUtils.convert_array_to_numpy_array(data)
-
         return data[indices_list]
 
     @staticmethod
@@ -88,18 +87,6 @@ class TSEDataUtils:
         data = TSEDataUtils.convert_array_to_numpy_array(data)
 
         return data[abs(data - np.mean(data)) < stdev_factor * np.std(data)]
-
-    @staticmethod
-    # Modified from original source: http://stackoverflow.com/q/11686720
-    def filter_outliers_mean_stdev_alternative(data, stdev_factor=2):
-
-        # Ensure we are dealing with a numpy array before operating.
-        data = TSEDataUtils.convert_array_to_numpy_array(data)
-
-        u = np.mean(data)
-        s = np.std(data)
-        filtered = [e for e in data if (u - stdev_factor * s < e < u + stdev_factor * s)]
-        return filtered
 
     @staticmethod
     # This is a convenience function for 'TSEUtils.filter_outliers_ab_dist_median_indices' to return the actual data.

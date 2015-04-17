@@ -25,3 +25,7 @@ class TestTSEResult(unittest.TestCase):
 
     def test_get_tuple(self):
         assert_equal(self.test_result.to_tuple(), (1, 100), "Result value should equal (100, 200)")
+
+    def test_str(self):
+        assert_equal(self.test_result.__str__(), "(1, 100)")
+        assert_equal(self.test_result.__repr__(), "(1, 100)")
