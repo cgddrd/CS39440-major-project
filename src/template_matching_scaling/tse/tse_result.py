@@ -2,9 +2,10 @@ __author__ = 'connorgoddard'
 
 
 class TSEResult:
-    def __init__(self, row, displacement):
+    def __init__(self, row, displacement, match_scores):
         self._row = row
         self._displacement = displacement
+        self._match_scores = match_scores
 
     # Python 'toString' method for class.
     def __str__(self):
@@ -24,5 +25,13 @@ class TSEResult:
         """I'm the 'displacement' property."""
         return self._displacement
 
+    @property
+    def match_scores(self):
+        """
+        'match_scores' property.
+        :return:
+        """
+        return self._match_scores
+
     def to_tuple(self):
-        return self.row, self.displacement
+        return self.row, self.displacement, self.match_scores
