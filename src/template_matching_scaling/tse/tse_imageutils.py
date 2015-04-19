@@ -312,7 +312,7 @@ class TSEImageUtils:
         height = end_coordinate[1] - origin_coordinate[1]
         width = end_coordinate[0] - origin_coordinate[0]
 
-        centre = ((origin_coordinate[0] + (width / 2)), (origin_coordinate[1] + (height / 2)))
+        centre = ((origin_coordinate[0] + int(round(width / 2.0))), (origin_coordinate[1] + int(round(height / 2.0))))
 
         scaled_origin = TSEGeometry.scale_coordinate_relative_centre(origin_coordinate, centre, scale_factor)
 
