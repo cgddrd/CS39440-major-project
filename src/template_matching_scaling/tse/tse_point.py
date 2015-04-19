@@ -20,3 +20,11 @@ class TSEPoint:
 
     def to_tuple(self):
         return self.x, self.y
+
+    # Python 'toString' method for class.
+    def __str__(self):
+        return str(self.to_tuple())
+
+    # Required to return a string representation while in a list. See: http://stackoverflow.com/a/727779
+    def __repr__(self):
+        return self.__str__()
