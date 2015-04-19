@@ -21,8 +21,7 @@ class TSEGeometry:
 
         new_vec = ((vec[0] * scale_factor), (vec[1] * scale_factor))
 
-        # Return scaled coordinate relative to the centre of the patch
-        return int(new_vec[0] + centre_coordinate[0]), int(new_vec[1] + centre_coordinate[1])
+        return int(round(new_vec[0] + centre_coordinate[0])), int((new_vec[1] + centre_coordinate[1]))
 
     @staticmethod
     def calc_vec_magnitude(point_1, point_2):
