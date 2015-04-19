@@ -25,4 +25,4 @@ script:
   - bash run_travisci_tests.sh
 
 after_success:
-  - coveralls -b "src/template_matching_scaling"
+  - coveralls -b "src/tse"
