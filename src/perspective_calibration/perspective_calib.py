@@ -3,6 +3,11 @@ from __future__ import division
 import cv2
 import argparse
 
+# Bug Fix: #136 - Switch from using 'Apple' backend to 'TKAgg' to fix keyboard focus issues.
+# See: http://gotoanswer.com/?q=Close+pyplot+figure+using+the+keyboard+on+Mac+OS+X
+import matplotlib
+matplotlib.use('TKAgg')
+
 import matplotlib.pyplot as plt
 import datetime
 
@@ -50,7 +55,7 @@ class PerspectiveCalibration:
         image_height, image_width = self._new_img.shape[:2]
 
         # Here we are unwrapping the TUPLE returned from the function into two separate variables (coords_line_1, coords_line_2)
-        coords_line_1, coords_line_2 = TSEGeometry.calc_line_points_horizontal_reflection(start_point, end_point, image_height, image_width)
+        coords_line_1, coords_line_2 = TSEGeometry.calc_line_points_horizontal_reflection(start_point, end_point, int(round(image_width/2)), image_height)
 
         for i in range(len(coords_line_1)):
             cv2.circle(self._new_img, coords_line_1[i], 2, (0, 0, 255), -1)
@@ -97,23 +102,30 @@ class PerspectiveCalibration:
 
     def on_key_press(self, event):
 
-        if event.key == 'r':
+        if event.key == 'c':
             self.reset_image_gui()
+            print "Image reset successfully."
 
-        elif event.key == 'c':
+        elif event.key == 'v':
 
             if self._lock_gui is False and self._point_count == 4:
                 self.render_line(self._point_coords[0], self._point_coords[1], self._point_coords[2],
                                  self._point_coords[3])
                 self.update_image_gui(self._new_img)
                 self._lock_gui = True
+                print "Calibration data generated successfully."
+            else:
+                print "Error: Four coordinate points must be set before calibration data can be generated."
 
-        elif event.key == 'v':
+        elif event.key == 'r':
 
             if self._lock_gui is False and self._point_count == 2:
                 self.render_line_reflection(self._point_coords[0], self._point_coords[1])
                 self.update_image_gui(self._new_img)
                 self._lock_gui = True
+                print "Reflection and calibration data generated successfully."
+            else:
+                print "Error: Two coordinate points must be set before reflection can be calculated and calibration data generated."
 
         elif event.key == 'w':
 
@@ -121,7 +133,9 @@ class PerspectiveCalibration:
 
                 filename = "{0}_{1}.txt".format(self._output_file_name_prefix, datetime.datetime.utcnow().strftime("%d_%m_%y_%H_%M_%S"))
 
-                self._file.write_tuple_list_to_file(filename, "height,calib_width", self._calibration_results, False)
+                self._file.write_tuple_list_to_file(filename, self._calibration_results, "height,calib_width", False)
+
+                print "Calibration data exported to file successfully."
 
             else:
                 print "Error: Cannot write calibration results to file until results have been generated."
