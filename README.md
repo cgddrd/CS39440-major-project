@@ -1,8 +1,8 @@
-# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project) [![Coverage Status](https://coveralls.io/repos/cgddrd/CS39440-major-project/badge.svg?branch=develop)](https://coveralls.io/r/cgddrd/CS39440-major-project?branch=develop)
+# *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project) [![Coverage Status](https://coveralls.io/repos/cgddrd/CS39440-major-project/badge.svg?branch=develop)](https://coveralls.io/r/cgddrd/CS39440-major-project?branch=develop) [![Code Climate](https://codeclimate.com/github/cgddrd/CS39440-major-project/badges/gpa.svg)](https://codeclimate.com/github/cgddrd/CS39440-major-project) 
 
 ## Project Metrics
 
-### Average Throughput 
+### Average Throughput
 [![Throughput Graph](https://graphs.waffle.io/cgddrd/cs39440-major-project/throughput.svg)](https://waffle.io/cgddrd/cs39440-major-project/metrics)
 
 ## Installation
@@ -14,7 +14,7 @@
     **Please note:** Due to Cython requiring installation **prior to running** `setup.py`, this step must be followed (i.e. do not simply try to install dependencies as part of the `setup.py` installation).
 
         pip install -r requirements.txt
-        
+
 2. Compile 'C' extension modules (`.pyx`) using [Cython](https://github.com/cython/cython).
 
         python setup.py build_ext --inplace
@@ -36,7 +36,7 @@ mobile robot to possess in order to help to maximise its own chances of survival
 Combining recent advances in camera technology with appropriate computer vision algorithms and
 technique, the proposed project aims to design and implement a **vision-based software application capable
 of estimating the general “shape” of the terrain currently in front of a moving robot as it follows
-a route through its environment**. 
+a route through its environment**.
 
 Through this system, it should be possible to identify the presence of
 both positive, and negative obstacles (e.g. rocks and pits respectively), providing a reasonable indication
