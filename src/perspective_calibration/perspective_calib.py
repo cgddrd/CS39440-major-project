@@ -2,12 +2,13 @@ from __future__ import division
 
 import cv2
 import argparse
+
 import matplotlib.pyplot as plt
 import datetime
 
-from point import Point
-from fileio import FileIO
-import geometrymath
+from tse.tse_point import TSEPoint
+from tse.tse_fileio import TSEFileIO
+from tse.tse_geometry import TSEGeometry
 
 __author__ = 'connorgoddard'
 
@@ -22,7 +23,7 @@ class PerspectiveCalibration:
     def __init__(self, image_path, output_file_name_prefix, output_folder_name):
 
         self._output_file_name_prefix = output_file_name_prefix
-        self._file = FileIO(output_folder_name)
+        self._file = TSEFileIO(output_folder_name)
         self._original_img = cv2.imread(image_path, cv2.IMREAD_COLOR)
         self._new_img = self._original_img.copy()
 
@@ -33,7 +34,7 @@ class PerspectiveCalibration:
         height, width, depth = self._new_img.shape
 
         # Here we are unwrapping the TUPLE returned from the function into two separate variables (coords_line_1, coords_line_2)
-        coords_line_1, coords_line_2 = geometrymath.calc_line_points(start_point, end_point, start_point2, end_point2, height)
+        coords_line_1, coords_line_2 = TSEGeometry.calc_line_points(start_point, end_point, start_point2, end_point2, height)
 
         for i in range(len(coords_line_1)):
             cv2.circle(self._new_img, coords_line_1[i], 2, (0, 0, 255), -1)
@@ -49,7 +50,7 @@ class PerspectiveCalibration:
         image_height, image_width = self._new_img.shape[:2]
 
         # Here we are unwrapping the TUPLE returned from the function into two separate variables (coords_line_1, coords_line_2)
-        coords_line_1, coords_line_2 = geometrymath.calc_line_points_reflection(start_point, end_point, image_height, image_width)
+        coords_line_1, coords_line_2 = TSEGeometry.calc_line_points_horizontal_reflection(start_point, end_point, image_height, image_width)
 
         for i in range(len(coords_line_1)):
             cv2.circle(self._new_img, coords_line_1[i], 2, (0, 0, 255), -1)
@@ -65,8 +66,8 @@ class PerspectiveCalibration:
 
     def add_new_point(self, mouse_x, mouse_y):
 
-        new_point = Point(mouse_x, mouse_y)
-        self._point_coords.append(new_point.get_value())
+        new_point = TSEPoint(mouse_x, mouse_y)
+        self._point_coords.append(new_point.to_tuple())
 
     def on_mouse_click(self, event):
 
@@ -120,7 +121,7 @@ class PerspectiveCalibration:
 
                 filename = "{0}_{1}.txt".format(self._output_file_name_prefix, datetime.datetime.utcnow().strftime("%d_%m_%y_%H_%M_%S"))
 
-                self._file.write_file(filename, "height,calib_width", self._calibration_results, False)
+                self._file.write_tuple_list_to_file(filename, "height,calib_width", self._calibration_results, False)
 
             else:
                 print "Error: Cannot write calibration results to file until results have been generated."
