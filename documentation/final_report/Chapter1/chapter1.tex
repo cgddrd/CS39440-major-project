@@ -43,9 +43,14 @@ Cameras are becoming an increasingly favourable sensor for use on robotic system
 
 \subsection{Related Work}
 
-Many solutions to vision-based navigation and obstacle avoidance have been suggested and published, with the majority proposing novel approaches of combining ``standard" computer-vision algorithms (e.g. optical flow, feature tracking or patch tracking) with a variety of hardware configurations (e.g. monocular systems, stereo cameras, vision and 3D hybrid). Typically these improve on previously published performance results, or focus on specific types of obstacle avoidance (e.g. precipice or animal detection).
+Many solutions to vision-based navigation and obstacle avoidance have been suggested and published, with the majority proposing new or improved approaches of combining standard computer-vision techniques (e.g. optical flow, feature tracking and patch tracking) with a variety of hardware configurations (e.g. monocular systems, stereo cameras, vision and 3D hybrid). Typically these either attempt to improve on previously published performance results, or focus on the avoidance of specific types of obstacle (e.g. precipice or animal detection). By investigating existing research conducted in this area, it is possible to identify and compare potential benefits and challenges between various approaches that will in turn feed into future design decisions.
 
+The first approach to be noted is that from the work of J. Campbell \textit{et al.} \cite{j-campbell} in which the authors propose a system for estimating the change in position and rotation of a robot as it moves throughout its environment using information obtained solely via a single consumer-grade colour camera. The approach described involves the use of feature-based tracking to estimate the optical flow-field between subsequent video frames, before taking these optical flow vectors currently corresponding to image coordinates and back-projecting them into a ``robot-centred" coordinate system to establish the incremental ``real world" translation and rotation of the robot over a given time period. The detection and subsequent tracking of matching features between captured frames is provided via the \textit{OpenCV} library implementation of the Lucas-Kanade algorithm \cite{opencv-lucas-kanade-features}. The authors report that this implementation provides a more efficient and robust version of the original algorithm proposed by Lucas and Kanade \cite{lucas-kanade-features}. 
 
+Upon further investigation this improvement appears to be attributed to the proposal published by J. Bouguet \cite{j-bouguet} to combine a multi-scale pyramidal representation of an image within the existing Lucas-Kanade algorithm. This approach can help to provide both greater accuracy, by locating features that may have moved distances greater than the current window size, while also improving efficiency through a reduction in the size of the search area within higher resolution versions of an image, by first localising the general target area within lower resolution versions. 
+
+Of particular interest in the work of J. Campbell \textit{et al.} \cite{j-campbell} is the proposal of detecting environment hazards via the exploitation of the optical flow field. The idea discussed in the paper bases itself around the observed discontinuities caused to the optical flow field between the ``normal ground" and potential hazards. The authors found that positive objects that appear closer to the camera (e.g. rocks) demonstrate a greater displacement between subsequent frames than the ground, and negative obstacles (e.g. precipices) demonstrate a smaller displacement. 
+   
 
 \subsection{Motivation}
 
@@ -57,29 +62,23 @@ While the primary aims of the proposed project are research-focussed, the ultima
 
 \section{Analysis}
 
+
 \subsection{Overview}
+
 
 \subsection{Research Aims}
 
-\subsubsection{Primary Aims}
 
-\subsubsection{Secondary Aims}
+\subsection{Design Decisions}
 
-\subsection{Hypothesis}
+\subsubsection{Feature Matching}
 
-\section{Proposed Development Strategy}
+\subsubsection{Development Environment}
 
-\subsection{Development Environment}
+\subsubsection{Testing}
 
-\subsection{Testing}
+\subsubsection{External Libraries}
 
-\subsection{External Libraries}
-
-\subsection{Requirements}
-
-\subsubsection{Testing Harness}
-
-\subsubsection{Template Matching Methods}
 
 \section{Research Methodology}
 
