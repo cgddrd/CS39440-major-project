@@ -56,6 +56,11 @@
 \renewcommand{\headrulewidth}{0 pt}
 \renewcommand{\chaptermark}[1]{\markboth{#1}{}}
 
+\newlength\tindent
+\setlength{\tindent}{\parindent}
+\setlength{\parindent}{0pt}
+\renewcommand{\indent}{\hspace*{\tindent}}
+
 \tableofcontents   
 \newpage
 \listoffigures
@@ -66,7 +71,9 @@
 % Set up page numbering
 \pagenumbering{arabic}
 
-\title{Estimation of Terrain Shape Using a Monocular Vision-based System}
+%\title{Estimation of Terrain Shape Using a Monocular Vision-based System}
+
+\title{Estimation of Terrain Gradient Conditions and Obstacle Location Using a Monocular Vision-based System}
 
 \setchapterheaderfooter
 

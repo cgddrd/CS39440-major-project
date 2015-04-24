@@ -46,6 +46,7 @@ Cameras are becoming an increasingly favourable sensor for use on robotic system
 \subsection{Computer Vision Principles}
 
 \subsection{Related Work}
+\label{related-work}
 
 The challenge of providing accurate and robust obstacle detection has, and remains to be major topic of focus within the field of computer vision. When beginning to investigate this area of research, it quickly becomes clear that there are an enormous variety of solutions already available. In the majority of cases, these solutions propose new or improved approaches to combining ``standard" computer-vision techniques with a variety of hardware configurations, with the aim of either improving on previously published results, or to focus on the avoidance of specific types of obstacle (e.g. precipice or animal detection). 
 
@@ -76,7 +77,7 @@ A major challenge relating to the use of optical flow methods for obstacle detec
 
 \subsubsection{Appearance-Based Methods}
 
-Ulrich and Nourbakhsh \cite{ulrich-nourbakhsh} present an altogether different approach to vision-based obstacle detection. Rather than scrutinising differences in motion behaviour of scene objects, the authors instead focus on comparing differences in colour between the ground and other objects in the robot's field of view. Ulrich and Nourbakhsh argue that using colour as a detection metric for obstacles can prove to be less computationally expensive than ``range-based" obstacle detection methods like optical flow or stereo vision, and in certain cases, have also shown to be more accurate and reliable - particularly in cases involving the detection of small or flat objects close the ground or where a system needs to be able to differentiate between terrain surfaces. 
+Ulrich and Nourbakhsh \cite{ulrich-nourbakhsh} present an altogether different approach to vision-based obstacle detection. As opposed to scrutinising differences in motion behaviour of scene objects, the authors instead focus on comparing differences in colour between the ground and other objects in the robot's field of view. Ulrich and Nourbakhsh argue that using colour as a detection metric for obstacles can prove to be less computationally expensive than ``range-based" obstacle detection methods like optical flow or stereo vision, and in certain cases, have also shown to be more accurate and reliable - particularly in cases involving the detection of small or flat objects close the ground or where a system needs to be able to differentiate between terrain surfaces. 
 
 A key aspect from the Ulrich and Nourbakhsh paper discusses details of how their system is able to effectively handle image noise caused by changes in illumination. In their solution, the authors discuss the use of an alternative colour space to RGB for representing input images that allows for the undesired effects caused by changes in illumination between subsequent frames to be negated. By converting images to use the `Hue-Saturation-Intensity' colour space, the actual colour of objects within the image (represented by the Hue and Saturation channels) become less sensitive to changes in brightness (represented by the Intensity channel). As well as providing greater resistance to illumination changes, using a colour space that separates colour from brightness also provided an easier platform from which the authors could further remove noise via channel thresholding \cite{ulrich-nourbakhsh}. 
 
@@ -90,7 +91,7 @@ As part of a survey conducted into various methodologies of appearance-based tem
 
 Later in the same survey, Perveen \textit{et al} discuss an additional modification to traditional template matching methods that they describe as able to exploit an important observation from object-appearance behaviour in order to provide a dramatic reduction in the computation time required for processing image patches. This observation, and the potential consequences it can pose in terms of efficiency gains, is described succinctly by the authors themselves:
 
-\textit{``The shape of any object is defined solely by the shape of its edges. Therefore instead of matching of the whole pattern, we could extract its edges and match only the nearby pixels, thus avoiding some unnecessary computations. In common applications the achieved speed-up is usually significant."} \cite{perveen}
+\indent \textit{``The shape of any object is defined solely by the shape of its edges. Therefore instead of matching of the whole pattern, we could extract its edges and match only the nearby pixels, thus avoiding some unnecessary computations. In common applications the achieved speed-up is usually significant."} \cite{perveen}
 
 Further investigation has shown that a number of previous robotic projects have successfully utilised edge detection as a means of providing accurate obstacle detection \cite{hanumante} and \cite{borenstein}. Also of interest was the work conducted by Lin and Chunbo \cite{lin} in which they propose a solution into the issue of rotation invariance within appearance-based detection methods through combining of the use of contour images with the ``mean absolute difference" template matching method. 
 
@@ -108,29 +109,75 @@ An important consideration to realise however, is that by increasing the variety
 
 \subsection{Project Overview}
 
-Making use of recent advances in camera technology with appropriate computer vision techniques, this project aims to perform a viability study into the use of appearance-based pattern matching and optical flow analysis to provide an estimation into the general ``shape" of current terrain, while also supporting the detection of obstacles in the path of a mobile robot. 
+Making use of recent advances in camera technology with appropriate computer vision techniques, this project focusses on conducting a viability study into the use of various feature matching techniques and optical flow analysis in order to provide an estimation into the general gradient of the current terrain, while also supporting the detection of nearby obstacles and an indication of the egomotion of a mobile robot. 
 
-Through this system, it should be possible to identify the presence of both positive, and negative obstacles (e.g. rocks and pits respectively), providing a reasonable indication of their general size and location. In addition, it is predicted that such a system will also be able to provide an estimation of the speed and change in rotation/orientation of the robot as it traverses along a path. These will be calculated as by-products of the terrain inference mechanism, and could be expected to eventually form part of a larger visual odometry and/or autonomous navigation system.
+%Through this system, it should be possible to identify the presence of both positive, and negative obstacles (e.g. rocks and pits respectively), providing a reasonable indication of their general size and location. In addition, it is predicted that such a system will also be able to provide an estimation of the speed and change in orientation of the robot as it traverses along a path. These will be calculated as by-products of the terrain inference mechanism, and could be expected to eventually form part of a larger visual odometry and/or autonomous navigation system.
 
-While the aims of this project are primarily research-focussed, an ultimate goal of the project would be to install such a system onto a working mobile robot. A proposed example of such a robot could be the `IDRIS' all-terrain, four-wheel-drive robot currently owned and operated by the Department of Computer Science at Aberystwyth University.
+While this project is primarily research-focussed, an ultimate goal of the project would be to install such a system onto a working mobile robot. A proposed example of such a robot could be the `IDRIS' all-terrain, four-wheel-drive robot currently owned and operated by the Department of Computer Science at Aberystwyth University.
+
+% FIGURE: IDRIS
 
 \subsection{Motivation}
 
-The motivation for undertaking the project presented in this report can be primarily traced back to a high level of interest that the author has in the general field of computer vision and its associated topic areas.
+Motivation for undertaking this project comes primarily from a peaked interest into the field of computer vision and its associated topics gained following the decision to undertake a computer vision module at university.
+
+The project also presented a key opportunity for the author to engage in a substantial piece of work falling outside of their prior experience, choosing to pursue a problem of a scientific or research-based nature, rather than one of `traditional' software engineering. 
+
+Further opportunities were also presented for enhancing development skills using the C, C++ and Python programming languages, and in particular, the development of computer vision applications using popular image processing libraries.
 
 
 \section{Analysis}
 
+Focussing on conducting research as part of a scientific investigation, this project looks specifically into investigating the viability of the following proposed hypothesis: 
 
-\subsection{Overview}
+\indent \textit{``From images captured via a monocular camera system, analysis of extracted optical flow information can provide estimates into important terrain and hazard information useful in supporting the safe navigation of an autonomous robot as it makes its way through the current environment. In particular, these estimations can help to establish vital details regarding the general gradient condition of terrain; the location, size and shape of potential obstacles and the current speed and orientation of the robot itself."}
+ 
+In the case of this project, such a statement is technically an example of a `working hypothesis'. Defined by the Collins English Dictionary as \textit{``a suggested explanation for a group of facts or phenomena, accepted as a basis for further verification"} \cite{collins}, a working hypothesis gives rise to the expectation for further investigative work to be conducted, even if this hypothesis is later discovered to fail \cite{century}. 
 
-\subsection{Research Aims}
+The history of work that led to the proposal of the above hypothesis actually began focussing not on obstacle detection, nor the inference of terrain gradients, but instead on investigating potential solutions towards a lightweight visual-based odometry system for installation aboard a mobile robot. 
 
-\subsection{Design Decisions}
+It was not until the completion of initial background investigations into existing approaches (namely the work of Campbell \textit{et al.} \cite{campbell} - discussed further in Section \ref{related-work}) that key ideas surrounding the final hypothesis began to come into fruition. 
 
-\subsubsection{Feature Matching}
+\subsection{Design of the Working Hypothesis} 
 
-\subsubsection{Development Environment}
+The hypothesis detailed in this report can be decomposed into four key areas of expectation. While all relate to the exploitation of observed optical flow behaviour, each focusses on providing an estimation into the status of a specific ``condition metric". 
+
+While these will of course only be estimates, it is hoped that when brought together, these observations will provide a vital insight into the overall condition of the current terrain and robot egomotion. 
+
+The four primary ``condition metrics" proposed under the hypothesis are as follows:
+
+\begin{itemize}
+	\item \textbf{Terrain gradient} - Provides an indication of how ``flat" the terrain surrounding the robot current is. Any significant changes to terrain slope (positive or negative) should be identified in order to allow any appropriate action (e.g. reduction in speed) to be taken.
+	\item  \textbf{Oncoming obstacles} - The detection of both positive and negative obstacles (e.g. rocks and pits respectively) encountered along the path of a mobile robot as it moves through its environment. 
+	\item \textbf{Robot speed} - Indication of a robot's speed based upon a prior knowledge of a fixed time interval and the distance moved by the robot within that time frame.
+	\item \textbf{Robot orientation} - An indication of current orientation, based upon observations into changes in rotation made as a result of the robot turning. 
+	
+\end{itemize} 
+
+The following subsections aim to provide a description and justification of each expectation, along with a discussion into the general ``thought processes" considered in order to arriving at a final proposal.
+
+\subsubsection{Inference of Terrain Gradient}
+
+A common observation of the background reading was a discussion around the notion of motion parallax, and in particular the potential applications it presented for extracting location and structure information of objects. 
+
+The use of observed changes in motion between images to estimate the shape and location of 3D-structures is well-explored concept that has given rise to a plethora of innovate vision-based projects \cite{tiddeman}, \cite{snavely}.
+
+\subsubsection{Obstacle Detection}
+
+\subsubsection{Rotation Estimation}
+
+\subsubsection{Speed Estimation}
+
+
+\subsection{Task Planning}
+
+%\subsection{Design Decisions}
+%
+%\subsubsection{Feature Matching}
+%
+%\subsubsection{Development Environment}
+
+
 
 \section{Research Methodology}
 
@@ -140,7 +187,6 @@ The motivation for undertaking the project presented in this report can be prima
 
 \subsection{Testing}
 
-\section{Project Working Hypothesis}
 
 
 
