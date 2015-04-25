@@ -142,27 +142,47 @@ It was not until the completion of initial background investigations into existi
 
 The hypothesis detailed in this report can be decomposed into four key areas of expectation. While all relate to the exploitation of observed optical flow behaviour, each focusses on providing an estimation into the status of a specific ``condition metric". 
 
-While these will of course only be estimates, it is hoped that when brought together, these observations will provide a vital insight into the overall condition of the current terrain and robot egomotion. 
+While these will of course only be estimates, it is hoped that when they are brought together, these observations could provide a vital insight into the overall status and condition of the current terrain and robot egomotion. 
 
-The four primary ``condition metrics" proposed under the hypothesis are as follows:
+The four ``condition metrics" subject to observation proposed under the hypothesis were as follows:
 
 \begin{itemize}
-	\item \textbf{Terrain gradient} - Provides an indication of how ``flat" the terrain surrounding the robot current is. Any significant changes to terrain slope (positive or negative) should be identified in order to allow any appropriate action (e.g. reduction in speed) to be taken.
+	\item \textbf{Terrain gradient} - Indication of how ``flat" the terrain surrounding the robot current is. Any significant changes to terrain slope (positive or negative) should be identified in order to allow any appropriate action (e.g. reduction in speed) to be taken.
 	\item  \textbf{Oncoming obstacles} - The detection of both positive and negative obstacles (e.g. rocks and pits respectively) encountered along the path of a mobile robot as it moves through its environment. 
 	\item \textbf{Robot speed} - Indication of a robot's speed based upon a prior knowledge of a fixed time interval and the distance moved by the robot within that time frame.
 	\item \textbf{Robot orientation} - An indication of current orientation, based upon observations into changes in rotation made as a result of the robot turning. 
 	
 \end{itemize} 
 
-The following subsections aim to provide a description and justification of each expectation, along with a discussion into the general ``thought processes" considered in order to arriving at a final proposal.
+%Given the high level of potential scope for investigation presented in the working hypothesis, it was deemed important, especially in the early stages of investigation, to draw some appropriate assumptions that would help simplify the general ideas presented into manageable stages. Clearly, should initial findings be positive, then (assuming enough available time remaining) it was expected that further work could then be planned to tackle solving the more complex issues addressing these assumptions.
+%
+%Taking guidance from the background research, the assumptions subsequently drawn were deemed appropriate in relation to the main objective of providing visual-based terrain inference, obstacle detection and egomotion estimation of a wheeled robot:
+%
+% \begin{enumerate}
+% 	\item In the first instance, it was assumed that the proposed system would only support motion following straight line trajectories (i.e. motion caused as a result of the robot performing any kind of turn would be ignored). \\ \\
+% 	An obvious exception to this was the proposed ability to estimate changes in robot orientation, which in theory would have to be caused by the robot changing direction. This however would itself make the frankly unrealistic assumption of the camera suffering no shake caused by traversal over uneven terrain. 
+% \end{enumerate}
 
-\subsubsection{Inference of Terrain Gradient}
+The remainder of this section is dedicated to providing details regarding the core ideas proposed within the hypothesis, including a discussion into the general ``thought processes" considered while forming these ideas.
 
-A common observation of the background reading was a discussion around the notion of motion parallax, and in particular the potential applications it presented for extracting location and structure information of objects. 
+\subsubsection{Inference of Terrain Gradient \& Obstacle Detection}
 
-The use of observed changes in motion between images to estimate the shape and location of 3D-structures is well-explored concept that has given rise to a plethora of innovate vision-based projects \cite{tiddeman}, \cite{snavely}.
+The notion of motion parallax, and its usefulness as means of inferring information about real-world environments, is an idea found to be commonplace in many vision-based projects wishing to extract details about 3D environments from 2D images \cite{}, \cite{}.  
 
-\subsubsection{Obstacle Detection}
+The general theory behind motion parallax is very simple, providing a visual cue from which the depth of objects situated within a 3-dimensional scene can subsequently be perceived. The concept describes how as the visual field of an observer changes due their movement, objects located at a short distance away will appear to move across the scene faster than those objects located further away.
+ 
+ By measuring the level of displacement that an object demonstrates, it therefore becomes possible to infer the relative distance to that object from the current view position. Typical approaches within computer vision accomplish this task through the use of feature detection and tracking to calculate the displacement of static objects between consecutive images. 
+ 
+One of the key advantages to using motion parallax within the context of computer vision and robotics comes from the fact that its effects continue to be visible even if captured via the use of only a single camera \cite{}. Therefore, strictly speaking, motion parallax can be best defined as providing a \textit{monocular} visual cue for depth, open to exploitation by any visual-based system defined as such through the use of at least one camera for providing input.
+
+In the case of Campbell \textit{et al.} \cite{campbell}, the authors make exclusive use of the observed differences in the displacement of objects as the underlying mechanism from which their system is able to detect potential obstacles. 
+
+This process of measuring the displacement of pixels within select regions of an image is referred to as \textit{sparse optical flow} \cite{sparse-optical-flow} within the field of computer vision. By monitoring discontinuities in the length of these calculated optical flow vectors, Campbell \textit{et al.} are able to detect the presence of both positive and negative obstacles characterised as such by whether respectively, the pixels representing them hold vectors that are proportionally shorter or longer than the general majority \cite{campbell}.
+
+The approach proposed within the hypothesis for this project aims to take the same fundamental idea, and apply it further to the inference of terrain gradient \textit{in addition to} the presence of potential obstacles. It is considered that, just in the same way as positive obstacles appear closer to the camera than the ground on which they lie, an area of ground that demonstrates a sudden increase in its tendency upwards would also appear closer to the camera, therefore holding optical flow vectors that are proportionally longer than those previously recorded within the same area of the previous image relative to the ground plane. Likewise, if presented with an area of ground that was to tend evenly downward, it would be expected that a significant decrease in the displacement would be detected as a result of observing shorter optical flow vectors.  
+
+%The use of observed changes in motion between images to estimate the shape and location of 3D-structures is a well-explored concept that has given rise to a plethora of innovative vision-based projects \cite{tiddeman}, \cite{snavely}.
+
 
 \subsubsection{Rotation Estimation}
 
