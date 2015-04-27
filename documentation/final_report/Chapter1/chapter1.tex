@@ -43,7 +43,7 @@ A vital contributor to the success of reactive navigation and therefore to the o
 
 Cameras are becoming an increasingly favourable sensor for use on robotic systems, due primarily to the impressive variety and quantity of potential data that can be captured \textit{simultaneously} from a single device. They are also one of few sensors that have experienced a consistent reduction in price over the past decade \cite{campbell}, making them viable for many types of project application and budget. 
 
-\subsection{Computer Vision Principles}
+\subsection{Related Computer Vision Concepts}
 
 \subsection{Related Work}
 \label{related-work}
@@ -109,7 +109,7 @@ An important consideration to realise however, is that by increasing the variety
 
 \subsection{Project Overview}
 
-Making use of recent advances in camera technology with appropriate computer vision techniques, this project focusses on conducting a viability study into the use of various feature matching techniques and optical flow analysis in order to provide an estimation into the general gradient of the current terrain, while also supporting the detection of nearby obstacles and an indication of the egomotion of a mobile robot. 
+Making use of recent advances in camera technology with appropriate computer vision techniques, this project focusses on conducting a viability study into the use of various appearance-based feature tracking techniques and subsequent optical flow analysis in order to provide an estimation into the general gradient of the current terrain, while also supporting the detection of nearby obstacles and an indication of the egomotion of a mobile robot. 
 
 %Through this system, it should be possible to identify the presence of both positive, and negative obstacles (e.g. rocks and pits respectively), providing a reasonable indication of their general size and location. In addition, it is predicted that such a system will also be able to provide an estimation of the speed and change in orientation of the robot as it traverses along a path. These will be calculated as by-products of the terrain inference mechanism, and could be expected to eventually form part of a larger visual odometry and/or autonomous navigation system.
 
@@ -168,7 +168,7 @@ One of the key advantages to using motion parallax within the context of compute
 
 In the case of Campbell \textit{et al.} \cite{campbell}, the authors make exclusive use of the observed differences in the displacement of objects as the underlying mechanism for  detecting the presence potential obstacles. 
 
-Measuring the displacement by which select ``distinctive" areas of an image move, is a process commonly known as \textit{sparse optical flow} \cite{sparse-optical-flow}. By monitoring discontinuities in the length of calculated optical flow vectors (i.e. the distance and direction of displacement along the image plane), Campbell \textit{et al.} were able to detect the presence of both positive and negative obstacles, characterised respectively by whether they demonstrated vectors that were proportionally \textit{shorter}, or \textit{longer} than the general consensus set \cite{campbell}.
+Measuring the displacement by which select ``distinctive" areas of an image move over time, is a process more commonly known as \textit{sparse optical flow} \cite{sparse-optical-flow}. By monitoring discontinuities in the length of calculated optical flow vectors (i.e. the distance and direction of displacement along the image plane), Campbell \textit{et al.} were able to detect the presence of both positive and negative obstacles, characterised respectively by whether the features identified in the image demonstrated vectors that were proportionally \textit{shorter}, or \textit{longer} than the general consensus set \cite{campbell}.
 
 A potentially problematic issue associated with sparse optical flow and feature detection in general, is how to ensure adequate coverage and frequency of features, when the scene represented in consecutive images fails to contain many regions ``distinctive" enough for use by feature detectors. When faced with this issue, Campbell \textit{et al.} \cite{campbell} chose to deliberately select a wider range of lower quality features within input images in order to ensure that they obtained reasonable coverage across the entire image space. 
 
@@ -180,29 +180,60 @@ The proposed hypothesis aimed to take the same fundamental ideas proposed by Cam
 
 It was considered that, just in the same way as positive obstacles appear closer to the camera than the ground on which they lie, an area of ground that demonstrates a sudden increase in its tendency upwards appears closer to the camera, therefore holding optical flow vectors that are proportionally longer than those previously recorded within the same region of the image plane. Likewise, when presented with an area of ground sloping evenly downwards, a decrease in its displacement detected through the observation of proportionally shorter optical flow vectors would generally be expected.  
 
-Continuing to employ the concept of motion parallax as the primary means of estimating the 3D-geometric characteristics of a captured 2D scene, the hypothesis introduced two key differences in its general approach from those projects previously investigated:
+Continuing to employ the concept of motion parallax as the primary means of estimating the 3D-geometric characteristics of a captured 2D scene, the hypothesis introduced two key differences in its general approach from those discussed within projects previously investigated:
 
 \begin{itemize}
-	\item The adoption of appearance-based matching for the tracking of image features over the use of detectors that relied upon feature descriptors.
-	\item The use of a formalised model to represent detected changes in vertical displacement as part of efforts to estimate changes in terrain gradient and the location/characteristics of potential obstacles. 
+	\item The exclusive adoption of appearance-based detection and matching for the tracking of image features over the use of detectors that relied upon feature descriptors.
+	\item The use of a formalised model to represent detected changes in vertical displacement as part of efforts to estimate changes in terrain gradient in addition to the location/characteristics of potential obstacles. 
 \end{itemize}
 
+\subsubsection{Appearance-Based Feature Detection \& Tracking}
 
-The decision to use appearance-based matching for the detection and subsequent tracking of features was taken primarily out of interest in evaluating the performance of such techniques within the context of optical flow analysis. 
+The decision to use appearance-based matching for the detection and subsequent tracking of features was taken primarily out of an interest in conducting an evaluation into the performance of such methods within the context of optical flow analysis. 
 
-An additional reason identified on the back of background research \cite{} \cite{} directed towards the common observation that on average, appearance-based detectors tended to be less computationally expensive than their feature-based equivalents \cite{}. This was an aspect that tied in closely to the relationship that the project exhibited between the fields of computer vision and robotics, and was subsequently deemed important benefit in relation to the ultimate goal of installation aboard a mobile robot.
+An additional reason that was identified on the back of background research \cite{} \cite{} directed towards the common observation that on average, appearance-based detectors tended to be less computationally expensive than their feature-based equivalents \cite{}. This was an aspect that tied in closely with the relationship that the project exhibited between the fields of computer vision and robotics, and subsequently was deemed an important benefit in relation to the ultimate goal of installation aboard a mobile robot that would most likely possess limited computing capability.
 
-The idea behind the definition of a formal model for representing vertical displacement of image regions, was one that would lay at the centre of the entire project investigation. Designed to be simplistic, yet efficient and accurate in its approach, it was predicted that through the use of the model it would be possible to quickly identify features within an image that displayed either a significant increase or decrease in the level of displacement, and hence could subsequently be identified as either an obstacle (positive or negative), or even perhaps a change in the slope of the current terrain.
+\subsubsection{Vertical Displacement Model}
 
-The process for building and subsequently evaluating the model would take on the following structure:
+The use of a model for representing vertical displacement of image regions was an idea that lay at the centre of the main investigation conducted for the major project. Its purpose was to provide a mechanism by which the core underlying prediction relating to the estimation of changes in terrain gradient and obstacle detection could be evaluated:
+	
+	\indent \textit{``Following the concepts of motion parallax, it is predicted that features captured towards the bottom of an image will show greater displacement between subsequent frames, than those features captured towards the top of the image."}
+	
+The model was designed to take the form of a kind of ``lookup-table", where a simple structure would be adopted to focus specifically on the relationship between the \textit{height within an image}, and the \textit{level of vertical displacement that the row located at that height demonstrated}. 
 
-\begin{enumerate}
-	\item 
-\end{enumerate}
+ If visualised as 2D scatter plot (Figure \ref{}), this structure definition would be represented as:
+	
+	\begin{itemize}
+		\item \textbf{X axis:} The height of the image, plotted as 1px-high rows.
+		\item \textbf{Y axis:} The vertical displacement in pixels recorded at a given height.
+	\end{itemize}
+	
+	where the predicted trend would see as the row number (i.e. height relative to the top of the image) increased, so to would the level of vertical displacement.
+	
+Conducted as part of an initial `calibration' stage, a robot would navigate across an area of the current terrain that was generally flat and contained no obstacles. During this time a ``baseline" vertical displacement model would be produced by taking an average of the displacement recorded for each image row across a number of measurement attempts.
+	
+Within the scope of the proposed final system, this ``baseline" vertical displacement model would provide the basis from which it would then become possible to identify cases of ``unusual" displacement behaviour by comparing the level of displacement behaviour recorded during for a given row against the general trend. 
 
+In the case of a small number of isolated rows, a significant extension or reduction in the length of the displacement recorded would be indicative of a potential obstacle (positive or negative). In the case of a larger range of rows, the same observations would be indicative of a change (positive or negative) in the slope gradient of the ground forming the terrain (Figure \ref{}).
+	
+  % ADD FIGURE SHOWING EXAMPLE OF NEGATIVE OBSTACLE AND ONE OF POSITIVE OBSTACLE.
+  
+ Establishing the difference between a change in displacement that was caused by an obstacle, and one that was caused by a change in terrain gradient, would come down to the evaluation of the pattern of displacement recorded across all of the rows of the image.
+ 
+ It would typically be expected that the event of a single oncoming obstacle would demonstrate a very rapid increase (positive obstacle) or decrease (negative obstacle) in the level of displacement shown, however this change would only be observed within a small subset of rows in which that obstacle appeared. Similarly in the case of multiple obstacles, significant changes in displacement would be expected, but only for a number of small subsets that would typically be isolated throughout the height of the image (Figure \ref{}).
+ 
+% Draw example graph showing obstacle spikes - 1) graph with only one spike, 2) graph with multiple isolated spikes.  
+ 
+ Alternatively, in the event of a change in terrain gradient it would instead be expected that in the case of those pixels representing the ground, the vast majority would consequently all demonstrate a similar change in displacement in terms of both direction and magnitude.
+
+ This is because a change in the slope of the actual \textit{ground} is likely to be observed across a much larger range of rows than what would be observed for an individual obstacle such as a rock or pit.  In addition, it would be expected that this trend would continue over time, resulting in this new level of displacement in effect becoming the `control' from which comparisons are then made until such a time as the terrain gradient was to again change. 
+ 
+ 
+ % ADD FIGURE SHOWING DIFFERENCE BETWEEN OBSTCALE AND GENERAL CHANGE IN TERRAIN.
 \subsubsection{Calibration \& Focus of Expansion}
 
-A further point to consider regarding the use of input supplied by an optical camera is \textit{calibration}. The primary requirement for calibration stems from a need to identify and correct the \textit{distortion} that is observed from the use of cameras whose optics adopt the \textit{pinhole camera model} \cite{camera-calib}. Failure to correct such distortion can result in significant inaccuracies being observed between the perceived motion of an object captured in an image, and the actual movement that it demonstrates. 
+A further point to consider regarding the use of input supplied by an optical camera is \textit{calibration}. The primary requirement for calibration stems from a
+the need to identify and correct the \textit{distortion} observed as a result of using cameras whose optics adopt the \textit{pinhole camera model} \cite{camera-calib}. Failure to correct such distortion can result in significant inaccuracies being observed between the perceived motion of an object captured in an image, and the actual movement that it demonstrates. 
 
 In the case of many projects where optical cameras constituted part of the hardware configuration, calibration of both the camera lens and physical setup allowed for the calculation of conversions between native camera units (e.g. pixels) and their real world equivalents (e.g. centimeters) \cite{campbell}, \cite{low}, \cite{}.
 
@@ -214,8 +245,9 @@ Through the understanding of a concept known as \textit{Focus of Expansion} (FOE
 
 By isolating the tracking of objects to only those lay within a specific range of the FOE, it would become possible to negate against the effects of perspective distortion without the need to perform explicit calibration of camera parameters. 
 
-
 \subsubsection{Rotation Estimation}
+
+For the purposes of providing estimates into terrain conditions and obstacle  
 
 \subsubsection{Speed Estimation}
 
