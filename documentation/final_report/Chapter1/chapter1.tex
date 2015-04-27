@@ -24,7 +24,7 @@
 
 \subsection{Introduction}
 
-The ability to decide between one or more alternate choices is a complex skill that as humans, we possess but rarely consciously observe. As human beings, we are expected to make decisions both large and small as part of everyday life, but . While most decisions will have typically little impact requiring almost unnoticeable levels of thought (e.g. \textit{``do I have peas or beans tonight with dinner?"}), others that could have potentially life-changing consequences (e.g. \textit{"do I take this new job or not?"}) will force an individual to consider much more closely.
+As human beings, we are expected to make decisions both large and small as part of everyday life. While the act of making a decision is constitutes an action that is rarely consciously observed, others that may have potentially life-changing consequences will force an individual to consider much more closely.
 
 For a human faced with making such decisions, identifying which out of a number of possible choices constitutes the ``right" decision is often regarded as a challenging and highly subjective task. %Each decision that a person makes will vary based upon their individual characteristics, which as a consequence can often result in contrasting decisions being taken in response to the same situation.% 
 Before settling on a final decision, an individual will typically identify and evaluate all possible choices by considering each upon a weighting of merit \cite{rational-decision-model}. While variations in weighting between specific individuals can cause different decision outcomes, an important realisation comes from the understanding that all considerations made by an individual rely on their \textit{trust} in the accuracy and truth of information gathered during the identification and comparison of these alternative choices.
@@ -35,7 +35,7 @@ Before settling on a final decision, an individual will typically identify and e
  
 Given the importance of the relationship between reliable information and correct decision making, a major challenge within the field of autonomous robotics is maximising both the accuracy of input data, and the robustness of systems used to verify such accuracy.
 
-  Accurate and efficient navigation plays a crucial role in allowing robots that require autonomous motion capabilities to make safe, yet objective decisions on how best to traverse from a starting position to a target position. This idea becomes evermore important when it is considered that a key use case for robotic systems typically involves the undertaking of tasks within environments deemed unfeasible or unsafe for humans to complete themselves. Observing examples of tasks where autonomous robots are expected to operate in particularly harsh environments, including bomb disposal \cite{bomb-disposal} and planetary exploration \cite{planet-explore}, it becomes clear that the ability to perform safe and robust navigation is vital to the survival of both mission and device.
+  The ability to successfully navigate plays a crucial role in allowing robots that require autonomous motion capabilities to make safe, yet objective decisions on how best to traverse from a starting position to a target position. This idea becomes evermore important when it is considered that a key use case for robotic systems typically involves the undertaking of tasks within environments deemed unfeasible or unsafe for humans to complete themselves. Observing examples of tasks where autonomous robots are expected to operate in particularly harsh environments, including bomb disposal \cite{bomb-disposal} and planetary exploration \cite{planet-explore}, it becomes clear that the ability to perform safe and robust navigation is vital to the survival of both mission and device.
 
 As a problem-space, autonomous navigation can be decomposed into two key areas of focus; one of \textit{reactive} navigation, and the other of \textit{deliberative} navigation. Reactive, or local navigation is concerned with controlling the path of the robot through the immediate surrounding area, focussing in particular on the safe traversal around potentially dangerous terrain hazards including obstacles, steep slopes and precipices. In contrast, deliberative or global navigation is tasked with planning the ``high-level" path that a robot will follow in order to reach its destination. As a consequence, deliberative navigation tends to adopt a greater level of focus on calculating the most \textit{optimal} path through the environment over necessarily the one that is ``safest" for the robot. Traditionally within autonomous navigation systems, feedback from both the reactive and deliberative components is combined in order to arrive at final path that balances both safety and objectivity \cite{mer-rover}. 
 
@@ -175,6 +175,7 @@ A potentially problematic issue associated with sparse optical flow and feature 
 Naturally, choosing specifically to allow the detection of lower-quality features opens up a greater risk to outliers and false positives, which Campbell and his team later counteract through the combined filtering and `peer-verification' of incremental optical flow vectors \cite{campbell}. While this approach is noted to strike a good balance between the amount of information that can be extracted, and its overall resilience to potential outliers, it does of course also attribute itself to an increase in the overall computational cost of the system. This is a price that aboard some robotic systems could prove simply to be too high, particularly in situations where spare computing power is already considered a luxury (e.g. planetary rovers \cite{mer}). 
 
 \subsubsection{Supporting Inference of Terrain Gradient \& Obstacle Detection}
+\label{hypo-gradient}
 
 The proposed hypothesis aimed to take the same fundamental ideas proposed by Campbell \textit{et al.} \cite{campbell} for the detection of obstacles located within the visual field (discussed more in detail in Section \ref{related-work}), before attempting to apply them further to the inference of terrain gradient conditions. 
 
@@ -188,20 +189,22 @@ Continuing to employ the concept of motion parallax as the primary means of esti
 \end{itemize}
 
 \subsubsection{Appearance-Based Feature Detection \& Tracking}
+\label{hypo-tracking}
 
 The decision to use appearance-based matching for the detection and subsequent tracking of features was taken primarily out of an interest in conducting an evaluation into the performance of such methods within the context of optical flow analysis. 
 
 An additional reason that was identified on the back of background research \cite{} \cite{} directed towards the common observation that on average, appearance-based detectors tended to be less computationally expensive than their feature-based equivalents \cite{}. This was an aspect that tied in closely with the relationship that the project exhibited between the fields of computer vision and robotics, and subsequently was deemed an important benefit in relation to the ultimate goal of installation aboard a mobile robot that would most likely possess limited computing capability.
 
 \subsubsection{Vertical Displacement Model}
+\label{hypo-model}
 
 The use of a model for representing vertical displacement of image regions was an idea that lay at the centre of the main investigation conducted for the major project. Its purpose was to provide a mechanism by which the core underlying prediction relating to the estimation of changes in terrain gradient and obstacle detection could be evaluated:
 	
 	\indent \textit{``Following the concepts of motion parallax, it is predicted that features captured towards the bottom of an image will show greater displacement between subsequent frames, than those features captured towards the top of the image."}
 	
 The model was designed to take the form of a kind of ``lookup-table", where a simple structure would be adopted to focus specifically on the relationship between the \textit{height within an image}, and the \textit{level of vertical displacement that the row located at that height demonstrated}. 
-
- If visualised as 2D scatter plot (Figure \ref{}), this structure definition would be represented as:
+ 
+ If visualised as a 2D scatter plot (Figure \ref{}), this structure definition would be represented as:
 	
 	\begin{itemize}
 		\item \textbf{X axis:} The height of the image, plotted as 1px-high rows.
@@ -210,51 +213,71 @@ The model was designed to take the form of a kind of ``lookup-table", where a si
 	
 	where the predicted trend would see as the row number (i.e. height relative to the top of the image) increased, so to would the level of vertical displacement.
 	
-Conducted as part of an initial `calibration' stage, a robot would navigate across an area of the current terrain that was generally flat and contained no obstacles. During this time a ``baseline" vertical displacement model would be produced by taking an average of the displacement recorded for each image row across a number of measurement attempts.
+The use of the model relies upon the completion of an initial calibration stage, in which a robot would navigate across an area of terrain that was generally considered to be both flat and clear of obstacles. During this time, a ``baseline" vertical displacement model is generated by taking an average of the displacement recorded for each image row across a number of separate measurements.
 	
-Within the scope of the proposed final system, this ``baseline" vertical displacement model would provide the basis from which it would then become possible to identify cases of ``unusual" displacement behaviour by comparing the level of displacement behaviour recorded during for a given row against the general trend. 
+Within the scope of the proposed final system, subsequent comparison of displacement magnitude and direction recorded for a given row is performed against the general trend of this ``baseline" model as a means of identifying cases of ``unusual" displacement behaviour (Figure \ref{}). This comparison is re-evaluated upon every system cycle, following the generation of a new model to represent the changes in the scene captured by the latest images from the camera. 
 
-In the case of a small number of isolated rows, a significant extension or reduction in the length of the displacement recorded would be indicative of a potential obstacle (positive or negative). In the case of a larger range of rows, the same observations would be indicative of a change (positive or negative) in the slope gradient of the ground forming the terrain (Figure \ref{}).
-	
+Observing a significant extension or reduction in the length of displacement recorded between the ``baseline" model and the latest version of the model would provide a strong indication to the presence of a potential obstacle (positive or negative) or change in the slope gradient of the ground (Figure \ref{}).
+
   % ADD FIGURE SHOWING EXAMPLE OF NEGATIVE OBSTACLE AND ONE OF POSITIVE OBSTACLE.
   
- Establishing the difference between a change in displacement that was caused by an obstacle, and one that was caused by a change in terrain gradient, would come down to the evaluation of the pattern of displacement recorded across all of the rows of the image.
+ Establishing the difference between a change in displacement caused by an obstacle, and one caused by a change in terrain gradient comes down to the evaluation of the pattern of displacement recorded across all of the rows in the image.
  
- It would typically be expected that the event of a single oncoming obstacle would demonstrate a very rapid increase (positive obstacle) or decrease (negative obstacle) in the level of displacement shown, however this change would only be observed within a small subset of rows in which that obstacle appeared. Similarly in the case of multiple obstacles, significant changes in displacement would be expected, but only for a number of small subsets that would typically be isolated throughout the height of the image (Figure \ref{}).
- 
+In the event of an oncoming obstacle, the rows representing that object in the image would be expected to demonstrate a significant increase (positive obstacle) or decrease (negative obstacle) in the level of displacement shown. However importantly, this change would typically not be representative of the general trend in displacement that is observed across the entire height of image (indicated as a `spike' in a 2D scatter plot (Figure \ref{}). 
+
 % Draw example graph showing obstacle spikes - 1) graph with only one spike, 2) graph with multiple isolated spikes.  
  
- Alternatively, in the event of a change in terrain gradient it would instead be expected that in the case of those pixels representing the ground, the vast majority would consequently all demonstrate a similar change in displacement in terms of both direction and magnitude.
-
- This is because a change in the slope of the actual \textit{ground} is likely to be observed across a much larger range of rows than what would be observed for an individual obstacle such as a rock or pit.  In addition, it would be expected that this trend would continue over time, resulting in this new level of displacement in effect becoming the `control' from which comparisons are then made until such a time as the terrain gradient was to again change. 
+ Alternatively in the event of a change in terrain gradient, it would instead be expected that the vast majority of those pixels representing the ground would consequently all demonstrate a similar change in displacement in terms of both direction and magnitude. This is because a change in the slope of the actual \textit{ground} is likely to be observed across a much larger range of rows than what would be observed for an individual obstacle such as a rock or pit.
  
- 
- % ADD FIGURE SHOWING DIFFERENCE BETWEEN OBSTCALE AND GENERAL CHANGE IN TERRAIN.
+ % ADD FIGURE SHOWING DIFFERENCE BETWEEN OBSTACLE AND GENERAL CHANGE IN TERRAIN.
 \subsubsection{Calibration \& Focus of Expansion}
+\label{hypo-calib}
 
-A further point to consider regarding the use of input supplied by an optical camera is \textit{calibration}. The primary requirement for calibration stems from a
-the need to identify and correct the \textit{distortion} observed as a result of using cameras whose optics adopt the \textit{pinhole camera model} \cite{camera-calib}. Failure to correct such distortion can result in significant inaccuracies being observed between the perceived motion of an object captured in an image, and the actual movement that it demonstrates. 
+When contemplating the use of input supplied by an optical camera, one of the most crucial aspects to consider is the need to perform calibration of the camera lens. The primary requirement for performing calibration of the camera stems from the need to identify and correct the \textit{distortion} observed in images that are captured through a \textit{pinhole camera} lens \cite{camera-calib}. 
 
-In the case of many projects where optical cameras constituted part of the hardware configuration, calibration of both the camera lens and physical setup allowed for the calculation of conversions between native camera units (e.g. pixels) and their real world equivalents (e.g. centimeters) \cite{campbell}, \cite{low}, \cite{}.
+Failure to correct such distortion can result in significant inaccuracies being observed between the perceived motion of an object captured in an image, and the actual movement that it demonstrates. The effects caused by \textit{perspective distortion} on the perceived motion of objects positioned within the view of a forward-facing camera is a problem that is of particular importance to the success of the approach detailed in Section \ref{hypo-gradient}. Figure \ref{} provides a visual example of these kind of observed effects, where the ratio between the vertical and horizontal displacement of an object appears to change balance in relation to the distance it is located away from the horizontal centre of the image.
 
-While solutions capable of providing automatic methods of camera calibration do now exist \cite{camera-calib}, all continue to rely upon some form of manual involvement (normally in the calibration of the camera lens). 
+% FIGURE SHOWING PERSPECTIVE DISTORTION.
 
-For this project, it was identified that this additional level of complexity could be done away with by instead focussing the analysis of optical flow within the bounds of a fixed-width column running down the centre of the image. While the height of this ``region-of-interest" would match that of the current image, its width would be limited to only occupy a small subset of pixels located around the centre of the horizontal axis (Figure \ref{}). 
+In the case of many robotic software projects engaging in tasks involving visual navigation or obstacle detection, the calibration of both the camera lens and physical setup allows for future conversion between native camera units (e.g. pixels) and their real world equivalents (e.g. centimeters) \cite{campbell}, \cite{low}, \cite{}. While many computerised solutions to camera calibration do now exist \cite{camera-calib}, all continue to rely upon some form of manual involvement (normally surrounding calibration of the camera lens). 
 
-Through the understanding of a concept known as \textit{Focus of Expansion} (FOE), it was  predicted that this approach could help to dramatically limit the distortion applied to the perceived displacement of tracked features by the camera lens. In Figure \ref{}, the idea of FOE is clear to see. When a camera is moved forward and an image taken, all of motion vectors observed in the resulting perspective image appear to begin from a single point along the horizon \cite{stanford-cs}. This `single point' is what is known as the Focus of Expansion, and acts as the primary metric for an observer wishing to identify the direction in which they are currently headed \cite{texas-cs}. 
+Through the understanding of a concept known as \textit{Focus of Expansion} (FOE) it was identified that this additional level of complexity associated with camera calibration could instead be replaced with a much simpler approach that focussed exclusively on the analysis of optical flow of features that were contained within a confined ``region-of-interest" located around the horizontal centre of the image (Figure \ref{}).
 
-By isolating the tracking of objects to only those lay within a specific range of the FOE, it would become possible to negate against the effects of perspective distortion without the need to perform explicit calibration of camera parameters. 
+From examining Figure \ref{}, the reasoning behind FOE should be clear to see. When a camera is moved forward and an image is subsequently taken, all of the motion vectors observed in the resulting perspective image appear to begin from a single point centred along the horizon \cite{stanford-cs}. This `single point' is known as the Focus of Expansion, and acts as the primary metric for an observer wishing to identify the direction in which they are currently headed \cite{texas-cs}. 
 
-\subsubsection{Rotation Estimation}
+By restricting the tracking of features to only those that lay within a specific range of the FOE, it was hoped that this would allow for a reasonable reduction in the effects caused by perspective distortion without requiring the explicit calibration of camera parameters. 
 
-For the purposes of providing estimates into terrain conditions and obstacle  
+\subsubsection{Estimation of Robot Orientation}
 
-\subsubsection{Speed Estimation}
+An important observation relating to the motion exhibited by a robot, is the notion of it being possible to separate such motion into two main constituent parts; \textit{translation} and \textit{rotation} \cite{campbell}. 
 
+In the context of this project, translation represents the displacement that a robot obtains while travelling along in a single direction. As already discussed in sections \ref{hypo-gradient}, \ref{hypo-model} and \ref{hypo-calib}, it is currently possible using optical flow analysis, to record translational motion of a forward-moving robot by measuring the level of \textit{vertical displacement} that is demonstrated throughout a series of images captured via a front-facing camera.
+
+The other type of motion that can be demonstrated by a robot is of course, rotation. For a typical mobile robot, rotational movement actually constitutes a change in heading or orientation, which specifically, describes a rotation around the vertical axis \cite{campbell}. In the opposite way to translational movement, changes in rotation can represented by the \textit{horizontal} displacement of features tracked through a collection of images showing the scene in front a robot \cite{labrosse}. 
+
+However, a crucial distinction to be made between these two modes of motion, is the difference observed towards the level of respective displacement that features within an image can demonstrate. In the case of translational motion, features detected towards the top of the image will show a much smaller level of vertical displacement than features located towards the bottom. This is a consequence of the effects caused by motion-parallax, and forms the foundation of the proposal made in Section \ref{hypo-model} for supporting the inference of terrain gradient and obstacle detection. 
+
+In contrast, it is noted that a change in rotation will cause \textit{all} features tracked within an image to move through the \textit{same angle} \cite{campbell}. This is very important, as it subsequently reveals how all of these features should theoretically demonstrate the same level of horizontal displacement regardless of how close or distant they are to the camera at the time of capture.
+
+Taking inspiration from the work of Campbell \textit{et al.}, it is predicted that taking the median of these horizontal displacement values will provide an estimation into the change of orientation that a robot has undertaken.
+
+\subsubsection{Estimation of Robot Speed}
+
+For supporting both the inference of terrain gradient conditions and detection of potential obstacles, it is the role of the vertical displacement model (Section \ref{hypo-model})  to provide a delineation of the distance by which tracked features within an image have moved, relative to the position at which they were last detected. 
+
+Quite simply, using the relationship defined by the infamous \textit{speed-distance-time} equation:
+
+$$\text{Speed} = \frac{\text{Distance}}{\text{Time}}$$ 
+
+it becomes possible to estimate the speed at which the robot the travelling when assuming that the time interval between the capture of subsequent images remains constant.
+
+Therefore, a proposed extension to the vertical displacement model would instead see a number of separate models produced during the calibration stage, where each would represent the distance of vertical displacement demonstrated by the terrain as the robot travels at differing speeds (Figure \ref{}).
+
+Once these multiple models have been established, it would not be an unfeasible task for system to calculate which of the models best matches the current general trend of displacement demonstrated, which in turn would allow for an estimation into current speed of travel.
 
 \subsection{Task Planning}
 
-%Given the high level of potential scope for investigation presented in the working hypothesis, it was deemed important, especially in the early stages of investigation, to draw some appropriate assumptions that would help simplify the general ideas presented into manageable stages. Clearly, should initial findings be positive, then (assuming enough available time remaining) it was expected that further work could then be planned to tackle solving the more complex issues addressing these assumptions.
+%Given the high level of potential scope for investigation presented under the working hypothesis, it was deemed important, especially in the early stages of investigation, to draw some appropriate assumptions that would help simplify the general ideas presented into manageable stages. Clearly, should initial findings be positive, then (assuming enough available time remaining) it was expected that further work could then be planned to tackle solving the more complex issues addressing these assumptions.
 %
 %Taking guidance from the background research, the assumptions subsequently drawn were deemed appropriate in relation to the main objective of providing visual-based terrain inference, obstacle detection and egomotion estimation of a wheeled robot:
 %
