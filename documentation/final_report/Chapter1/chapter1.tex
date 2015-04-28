@@ -246,7 +246,7 @@ In the event of an oncoming obstacle, the rows representing that object in the i
 \subsubsection{Calibration \& Focus of Expansion}
 \label{hypo-calib}
 
-When contemplating the use of input supplied by an optical camera, one of the most crucial aspects to consider is the need to perform calibration of the camera lens. The primary requirement for performing calibration of the camera stems from the need to identify and correct the \textit{distortion} observed in images that are captured through a \textit{pinhole camera} lens \cite{camera-calib}. 
+When contemplating the use of input supplied by an optical camera, one of the most crucial aspects to consider is the need to perform calibration of the camera lens. The primary requirement for performing calibration stems from the need to identify and correct the \textit{distortion} observed in images that are captured through a \textit{pinhole camera} lens \cite{camera-calib}. 
 
 Failure to correct such distortion can result in significant inaccuracies being observed between the perceived motion of an object captured in an image, and the actual movement that it demonstrates. The effects caused by \textit{perspective distortion} on the perceived motion of objects positioned within the view of a forward-facing camera is a problem that is of particular importance to the success of the approach detailed in Section \ref{hypo-gradient}. Figure \ref{} provides a visual example of these kind of observed effects, where the ratio between the vertical and horizontal displacement of an object appears to change balance in relation to the distance it is located away from the horizontal centre of the image.
 
@@ -261,7 +261,7 @@ From examining Figure \ref{}, the reasoning behind FOE should be clear to see. W
 By restricting the tracking of features to only those that lay within a specific range of the FOE, it was hoped that this would allow for a reasonable reduction in the effects caused by perspective distortion without requiring the explicit calibration of camera parameters. 
 
 \subsection{Estimation of Robot Orientation}
-
+\label{hypo-rotation}
 An important observation relating to the motion exhibited by a robot, is the notion of it being possible to separate such motion into two main constituent parts; \textit{translation} and \textit{rotation} \cite{campbell}. 
 
 In the context of this project, translation represents the displacement that a robot obtains while travelling along in a single direction. As already discussed in sections \ref{hypo-gradient}, \ref{hypo-model} and \ref{hypo-calib}, it is currently possible using optical flow analysis, to record translational motion of a forward-moving robot by measuring the level of \textit{vertical displacement} that is demonstrated throughout a series of images captured via a front-facing camera.
@@ -275,10 +275,10 @@ In contrast, it is noted that a change in rotation will cause \textit{all} featu
 Taking inspiration from the work of Campbell \textit{et al.}, it is predicted that taking the median of these horizontal displacement values will provide an estimation into the change of orientation that a robot has undertaken.
 
 \subsection{Estimation of Robot Speed}
-
+\label{hypo-speed}
 For supporting both the inference of terrain gradient conditions and detection of potential obstacles, it is the role of the vertical displacement model (Section \ref{hypo-model})  to provide a delineation of the distance by which tracked features within an image have moved, relative to the position at which they were last detected. 
 
-Quite simply, using the relationship defined by the \textit{speed-distance-time} equation:
+Quite simply, using the relationship defined by the \textit{speed-distance-time} equation \cite{}:
 
 $$\text{Speed} = \frac{\text{Distance}}{\text{Time}}$$ 
 
@@ -286,29 +286,84 @@ it becomes possible to estimate the speed at which the robot the travelling when
 
 Therefore, a proposed extension to the vertical displacement model would instead see a number of separate models produced during the calibration stage, where each would represent the distance of vertical displacement demonstrated by the terrain as the robot travels at differing speeds (Figure \ref{}).
 
-Once these multiple models have been established, it would not be an unfeasible task for system to calculate which of the models best matches the current general trend of displacement demonstrated, which in turn would allow for an estimation into current speed of travel.
+Once these multiple models have been established, it would not become an unfeasible task to further enhance the system in order for it to calculate which of the models best matches the current general trend of displacement demonstrated, which therefore would allow for it to present an estimation into current speed of travel.
 
 \section{Analysis}
 
-The main focus for this project falls upon conducting research as part of an investigation into the proposed hypothesis. As such, the overall plan for the project intended to perform as much experimentation into the aspects discussed in the hypothesis (see Section \ref{hypo-gradient}) as was feasibly achievable within the three month deadline set for the major project.
+The main focus for this project falls upon conducting research as part of an investigation into the proposed hypothesis. 
 
-As an initial planning task, all of the expected work to be completed was decomposed into one of four key project stages:
-
-\begin{itemize}
-	\item \textbf{Stage One - Data Collection:} In order to evaluate the approaches proposed within the investigation, it would first be necessary to collect and verify image data that could provide an appropriate basis for testing.
-	\item \textbf{Stage Two - Setup of Testing Environment:} Prior to beginning any experimentation, it was important to establish a stable and robust testing environment that could provide automated testing and result collection facilities. In the context of this project, this would include the design and implementation of an configurable `testing rig' capable of running and evaluating multiple sequences of tests.
-	\item \textbf{Stage Three - Implementation of Hypothesis Approaches:} Implementation of the actual approaches and predictions detailed within the proposed working hypothesis (see Section \ref{hypo-gradient}).
-	\item \textbf{Stage Four - Evaluation of Experiment Results:} Analysis of the performance results obtained for each of the evaluated approaches, focussing in particular on aspects regarding the accuracy of each method when tested against a variety of datasets.
-\end{itemize}  
+As such, the overall plan for the project intended to perform as much experimentation into the aspects discussed in the hypothesis (see Section \ref{hypo-gradient}) as was feasibly achievable within the three month deadline set for the major project.
 
 \subsection{Breakdown of Research Aims}
 
-Following the conceptualisation of the working hypothesis, it was important to devise a formal list of of ``high-level" research aims based upon the predictions that were made. These aims would need to be completed within a specific order, where each subsequent aim built upon the work of the last:
+Following the conceptualisation of the working hypothesis, it was necessary to devise a formal list of ``high-level" research aims based upon the proposals that were previously set out. 
+
+Given that these were indeed research-focussed aims, it was expected that they would be completed within a specific sequential order, as this would allow for the work of each subsequent aim to build upon the work of its predecessor.
+
+As there was a relatively high time constraint on the project (with respect to many of the previous projects investigated), it was decided that these aims should be decomposed further into primary and secondary categories.
+
+\subsubsection{Primary Aims}
+
+The following aims consist of those deemed most important in fulfilling the core motives behind the project investigation. Unsurprisingly, these `primary' aims were also responsible for laying the `groundwork' from which any `secondary' aims could then continue.  
+
+\begin{enumerate}
+	\item Establish which out the following appearance-based template matching methods:
+		\begin{itemize}
+			\item Euclidean Distance
+			\item Correlation Coefficient
+			\item Histogram Correlation
+			\item Histogram Chi-Square
+		\end{itemize}
+	 best supports the predicted positive correlation between the vertical position of features within an image, and the level of vertical displacement demonstrated (see Section \ref{hypo-model}).
+	 \item Implement a means of using the generated model of vertical displacement to identify potential obstacles and changes in terrain gradient based upon the predicted `comparative trend' behaviour detailed in Section \ref{hypo-model}.
+\end{enumerate}
+
+\subsubsection{Secondary Aims}
+
+Additional proposals from the hypothesis that provided further enhancements or abilities were classified as `secondary' aims. While optimistically, it was hoped that such functionality could be implemented in the time available, it was deemed more than likely that such aims would fall outside of the scope of the major project.
+
+\begin{enumerate}
+	 \item Further extend the capabilities of the vertical displacement model as discussed in Section \ref{hypo-speed} to provide estimates into the current speed of travel demonstrated by the robot.
+	 \item Add support for providing an estimation of the robot's change in orientation using the approach detailed in Section \ref{hypo-rotation}.
+\end{enumerate}
+
+\subsection{Breakdown of Experiment Work}
+
+As part of the initial planning stage, expected tasks relating to ``experimental research" were further decomposed into one of four key stages. This was to ensure that there was a full understanding into all of the different kinds of work involved in performing research experiments, which in turn would allow for adequate attention to be given in planning the finer details for each experiment. 
 
 \begin{itemize}
-	\item 
-\end{itemize}
+	\item \textbf{Stage One - Data Collection:} In order to evaluate the approaches proposed within the investigation, it would first be necessary to collect and verify image data that could provide an appropriate basis for testing.
+	\item \textbf{Stage Two - Setup of Testing Environment:} Prior to beginning any experimentation, it was important to establish a stable and robust testing environment for the evaluation of the implemented methods. In the context of this project, this would include the implementation of an configurable `testing rig' capable of running and evaluating multiple sequences of tests automatically.
+	\item \textbf{Stage Three - Implementation of Hypothesis Approaches:} Implementation of the actual approaches and predictions detailed within the proposed working hypothesis (see Section \ref{hypo-gradient}).
+	\item \textbf{Stage Four - Evaluation of Experiment Results:} Analysis of the performance results obtained for each of the implemented approaches, focussing in particular on aspects regarding the accuracy of each method when tested against a variety of datasets.
+\end{itemize}  
 
+Figure \ref{} provides an overview of how these four stages fitted into the general working process adopted for the project (discussed further in Section \ref{}). 
+
+Stages one and two would be performed initially, in order to ensure everything was prepared for the ``bulk" of the investigative work to come within stages three and four. As part of this investigative work, a number of potential appearance-based template matching methods were due to be implemented over a number of working `iterations'. 
+
+Stage three would therefore require repeating over each of these iterations, every time focussing upon a different method to \textit{implement} and subsequently \textit{test}, before finally allowing stage four to conduct an evaluation into the performance of each of the implemented methods.
+
+
+\subsection{Deliverables}
+
+As is typically the case with research-based projects, it was expected that the majority of deliverables resulting from the completion of tasks would consist mostly of experiment results and evaluation conclusions:
+
+\begin{itemize}
+	\item A collection of test images used to evaluate implemented experiments. This may either be images from an existing dataset \cite{ucl-dataset} \cite{baker-dataset}, \cite{mpi-dataset}, or images captured specifically for this project.
+	\item A set of predicted experiment results used in evaluating the results obtained from each conducted experiment.
+	\item A collection of recorded experiment results, represented as a series of plotted 2D-scatter graphs with the addition of moving averages to allow for the easy identification of expected behaviour trends.
+	\item This report, containing information regarding the background to the experiment and hypothesis, details on the experiment methods and a discussion of the results obtained.
+ \end{itemize}
+
+However as this project would also focus on producing software (an implicit requirement in the submission as department major project), inevitably there was the expectation of additional deliveries relating to both the development of software and undertaking of project-management:
+
+\begin{itemize}
+	\item A series of individual `test rig' applications provided for each primary experiment undertaken.
+	\item Accompanying unit and regression tests suites for each separate software module.
+	\item Accompanying documentation for produced software.
+	\item Breakdown of the current status of remaining work, including details of both ``high-level" and constituent tasks, in addition to details regarding previous project performance (e.g. `burn-down' and `throughput' charts (discussed further in Section \ref{mgmt}).
+\end{itemize}
   
 
 %\subsection{Design Decisions}
@@ -321,12 +376,27 @@ Following the conceptualisation of the working hypothesis, it was important to d
 
 \section{Research Methodology}
 
-\subsection{Overview}
+This was a project in which the work involved could potentially be subject to a great deal of change and re-organisation, arising as a result of attempting to solve a problem that has no fully-defined solution. 
 
-\subsection{Development Process}
+Given this fact, any amount of significant upfront planning and design was deemed unfeasible, as in the most likely of cases, it was generally expected that a significant proportion of these ``fixed" decisions would undergo some kind of modification following discovery of issues or better alternatives.
 
-\subsection{Testing}
+%DISCUSS QUANTITIVE BITS
 
+\subsection{Management Process}
+\label{mgmt}
 
+Traditional, plan-driven approaches towards software development tend to expect that all requirements are gathered up front prior to beginning any planning, design or implementation. 
 
+For this project, such an approach would have been highly unsuitable, as it was likely that ``requirements" would be created, modified and removed much later into the project as a result of recent discoveries in the successes and failures of previous experiments. 
 
+Instead, the decision was taken to adopt a SCRUM-based methodology for the planning, recording and organisation of tasks, where work would be partitioned into a series of time-boxed releases and subsequent sprints. By following an agile methodology process, development work could begin much more quickly, and in conjunction with ongoing research and experiment evaluation. Through choosing to begin building working software early, even with limited functionality, it would become possible to potentially contribute some of this work back into ongoing research (e.g. use of the same testing rig ``shell" within a new experiment) and in turn improve the overall efficiency of the work undertaken.
+
+The SCRUM methodology is itself founded upon empiricism \cite{}, and this allows it to appreciate that unpredicted changes can not effectively be addressed using a plan-driven approach. The work conducted for each iteration was prioritised based on discussions had with the project supervisor. New work items were added to a list of general outstanding tasks (product backlog), before later being organised into a specific collection of tasks (sprint backlog) scheduled for completion within the time allocated for a particular sprint.
+
+Each sprint attempted to follow a ``five-day on, two-day off" development cycle, which of course provided a buffer to help in situations where work took significantly longer than expected. Sprint planning meetings were arranged for the same time as the weekly group project meeting, and allowed for the planning of work for the coming week, along with the opportunity to discuss any changes that either party felt were required in light of new experiment results.
+
+In terms of tracking project progress, feedback for sprints and releases was provided via a combination of throughput and burn-down charts. While both provided a graphical representation of the measure of work completed, throughput charts focussed on comparing the frequency of completed tasks over a fixed range of weeks \cite{}, whereas burn-down charts plotted the amount of remaining work outstanding within an individual sprint or release, in relation to the time that was left before it closed \cite{}.
+
+\subsection{Testing \& Evaluation of Experiments}
+
+In performing the evaluation of experiment conducted within the scope of the project investigation, a discrete set of preemptive results were used that an experiment would subsequently have to try and replicate as closely as possible.
