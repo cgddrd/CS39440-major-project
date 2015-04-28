@@ -126,7 +126,7 @@ The project also presented a key opportunity for the author to engage in a subst
 Further opportunities were also presented for enhancing development skills using the C, C++ and Python programming languages, and in particular, the development of computer vision applications using popular image processing libraries.
 
 
-\section{Analysis}
+\section{Development of the Working Hypothesis} 
 
 Focussing on conducting research as part of a scientific investigation, this project looks specifically into investigating the viability of the following proposed hypothesis: 
 
@@ -138,7 +138,7 @@ The history of work that led to the proposal of the above hypothesis actually be
 
 It was not until the completion of initial background investigations into existing approaches (namely the work of Campbell \textit{et al.} \cite{campbell} - discussed further in Section \ref{related-work}) that key ideas surrounding the final hypothesis began to come into fruition. 
 
-\subsection{Development of the Working Hypothesis} 
+\subsection{Identification of Needs}
 
 The hypothesis detailed in this report can be decomposed into four key areas of prediction. While all relate to the exploitation of observed optical flow behaviour, each focusses on providing an estimation into the status of a specific ``condition metric". 
 
@@ -154,9 +154,20 @@ The four ``condition metrics" subject to observation under the proposed hypothes
 	
 \end{itemize} 
 
-The remainder of this section is dedicated to providing details regarding the core ideas proposed within the hypothesis, including a discussion into the general thought processes considered while forming these ideas.
+Given the high level of potential scope for investigation presented under the working hypothesis, it was deemed important, especially in the early stages of investigation, to draw some appropriate assumptions that could help simplify the general ideas presented into manageable stages. Clearly, should the initial findings be found to be positive and enough available time remained, then it was expected that further work could be planned in order to try and tackle the more complex issues that would address these assumptions.
 
-\subsubsection{Background to Motion Parallax}
+Taking guidance from the previous projects \cite{campbell}, \cite{low}, the chosen assumptions were deemed reasonable in relation to the main objective of providing visual-based terrain inference, obstacle detection and egomotion estimation of a wheeled robot:
+
+ \begin{enumerate}
+ 	\item In the first instance, it was assumed that the proposed system would only support motion following straight line trajectories. This meant that at least within the early stages of investigation, work would not focus on providing an estimation into robot orientation, given that theoretically this should not change while the robot is moving in a forward direction.
+ 	\item It is assumed that camera to be used as input will be mounted in fixed position facing in the same direction as the robot during forward travel.
+ 	
+% 	An obvious exception to this was the proposed ability to estimate changes in robot orientation, which in theory would have to be caused by the robot changing direction. This however would itself make the frankly unrealistic assumption of the camera suffering no shake caused by traversal over uneven terrain. 
+ \end{enumerate}
+
+The remainder of this section is dedicated to providing details regarding the core ideas proposed within the hypothesis, including a discussion into the general thought processes considered while being conceptualised.
+
+\subsection{Background to Motion Parallax}
 
 The concept of motion parallax, and its usefulness as means of inferring information about real-world environments, is an idea found to be commonplace in many vision-based projects wishing to extract details about 3D environments from 2D images \cite{}, \cite{}.  
 
@@ -174,26 +185,28 @@ A potentially problematic issue associated with sparse optical flow and feature 
 
 Naturally, choosing specifically to allow the detection of lower-quality features opens up a greater risk to outliers and false positives, which Campbell and his team later counteract through the combined filtering and `peer-verification' of incremental optical flow vectors \cite{campbell}. While this approach is noted to strike a good balance between the amount of information that can be extracted, and its overall resilience to potential outliers, it does of course also attribute itself to an increase in the overall computational cost of the system. This is a price that aboard some robotic systems could prove simply to be too high, particularly in situations where spare computing power is already considered a luxury (e.g. planetary rovers \cite{mer}). 
 
-\subsubsection{Supporting Inference of Terrain Gradient \& Obstacle Detection}
+\subsection{Supporting Inference of Terrain Gradient \& Obstacle Detection}
 \label{hypo-gradient}
 
-The proposed hypothesis aimed to take the same fundamental ideas proposed by Campbell \textit{et al.} \cite{campbell} for the detection of obstacles located within the visual field (discussed more in detail in Section \ref{related-work}), before attempting to apply them further to the inference of terrain gradient conditions. 
+The proposed hypothesis aimed to take the same fundamental ideas proposed by Campbell \textit{et al.} \cite{campbell} for the detection of obstacles located within the visual field (discussed more in Section \ref{related-work}), before attempting to apply them further to the inference of terrain gradient conditions. 
 
-It was considered that, just in the same way as positive obstacles appear closer to the camera than the ground on which they lie, an area of ground that demonstrates a sudden increase in its tendency upwards appears closer to the camera, therefore holding optical flow vectors that are proportionally longer than those previously recorded within the same region of the image plane. Likewise, when presented with an area of ground sloping evenly downwards, a decrease in its displacement detected through the observation of proportionally shorter optical flow vectors would generally be expected.  
+It was considered that, just in the same way as positive obstacles appear closer to the camera than the ground on which they lie, an area of ground that demonstrates a sudden increase in its tendency upwards would also conceptually appear ``closer" to the camera (Figure \ref{diag of ground with hill}). When the resulting optical flow field is later analysed, it would be expected that the same region of the ground plane (captured over consecutive images) would demonstrate optical flow vectors that became gradually longer than those previously recorded as a result of the parallax-induced motion being observed. Likewise, when presented with an area of ground sloping evenly downwards, a decrease in its displacement detected through the observation of proportionally shorter optical flow vectors would generally be expected.  
 
 Continuing to employ the concept of motion parallax as the primary means of estimating the 3D-geometric characteristics of a captured 2D scene, the hypothesis introduced two key differences in its general approach from those discussed within projects previously investigated:
 
 \begin{itemize}
-	\item The exclusive adoption of appearance-based detection and matching for the tracking of image features over the use of detectors that relied upon feature descriptors.
+	\item The exclusive adoption of appearance-based detection and matching for the tracking of image features over the use of alternative detectors that rely upon feature descriptors.
 	\item The use of a formalised model to represent detected changes in vertical displacement as part of efforts to estimate changes in terrain gradient in addition to the location/characteristics of potential obstacles. 
 \end{itemize}
 
 \subsubsection{Appearance-Based Feature Detection \& Tracking}
 \label{hypo-tracking}
 
-The decision to use appearance-based matching for the detection and subsequent tracking of features was taken primarily out of an interest in conducting an evaluation into the performance of such methods within the context of optical flow analysis. 
+The decision to use appearance-based matching for the detection and subsequent tracking of features was taken primarily out of an interest in conducting an evaluation into the performance of such methods with respect to optical flow analysis. 
 
-An additional reason that was identified on the back of background research \cite{} \cite{} directed towards the common observation that on average, appearance-based detectors tended to be less computationally expensive than their feature-based equivalents \cite{}. This was an aspect that tied in closely with the relationship that the project exhibited between the fields of computer vision and robotics, and subsequently was deemed an important benefit in relation to the ultimate goal of installation aboard a mobile robot that would most likely possess limited computing capability.
+While examples of previous work describe the combination of feature-based detection with appearance-based tracking \cite{low}, this investigation wished to focus exclusively on the use of appearance-based methods for both the initial detection, and subsequent matching/tracking of image features necessary to establish the optical flow field.
+
+One of the key motives behind this decision directed towards the common observation that appearance-based detectors on average tended to be less computationally expensive than their feature-based equivalents \cite{}. This was an aspect that tied in closely with the relationship that the project exhibited between the fields of computer vision and robotics, and subsequently was deemed an important benefit in relation to the ultimate goal of installation aboard a mobile robot that would most likely possess limited computing capability.
 
 \subsubsection{Vertical Displacement Model}
 \label{hypo-model}
@@ -204,7 +217,7 @@ The use of a model for representing vertical displacement of image regions was a
 	
 The model was designed to take the form of a kind of ``lookup-table", where a simple structure would be adopted to focus specifically on the relationship between the \textit{height within an image}, and the \textit{level of vertical displacement that the row located at that height demonstrated}. 
  
- If visualised as a 2D scatter plot (Figure \ref{}), this structure definition would be represented as:
+ When visualised as a 2D scatter plot (Figure \ref{}), this structure definition would be represented as:
 	
 	\begin{itemize}
 		\item \textbf{X axis:} The height of the image, plotted as 1px-high rows.
@@ -247,7 +260,7 @@ From examining Figure \ref{}, the reasoning behind FOE should be clear to see. W
 
 By restricting the tracking of features to only those that lay within a specific range of the FOE, it was hoped that this would allow for a reasonable reduction in the effects caused by perspective distortion without requiring the explicit calibration of camera parameters. 
 
-\subsubsection{Estimation of Robot Orientation}
+\subsection{Estimation of Robot Orientation}
 
 An important observation relating to the motion exhibited by a robot, is the notion of it being possible to separate such motion into two main constituent parts; \textit{translation} and \textit{rotation} \cite{campbell}. 
 
@@ -261,30 +274,42 @@ In contrast, it is noted that a change in rotation will cause \textit{all} featu
 
 Taking inspiration from the work of Campbell \textit{et al.}, it is predicted that taking the median of these horizontal displacement values will provide an estimation into the change of orientation that a robot has undertaken.
 
-\subsubsection{Estimation of Robot Speed}
+\subsection{Estimation of Robot Speed}
 
 For supporting both the inference of terrain gradient conditions and detection of potential obstacles, it is the role of the vertical displacement model (Section \ref{hypo-model})  to provide a delineation of the distance by which tracked features within an image have moved, relative to the position at which they were last detected. 
 
-Quite simply, using the relationship defined by the infamous \textit{speed-distance-time} equation:
+Quite simply, using the relationship defined by the \textit{speed-distance-time} equation:
 
 $$\text{Speed} = \frac{\text{Distance}}{\text{Time}}$$ 
 
-it becomes possible to estimate the speed at which the robot the travelling when assuming that the time interval between the capture of subsequent images remains constant.
+it becomes possible to estimate the speed at which the robot the travelling when it is assumed that the time interval between the capture of subsequent images remains constant.
 
 Therefore, a proposed extension to the vertical displacement model would instead see a number of separate models produced during the calibration stage, where each would represent the distance of vertical displacement demonstrated by the terrain as the robot travels at differing speeds (Figure \ref{}).
 
 Once these multiple models have been established, it would not be an unfeasible task for system to calculate which of the models best matches the current general trend of displacement demonstrated, which in turn would allow for an estimation into current speed of travel.
 
-\subsection{Task Planning}
+\section{Analysis}
 
-%Given the high level of potential scope for investigation presented under the working hypothesis, it was deemed important, especially in the early stages of investigation, to draw some appropriate assumptions that would help simplify the general ideas presented into manageable stages. Clearly, should initial findings be positive, then (assuming enough available time remaining) it was expected that further work could then be planned to tackle solving the more complex issues addressing these assumptions.
-%
-%Taking guidance from the background research, the assumptions subsequently drawn were deemed appropriate in relation to the main objective of providing visual-based terrain inference, obstacle detection and egomotion estimation of a wheeled robot:
-%
-% \begin{enumerate}
-% 	\item In the first instance, it was assumed that the proposed system would only support motion following straight line trajectories (i.e. motion caused as a result of the robot performing any kind of turn would be ignored). \\ \\
-% 	An obvious exception to this was the proposed ability to estimate changes in robot orientation, which in theory would have to be caused by the robot changing direction. This however would itself make the frankly unrealistic assumption of the camera suffering no shake caused by traversal over uneven terrain. 
-% \end{enumerate}
+The main focus for this project falls upon conducting research as part of an investigation into the proposed hypothesis. As such, the overall plan for the project intended to perform as much experimentation into the aspects discussed in the hypothesis (see Section \ref{hypo-gradient}) as was feasibly achievable within the three month deadline set for the major project.
+
+As an initial planning task, all of the expected work to be completed was decomposed into one of four key project stages:
+
+\begin{itemize}
+	\item \textbf{Stage One - Data Collection:} In order to evaluate the approaches proposed within the investigation, it would first be necessary to collect and verify image data that could provide an appropriate basis for testing.
+	\item \textbf{Stage Two - Setup of Testing Environment:} Prior to beginning any experimentation, it was important to establish a stable and robust testing environment that could provide automated testing and result collection facilities. In the context of this project, this would include the design and implementation of an configurable `testing rig' capable of running and evaluating multiple sequences of tests.
+	\item \textbf{Stage Three - Implementation of Hypothesis Approaches:} Implementation of the actual approaches and predictions detailed within the proposed working hypothesis (see Section \ref{hypo-gradient}).
+	\item \textbf{Stage Four - Evaluation of Experiment Results:} Analysis of the performance results obtained for each of the evaluated approaches, focussing in particular on aspects regarding the accuracy of each method when tested against a variety of datasets.
+\end{itemize}  
+
+\subsection{Breakdown of Research Aims}
+
+Following the conceptualisation of the working hypothesis, it was important to devise a formal list of of ``high-level" research aims based upon the predictions that were made. These aims would need to be completed within a specific order, where each subsequent aim built upon the work of the last:
+
+\begin{itemize}
+	\item 
+\end{itemize}
+
+  
 
 %\subsection{Design Decisions}
 %
