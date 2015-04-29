@@ -52,13 +52,13 @@ The challenge of providing accurate and robust obstacle detection has, and remai
 
 %From investigating existing research conducted in the area of visual-based navigation and obstacle avoidance, it is possible to identify and compare potential benefits and challenges between various approaches that will in turn feed into future design decisions.
 
-\subsubsection{Feature-Based Methods}
+%\subsubsection{Feature-Based Methods}
 
 One approach to be noted is that from the work of Campbell \textit{et al} \cite{campbell}, in which the authors propose a system for estimating the change in position and rotation of a robot using information obtained solely using a single consumer-grade colour camera. The approach describes the use of feature-based tracking to estimate the optical flow-field between subsequent video frames, before taking these optical flow vectors currently corresponding to image coordinates, and back-projecting them onto a ``robot-centred" coordinate system to establish the incremental `real world' translation and rotation of the robot over a given time period. The detection and subsequent tracking of matching features between captured frames is provided via the \textit{OpenCV} library implementation of the Lucas and Kanade algorithm \cite{opencv-lucas-kanade-features}. 
 
 Once gathered, these correspondences between features (i.e. optical flow vectors) are filtered to help remove outliers caused by matching error or occlusion. The criteria used for this filtering process focusses on verifying a smooth straight-line motion of same features between subsequent frames. It is reported that concentrating on the movement history of features across a subset of previous frames can provide a robust defence against outliers. This is because by definition, an outlier would typically be expected to be found outside of the projected straight-line trajectory of the mis-matched feature, thereby causing the motion behaviour of this feature to suddenly become erratic. Through the use of this filtering technique in conjunction with the correction of perspective distortion via calibration, the authors report they are able to allow for a wider, and potentially lower quality range of features to be initially detected in order to ensure adequate coverage of the entire image scene. 
 
-In the final stage of the process proposed in \cite{campbell}, the current frame is sectioned into regions representing the ``sky" and ``ground" individually, from within which the observed optical flow vectors are used to calculate an estimation of the robot's incremental rotation and translation respectively.
+In the final stage of the process, the current frame is sectioned into regions representing the ``sky" and ``ground" individually, from within which the observed optical flow vectors are used to calculate an estimation of the robot's incremental rotation and translation respectively.
 
 %The authors report that this implementation provides a more efficient and robust version of the original algorithm proposed by Lucas and Kanade \cite{lucas-kanade-features}. Upon further investigation this improvement appears to be attributed to the proposal published by Bouguet \cite{j-bouguet} in which the author combines a multi-scale pyramidal representation of an image with the existing Lucas-Kanade algorithm. This approach can help to provide both greater accuracy, by locating features that may have moved distances greater than the current window size, while also improving efficiency by means of reducing the size of the search area within higher resolution versions of an image, by first localising the general target area within lower resolution versions that are less computationally expensive to search. 
 
@@ -75,7 +75,7 @@ Once obtained, optical flow information was converted to more suitable range dat
 A major challenge relating to the use of optical flow methods for obstacle detection, and one discussed in the work of both Low and Wyeth \cite{low-wyeth}, and Campbell \textit{et al} \cite{low-wyeth} is the effect that disturbances in rotation (deliberate or otherwise) can cause on the observed optical flow vectors of features. While both papers propose alternative methods for removing the effects of rotation (the use of an Inertial Measurement Unit gyroscope in the case of Low and Wyeth, and a calibrated cylindrical coordinate model in the case of Campbell \textit{et al}), both appear to agree that rotational movement should be accounted separately to translational movement in order to ensure accurate results are obtained from the optical flow field. 
 
 
-\subsubsection{Appearance-Based Methods}
+%\subsubsection{Appearance-Based Methods}
 
 Ulrich and Nourbakhsh \cite{ulrich-nourbakhsh} present an altogether different approach to vision-based obstacle detection. As opposed to scrutinising differences in motion behaviour of scene objects, the authors instead focus on comparing differences in colour between the ground and other objects in the robot's field of view. Ulrich and Nourbakhsh argue that using colour as a detection metric for obstacles can prove to be less computationally expensive than ``range-based" obstacle detection methods like optical flow or stereo vision, and in certain cases, have also shown to be more accurate and reliable - particularly in cases involving the detection of small or flat objects close the ground or where a system needs to be able to differentiate between terrain surfaces. 
 
@@ -97,7 +97,7 @@ Further investigation has shown that a number of previous robotic projects have 
 
 \subsubsection{Hardware Configuration}
  
-While many of the approaches mentioned thus far discuss the use of monocular-based systems (i.e a single camera) for their hardware configuration, many other examples of vision-based systems using alternative choices of hardware are also available. One of the most popular alternatives to monocular camera systems is a concept that can be easily described as `natural progression' in terms of technological evolution. This description is of course talking about the use of two or more cameras, formally known as stereo vision. 
+While the majority of approaches mentioned thus far focus on the use of monocular-based systems (i.e a single camera) for their hardware configuration, many other examples of vision-based systems using alternative choices of hardware are also available. One of the most popular alternatives to monocular camera systems is a concept that can be easily described as `natural progression' in terms of technological evolution. This description is of course talking about the use of two or more cameras, formally known as stereo vision. 
 
 Williamson \cite{williamson} proposes a trinocular stereo vision system capable of detecting small obstacles over great distances - \textit{``objects as small as 14cm high over ranges well in excess of 100m"}. He discusses how by using three cameras arranged in a triangular formation, his obstacle detection system is able to maintain high levels of reliability even in situations where an image demonstrates \textit{``texture in one direction, but not in the other"}. This reliability is particularly important when you consider that typical examples of this type of behaviour have been found to originate around pixels representing the edges of objects that subsequently such a system is then aiming to detect \cite{williamson}. 
 
@@ -138,7 +138,8 @@ The history of work that led to the proposal of the above hypothesis actually be
 
 It was not until the completion of initial background investigations into existing approaches (namely the work of Campbell \textit{et al.} \cite{campbell} - discussed further in Section \ref{related-work}) that key ideas surrounding the final hypothesis began to come into fruition. 
 
-\subsection{Identification of Needs}
+\subsection{Key Aspects \& Assumptions}
+\label{assumptions}
 
 The hypothesis detailed in this report can be decomposed into four key areas of prediction. While all relate to the exploitation of observed optical flow behaviour, each focusses on providing an estimation into the status of a specific ``condition metric". 
 
@@ -167,7 +168,7 @@ Taking guidance from the previous projects \cite{campbell}, \cite{low}, the chos
 
 The remainder of this section is dedicated to providing details regarding the core ideas proposed within the hypothesis, including a discussion into the general thought processes considered while being conceptualised.
 
-\subsection{Background to Motion Parallax}
+\subsection{Depth Estimation via Motion Parallax \& Optical Flow}
 
 The concept of motion parallax, and its usefulness as means of inferring information about real-world environments, is an idea found to be commonplace in many vision-based projects wishing to extract details about 3D environments from 2D images \cite{}, \cite{}.  
 
@@ -179,23 +180,30 @@ One of the key advantages to using motion parallax within the context of compute
 
 In the case of Campbell \textit{et al.} \cite{campbell}, the authors make exclusive use of the observed differences in the displacement of objects as the underlying mechanism for  detecting the presence potential obstacles. 
 
-Measuring the displacement by which select ``distinctive" areas of an image move over time, is a process more commonly known as \textit{sparse optical flow} \cite{sparse-optical-flow}. By monitoring discontinuities in the length of calculated optical flow vectors (i.e. the distance and direction of displacement along the image plane), Campbell \textit{et al.} were able to detect the presence of both positive and negative obstacles, characterised respectively by whether the features identified in the image demonstrated vectors that were proportionally \textit{shorter}, or \textit{longer} than the general consensus set \cite{campbell}.
+\subsubsection{Sparse Optical Flow}
+Measuring the displacement by which select ``distinctive" areas of an image move over time, is a process more commonly known as \textit{sparse optical flow} \cite{nourani}. By monitoring discontinuities in the length of calculated optical flow vectors (i.e. the distance and direction of displacement along the image plane), Campbell \textit{et al.} were able to detect the presence of both positive and negative obstacles, characterised respectively by whether the features identified in the image demonstrated vectors that were proportionally \textit{shorter}, or \textit{longer} than the general consensus set \cite{campbell}.
 
 A potentially problematic issue associated with sparse optical flow and feature detection in general, is how to ensure adequate coverage and frequency of features, when the scene represented in consecutive images fails to contain many regions ``distinctive" enough for use by feature detectors. When faced with this issue, Campbell \textit{et al.} \cite{campbell} chose to deliberately select a wider range of lower quality features within input images in order to ensure that they obtained reasonable coverage across the entire image space. 
 
 Naturally, choosing specifically to allow the detection of lower-quality features opens up a greater risk to outliers and false positives, which Campbell and his team later counteract through the combined filtering and `peer-verification' of incremental optical flow vectors \cite{campbell}. While this approach is noted to strike a good balance between the amount of information that can be extracted, and its overall resilience to potential outliers, it does of course also attribute itself to an increase in the overall computational cost of the system. This is a price that aboard some robotic systems could prove simply to be too high, particularly in situations where spare computing power is already considered a luxury (e.g. planetary rovers \cite{mer}). 
+
+\subsubsection{Dense Optical Flow}
+
+As alternative solution is to instead attempt to track the change in motion of \textit{every pixel} in the image, known formally as \textit{dense optical flow} \cite{nourani}. 
 
 \subsection{Supporting Inference of Terrain Gradient \& Obstacle Detection}
 \label{hypo-gradient}
 
 The proposed hypothesis aimed to take the same fundamental ideas proposed by Campbell \textit{et al.} \cite{campbell} for the detection of obstacles located within the visual field (discussed more in Section \ref{related-work}), before attempting to apply them further to the inference of terrain gradient conditions. 
 
-It was considered that, just in the same way as positive obstacles appear closer to the camera than the ground on which they lie, an area of ground that demonstrates a sudden increase in its tendency upwards would also conceptually appear ``closer" to the camera (Figure \ref{diag of ground with hill}). When the resulting optical flow field is later analysed, it would be expected that the same region of the ground plane (captured over consecutive images) would demonstrate optical flow vectors that became gradually longer than those previously recorded as a result of the parallax-induced motion being observed. Likewise, when presented with an area of ground sloping evenly downwards, a decrease in its displacement detected through the observation of proportionally shorter optical flow vectors would generally be expected.  
+It was considered that, just in the same way as positive obstacles appear closer to the camera than the ground on which they lie, an area of ground that demonstrates a sudden increase in its tendency upwards would also conceptually appear ``closer" to the camera (Figure \ref{diag of ground with hill}). 
 
-Continuing to employ the concept of motion parallax as the primary means of estimating the 3D-geometric characteristics of a captured 2D scene, the hypothesis introduced two key differences in its general approach from those discussed within projects previously investigated:
+When the resulting optical flow field is later analysed, it would be expected that the same region of the ground plane (captured over consecutive images) would demonstrate optical flow vectors that became gradually longer than those previously recorded as a result of the parallax-induced motion being observed. Likewise, when presented with an area of ground sloping evenly downwards, a decrease in its displacement detected through the observation of proportionally shorter optical flow vectors would generally be expected.  
+
+Continuing to employ the concept of motion parallax as the primary means of estimating the 3D-geometric characteristics of a captured 2D scene, the hypothesis introduced two key differences in its general approach from those discussed within other projects investigated:
 
 \begin{itemize}
-	\item The exclusive adoption of appearance-based detection and matching for the tracking of image features over the use of alternative detectors that rely upon feature descriptors.
+	\item The exclusive use of appearance-based template matching techniques to provide a \textit{localised} variant of \textit{dense optical flow analysis} over the use of sparse optical flow techniques relying upon a high number of available image features.
 	\item The use of a formalised model to represent detected changes in vertical displacement as part of efforts to estimate changes in terrain gradient in addition to the location/characteristics of potential obstacles. 
 \end{itemize}
 
@@ -207,6 +215,8 @@ The decision to use appearance-based matching for the detection and subsequent t
 While examples of previous work describe the combination of feature-based detection with appearance-based tracking \cite{low}, this investigation wished to focus exclusively on the use of appearance-based methods for both the initial detection, and subsequent matching/tracking of image features necessary to establish the optical flow field.
 
 One of the key motives behind this decision directed towards the common observation that appearance-based detectors on average tended to be less computationally expensive than their feature-based equivalents \cite{}. This was an aspect that tied in closely with the relationship that the project exhibited between the fields of computer vision and robotics, and subsequently was deemed an important benefit in relation to the ultimate goal of installation aboard a mobile robot that would most likely possess limited computing capability.
+
+In the interests of time, the project decided to focus on the evaluation of four of the most popular similarity measures for template matching identified through the background research. These consisted of two `distance-based' measures, and two `histogram-based' measures.
 
 \subsubsection{Vertical Displacement Model}
 \label{hypo-model}
@@ -303,6 +313,7 @@ Given that these were indeed research-focussed aims, it was expected that they w
 As there was a relatively high time constraint on the project (with respect to many of the previous projects investigated), it was decided that these aims should be decomposed further into primary and secondary categories.
 
 \subsubsection{Primary Aims}
+\label{primary-aims}
 
 The following aims consist of those deemed most important in fulfilling the core motives behind the project investigation. Unsurprisingly, these `primary' aims were also responsible for laying the `groundwork' from which any `secondary' aims could then continue.  
 
@@ -317,6 +328,10 @@ The following aims consist of those deemed most important in fulfilling the core
 	 best supports the predicted positive correlation between the vertical position of features within an image, and the level of vertical displacement demonstrated (see Section \ref{hypo-model}).
 	 \item Implement a means of using the generated model of vertical displacement to identify potential obstacles and changes in terrain gradient based upon the predicted `comparative trend' behaviour detailed in Section \ref{hypo-model}.
 \end{enumerate}
+
+\textbf{Note to the Reader:} 
+
+It was deemed important at this point to inform the reader that due to significant issues discovered during experimentation, combined with a lack of author experience and general time constraints, it became progressively clear that work would only be able to focus exclusively on the first primary aim detailed above, before hitting the project deadline. Further discussion regarding this is available as part of the critical evaluation within Chapter 4.
 
 \subsubsection{Secondary Aims}
 
@@ -334,16 +349,16 @@ As part of the initial planning stage, expected tasks relating to ``experimental
 \begin{itemize}
 	\item \textbf{Stage One - Data Collection:} In order to evaluate the approaches proposed within the investigation, it would first be necessary to collect and verify image data that could provide an appropriate basis for testing.
 	\item \textbf{Stage Two - Setup of Testing Environment:} Prior to beginning any experimentation, it was important to establish a stable and robust testing environment for the evaluation of the implemented methods. In the context of this project, this would include the implementation of an configurable `testing rig' capable of running and evaluating multiple sequences of tests automatically.
-	\item \textbf{Stage Three - Implementation of Hypothesis Approaches:} Implementation of the actual approaches and predictions detailed within the proposed working hypothesis (see Section \ref{hypo-gradient}).
-	\item \textbf{Stage Four - Evaluation of Experiment Results:} Analysis of the performance results obtained for each of the implemented approaches, focussing in particular on aspects regarding the accuracy of each method when tested against a variety of datasets.
+	\item \textbf{Stage Three - Establishment of Ground Truth Data:} Compilation of verified results known to represent the ``true" behaviour of the various aspects under investigation. Used as the means of evaluating the relative success of experiments conducted.
+	\item \textbf{Stage Four - Implementation of Hypothesised Approaches:} Implementation of the actual approaches and predictions detailed within the proposed working hypothesis (see Section \ref{hypo-gradient}).
+	\item \textbf{Stage Five - Evaluation of Experiment Results:} Analysis of the performance results obtained for each of the implemented approaches, focussing in particular on aspects regarding the accuracy of each method when tested against a variety of datasets.
 \end{itemize}  
 
 Figure \ref{} provides an overview of how these four stages fitted into the general working process adopted for the project (discussed further in Section \ref{}). 
 
 Stages one and two would be performed initially, in order to ensure everything was prepared for the ``bulk" of the investigative work to come within stages three and four. As part of this investigative work, a number of potential appearance-based template matching methods were due to be implemented over a number of working `iterations'. 
 
-Stage three would therefore require repeating over each of these iterations, every time focussing upon a different method to \textit{implement} and subsequently \textit{test}, before finally allowing stage four to conduct an evaluation into the performance of each of the implemented methods.
-
+Stages three and four would require repeating over every new iteration, each time focussing upon a different method to \textit{implement} and subsequently \textit{test}, before finally moving to stage five in order to conduct an evaluation into the performance of each of the implemented methods.
 
 \subsection{Deliverables}
 
@@ -372,22 +387,24 @@ However as this project would also focus on producing software (an implicit requ
 %
 %\subsubsection{Development Environment}
 
-
-
 \section{Research Methodology}
 
-This was a project in which the work involved could potentially be subject to a great deal of change and re-organisation, arising as a result of attempting to solve a problem that has no fully-defined solution. 
+This was a project in which the work involved was potentially subject to a great deal of change and re-organisation, arising as a result of attempting to solve a problem that had no fully-defined solution. 
 
-Given this fact, any amount of significant upfront planning and design was deemed unfeasible, as in the most likely of cases, it was generally expected that a significant proportion of these ``fixed" decisions would undergo some kind of modification following discovery of issues or better alternatives.
+Given this fact, any amount of significant upfront planning and design was deemed unfeasible, as in the most likely of cases, it was expected that a significant proportion of these ``fixed" decisions would eventually undergo some kind of modification following the discovery of issues or better alternatives.
 
-%DISCUSS QUANTITIVE BITS
+Experiments were instead conducted over a number of project `iterations', in which all of the work associated with a particular experiment would be completed before moving onto the next experiment. This included the design of the experiment itself, the development and testing of associated software, and the gathering and evaluation of result data. 
+
+\subsection{Qualitative \& Quantitative Research}
+
+The project consisted of both qualitative and quantitative research aspects. Qualitative research focussed on providing the outline to the proposed hypothesis \cite{research-types}, aiming to investigate the reasons behind \textit{why} it was possible to use visual stimuli in aid of detecting potential hazards and changes in gradient across the observed terrain. This kind of research was conducted early within the project timeline and took the form of reading existing papers and examples of previous visual-based projects relating to the topics identified for this project.
+
+Quantitative research involved the gathering and subsequent analysis of data in order to try and identify \textit{how} various approaches could be used to solve the question topics uncovered within the qualitative research (i.e. the hypothesis) \cite{research-types}. In the context of this project, all of the experiments discussed in Section 2 fell under the category of quantitive, rather than qualitative research.
 
 \subsection{Management Process}
 \label{mgmt}
 
-Traditional, plan-driven approaches towards software development tend to expect that all requirements are gathered up front prior to beginning any planning, design or implementation. 
-
-For this project, such an approach would have been highly unsuitable, as it was likely that ``requirements" would be created, modified and removed much later into the project as a result of recent discoveries in the successes and failures of previous experiments. 
+Traditional, plan-driven approaches towards software development tend to expect that all requirements are gathered up front prior to beginning any planning, design or implementation. For this project, such an approach would have been highly unsuitable, as it was likely that ``requirements" would be created, modified and removed much later into the project as a result of recent discoveries in the successes and failures of previous experiments. 
 
 Instead, the decision was taken to adopt a SCRUM-based methodology for the planning, recording and organisation of tasks, where work would be partitioned into a series of time-boxed releases and subsequent sprints. By following an agile methodology process, development work could begin much more quickly, and in conjunction with ongoing research and experiment evaluation. Through choosing to begin building working software early, even with limited functionality, it would become possible to potentially contribute some of this work back into ongoing research (e.g. use of the same testing rig ``shell" within a new experiment) and in turn improve the overall efficiency of the work undertaken.
 
@@ -399,4 +416,9 @@ In terms of tracking project progress, feedback for sprints and releases was pro
 
 \subsection{Testing \& Evaluation of Experiments}
 
-In performing the evaluation of experiment conducted within the scope of the project investigation, a discrete set of preemptive results were used that an experiment would subsequently have to try and replicate as closely as possible.
+In evaluating the performance of experiments, it was not simply the case that results would equate to a clearcut pass or fail. Instead, testing was much more of a ``subjective" task, involving the use of previously established ground truth data that an experiment would subsequently be expected to try and replicate as closely as possible. The performance of each specific method tested within an individual experiment would be assessed by comparing how closely each of the recorded results matched the results predicted. 
+
+For testing aspects of the software (predominantly the testing rig and implementations of template matching methods), standard software-based testing practices were adopted. This constituted mainly of unit tests written to test for each specific function written in code, and regression tests for confirming that software continued to work as expected following the correction of a bug.
+
+
+

@@ -3,17 +3,90 @@
 %
 %This section should discuss the overall hypothesis being tested and justify the approach selected in the context of the research area.  Describe the experiment design that has been selected and how measurements and comparisons of results are to be made. %%You should concentrate on the more important aspects of the method. Present an overview before going into detail. As well as describing the methods adopted, discuss other approaches that were considered. You might also discuss areas that you had to revise after some investigation. %%You should also identify any support tools that you used. You should discuss your choice of implementation tools or simulation tools. For any code that you have written, you can talk about languages and related tools. For any simulation and analysis tools, identify the tools and how they are used on the project. %%If your project includes some engineering (hardware, software, firmware, or a mixture) to support the experiments, include details in your report about your design and implementation. You should discuss with your supervisor whether it is better to include a different top-level section to describe any engineering work.  
 
-\section{Data Collection}
+This chapter aims to provide a discussion into the experiments implemented with respect to the investigation detailed in Chapter 1, providing an emphasis on the approaches that were adopted and the resulting actions of handling issues encountered.
+
+The results subsequently collected from these experiments are presented in the Chapter 3.
+
+\section{Collection of Appropriate Test Data}
+
+Prior to beginning the implementation of any experiments, it was first necessary to identify and collect sets of sample images which would accurately represent the types of input expected upon the deployment of a completed system into a live scenario. 
+
+\subsection{Image Data Requirements}
+
+As discussed previously in Section \ref{assumptions}, for the purposes of simplifying the \textit{primary aims} presented in the working hypothesis, the assumption was drawn that at least in early stages of investigation, the system would make exclusive use of images captured from a single camera positioned to face in front of the robot that was also limited to moving in the same direction as the camera (i.e. forward-motion only).
+
+Therefore when identifying appropriate test data for use in experiments, a the following characteristics were considered:
+
+\begin{itemize}
+	\item The images must provide a reasonable field of view of the current scene both above and below the horizon line (i.e it was important to capture objects within the scene located both far away and close to the camera)
+	\item The images must show the act of forward translation through the current environment. This would be most obvious through the observation of a vertical displacement in the negative direction (i.e. downwards) visible in features located along the ground plane.
+	\item The images must not show forward translation as horizontal movement across the image plane (i.e. no images captured from cameras looking out from the side of a robot moving in a forwards direction).
+	\item The images must be of a size and quality reasonably expected of a standard ``point-and-shoot" consumer-grade camera.
+	\item The images must have been originally captured in colour, using the ``default" colour space supported by the camera (typically this would be RGB for standard consumer-grade camera).
+	 \item The images should demonstrate minimal change in rotation or pitch (i.e. should be taken across a flat surface), and should be 
+\end{itemize}
+
+In addition to these ``baseline" requirements, additional requirements were also defined with the intention for use within specific experiments focussing on the identification of particular aspects in motion behaviour. These secondary requirements were very much intended to be used on an ``as needed" basis and came with the possibility of the opposite statement to the ones detailed below being desired in certain situations:
+
+\begin{itemize}
+	\item The images should demonstrate minimal rotational motion (i.e. no examples of the robot turning to change direction)
+	\item The images should capture terrain that is predominately flat and free of major obstacles both positive (e.g. rocks) and negative (e.g. pits).
+\end{itemize}
+
+Unfortunately due to time constraints, some the planned experiments could not be completed within the scope of the major project, and as a consequence of this, not all examples of images meeting every one these requirements were actually captured. However, it was still important to define these requirements before beginning any experimentation and given more time, would still prove to be valid.
 
 \subsection{Existing Datasets}
 
+At the beginning of the project, some time was initially devoted to searching for any existing datasets that could provide suitable imagery. One of the main advantages to using existing datasets, is that typically other previous projects have already had the opportunity to verify that the data is both accurate, and provides a sufficient level of variability that proves crucial in testing the robustness of the systems that make use them as part of their evaluation.
+
+In the majority of cases, existing datasets also come pre-packaged with appropriately verified ground truth data, thereby preventing the need for projects that subsequently chose to use them having to produce their own ground truth results, consequently saving on both time and resources.
+
+While a number of previously published datasets were found to be available \cite{ucl-dataset}, \cite{baker-dataset}, \cite{mpi-dataset}, unfortunately none were found to be suitable in relation to the requirements detailed in the previous sub-section.   
+
 \subsection{Manual Datasets}
+
+Following the lack of appropriate existing datasets with the field, it was deemed necessary that bespoke datasets would instead have to be created manually. While in the short term this meant an increased work load, it also presented the opportunity to capture datasets that would could specifically meet the needs of the investigation and its experiments.
+
+\subsubsection{Camera Rig Setup}
+
+In the pursuit of capturing image datasets, a wide range of approaches could have potentially been adopted. One initial idea considered requesting the use of one of several `Pioneer' robots owned by the Computer Science department at Aberystwyth University. By rigidly mounting a camera to the front of one of these small wheeled robots, and remotely instructing it to move forward by a set distance before manually triggering the camera, it would be achievable to capture a collection of images in which each demonstrated an equal level of displacement between that and the next image. 
+
+As part of a particularly elaborate setup, it would have perhaps been feasible to provide an interface to the mounted camera (perhaps via USB or serial) before programming the Pioneer robot into automatically capturing images at set intervals, while following a pre-determined path through the environment (making use of the on-board sonar and odometry capabilities). 
+
+While these approaches would certainly provide an ample solution, following a discussion with the project supervisor, it was deemed that, at such an early stage in an investigation that was already limited in time remaining, efforts would be better spent focussing on conducting actual research, as opposed to the collection of test data.
+
+Nevertheless, a means of manually capturing image datasets was still required. As such, the decision was taken to adopt a much more `simplified' approach, that in exchange for greater manual involvement, could consequently be brought into service within a vastly shorter timeframe. 
+
+Compared to the use of the robot, this approach was certainly less `sophisticated' in terms of its setup, consisting only of:
+
+\begin{itemize}
+	\item Two cardboard boxes (one rectangular and one angled);
+	\item A consumer-grade ``point-and-shoot" camera (Panasonic Lumix DMC-FS18);
+	\item A standard 30cm ruler;
+	\item A standard spirit level;
+\end{itemize}
+
+However, as well as being quick to initially build, this setup would go on to prove to be a lot more portable and a great deal cheaper to modify and fix than one of the Pioneer robots. 
+
+The method behind the use of the `homemade' camera rig was also simple in design, however this was regarded as favourable given that it solely relied on manual involvement where human error subsequently becomes one of the biggest issues to face. Figure \ref{} below details the method outline: 
+
+% ADD FIGURE SHOWING FLOW CHART FOR METHOD (STEP 1 - GO TO START POSITION)...
+
+While one of the aims of the investigation hypothesis was to avoid the need for calibration of the camera, it was decided that in the interests of good experiment practice, measurements regarding the physical setup of the camera rig should be taken in case of future need. The measurements that were taken matched those taken by in the work by Campbell \textit{et al.}  \cite{campbell}, where the authors detailed their physical setup shown in Figure \ref{}:
+\\
+\\
+\\
+\\
+\\
+where $h$ refers to the height of the camera from the ground, and $d$ refers to the distance between the camera lens and the intersection with the ground plane. 
+
+In order to calculate $d$, a target $T$ was first lined up on the ground such that it became positioned in the centre of the camera's viewfinder (Figure \ref{}). Next, the height $h$ was measured, along with the distance between the position of the target $T$, and the position $L$ where the front of the camera lens intersected vertically with the floor. Finally, Pythagorus' theorem was adopted to calculate the length of $d$:
+
+$$ a^2 = \sqrt{b^2 + c^2} $$
 
 \subsubsection{Environments}
 
-\subsubsection{Noise Removal}
-
-\section{Ground Truth}
+\section{Establishment of Ground Truth}
 
 \section{Test Harness}
 
@@ -25,7 +98,7 @@
 
 \section{Template Matching (Full-width Patches) - Scaled}
 
-\section{Existing Methods}
+\section{Investigating Alternative Existing Methods}
 
 \subsection{Feature-based matching techniques}
 
