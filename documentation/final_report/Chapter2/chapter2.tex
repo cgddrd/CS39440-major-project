@@ -217,15 +217,39 @@ Prior to beginning the implementation of specific experiments, it was first nece
 	\item \textbf{Repeatability:} The testing infrastructure should ensure that each run of an experiment is treated as new and conducted in complete isolation to any previous run. 
 \end{itemize}
 
-\subsection{Choice of Programming Language}
+\subsection{Programming Languages}
 
 For this project, it was primarily the selection of specific external libraries that determined the programming languages that would be adopted.
 
-The original intention saw the entire project developed in C++, as this matched the `native' development language of the OpenCV library \cite{opencv} that was expected to provide a significant contribution to the implementation of the appearance-based similarity measures under investigation. While the OpenCV library did provide a comprehensive range of bindings for other programming languages including Python, Java and C\#, it was felt that choosing to develop in C++ would prove to be the most beneficial in terms of maximising available functionality (i.e. not all functions within OpenCV were available for alternative languages) and maximising the level of support available from both official documentation and wider community. 
+The original intention saw the entire project developed in C++, as this matched the `native' development language of the OpenCV library \cite{opencv} that was expected to provide a significant contribution to the implementation of the appearance-based similarity measures under investigation. While the OpenCV library did provide a comprehensive range of bindings for other programming languages including Python, Java and C\#, it was felt that choosing to develop in C++ would prove to be the most beneficial in terms of maximising available functionality (i.e. not all functions within OpenCV were available for alternative languages) and maximising the level of support available from both official documentation and the wider community. 
 
-\subsection{Choice of Development Tools}
+Following the completed implementation of the \textit{first experiment} (detailed in Section \ref{ex1}), this original intention was altered to instead change from C++ to Python as the primary development language. 
 
-\subsection{Choice of Core Libraries}
+This decision was not taken lightly, with the author being very much aware that by choosing a language with which they were unfamiliar, there was a high probability of the project incurring delays resulting from both learning the actual language, while also having to most likely dedicate additional time to fixing ``common" bugs typically associated with being new to the language. In spite of this, it was decided that while it may potentially cost time in the short term, switching to Python would provide a number of key benefits in the long term. 
+
+The first of these benefits was that in comparison to C++, the language provided significantly more functionality ``out of the box" due to it being situated at a ``higher" level programmatically. While reviewing the implementation of the first experiment, it was found that on a number of occasions, a function that had to written manually in C++ (e.g. standard deviation and variance of a numeric collection), was already available within the Python language itself, or one of its primary third-party libraries (e.g. numpy \cite{numpy} and scipy \cite{scipy}). While it was true that many of these functions did not take particularly long to implement in C++, there was a clear benefit to having such functions already implemented in libraries that were known to be both optimised and peer-tested. 
+
+Secondly, following research into the Python language, it soon became clear that it was a popular choice amongst scientific and engineering teams due mainly to its impressive level of support for scientific and numeric computing \cite{perez} and promotion of `natural language' within its syntax that is known to aid in supporting rapid prototyping \cite{ramanujam}. These were both characteristics that could be applied to the needs of this project, and hence were deemed beneficial to future development.
+
+%Thirdly, the process and technologies used to deploy Python applications appeared to be significantly less complicated than that for C++ applications. While  
+
+A further reason for switching to the Python language, which would in time become one of the most significant, was the prospect of being able to make use of the iPython interactive computing library \cite{ipython}. Following the discovery of this library during research looking into the use of Python within scientific applications, it became apparent that it had the potential to provide significant capabilities in terms of supporting the automated execution and presentation of experiments and their results. This approach provided a more  intuitive means of displaying and analysis than what was originally available using just a command-line based interface. 
+
+One of the most commonly noted disadvantages of using Python describes the fact that as a scripted language, its general performance is considered to be slower overall than that of compiled languages such as C++. While this was initially of some concern, it was later addressed through the use of a third-party library (Cython \cite{cython}) that enabled computationally expensive functions originally written in Python to be converted automatically into compiled C code.
+
+\subsection{Development Tools}
+
+Given the author's lack of prior knowledge in C++ or Python, it was decided that the use of an IDE for development would be most suitable for development, as they would be able to provide support facilities including code completion, automatic refactoring and powerful debugging facilities. 
+
+For C++ development, the Xcode IDE \cite{xcode} was chosen. While this was primarily a decision based on ease of having the IDE already installed, Xcode did provide a high level of support for managing the deployment of C++ applications, including a facility to automatically generate the `Makefiles' used to install the released version on another computer. 
+
+Python development was conducted within the PyCharm IDE making use of the educational license provided by JetBrains. Of particular benefit was the support provided for the automatic management of external dependencies and libraries, which included the ability to export a complete list of a project's dependencies and their precise version numbers.
+
+Version control was managed by git, with repositories hosted on both Github and a separate private git server. The project also made use of the Travis CI continuous integration platform to provide automated building and testing of software. Integrating directly with the Github service, new builds would be triggered automatically upon pushing of a new commit to the remote repository. Should any part of the build process fail (including unit test failures), the service would send an email notification detailing the type and source of the error.  
+
+\subsection{Core Libraries}
+
+
 
 \subsection{Implementation of Template Matching Similarity Measures}
 
@@ -237,9 +261,15 @@ The original intention saw the entire project developed in C++, as this matched 
 
 \subsection{Display \& Analysis of Results}
 
+\subsection{Testing?}
+
+- Unit test suites
+- Coveralls.io
+
 \section{Experiment Methods}
 
 \subsection{Experiment 1: Template Matching (Multiple Small Patches)}
+\label{ex1}
 \subsection{Experiment 2: Template Matching (Full-width Patches - Non-Scaled)}
 \subsection{Experiment 3: Template Matching (Full-width Patches - Geometric Scaled)}
 \label{tm-scaled}
