@@ -61,52 +61,193 @@ Compared to the use of the robot, this approach was certainly less `sophisticate
 
 \begin{itemize}
 	\item Two cardboard boxes (one rectangular and one angled);
-	\item A consumer-grade ``point-and-shoot" camera (Panasonic Lumix DMC-FS18);
+	\item A consumer-grade ``point-and-shoot" camera (Panasonic Lumix DMC-FS18 (2011));
 	\item A standard 30cm ruler;
 	\item A standard spirit level;
 \end{itemize}
 
 However, as well as being quick to initially build, this setup would go on to prove to be a lot more portable and a great deal cheaper to modify and fix than one of the Pioneer robots. 
 
-The method behind the use of the `homemade' camera rig was also simple in design, however this was regarded as favourable given that it solely relied on manual involvement where human error subsequently becomes one of the biggest issues to face. Figure \ref{} below details the method outline: 
+
+\subsubsection{Capturing Process}
+
+The method behind the use of the `homemade' camera rig to capture the image datasets also proved simple in design. This was regarded as favourable, given that it solely relied on manual involvement where human error subsequently becomes a potentially big issue. 
+
+Figure \ref{} below details the outline of the method used to capture an individual image dataset:
 
 % ADD FIGURE SHOWING FLOW CHART FOR METHOD (STEP 1 - GO TO START POSITION)...
 
-While one of the aims of the investigation hypothesis was to avoid the need for calibration of the camera, it was decided that in the interests of good experiment practice, measurements regarding the physical setup of the camera rig should be taken in case of future need. The measurements that were taken matched those taken by in the work by Campbell \textit{et al.}  \cite{campbell}, where the authors detailed their physical setup shown in Figure \ref{}:
-\\
-\\
-\\
-\\
-\\
-where $h$ refers to the height of the camera from the ground, and $d$ refers to the distance between the camera lens and the intersection with the ground plane. 
+While the method for capturing images followed a ``fixed" procedure, it did allow for changes in the type of terrain captured, and the level of set displacement by which the camera was moved between subsequent images.
 
-In order to calculate $d$, a target $T$ was first lined up on the ground such that it became positioned in the centre of the camera's viewfinder (Figure \ref{}). Next, the height $h$ was measured, along with the distance between the position of the target $T$, and the position $L$ where the front of the camera lens intersected vertically with the floor. Finally, Pythagorus' theorem was adopted to calculate the length of $d$:
+\subsubsection{Capture Locations}
 
-$$ a^2 = \sqrt{b^2 + c^2} $$
+A selection of locations were chosen for the purposes of capturing datasets. To ensure an appropriate level of variability, each dataset focussed on a different type of terrain environment that it was predicted a robot may face during live deployment.
 
-It was also possible to calculate the angle of the camera towards the ground plane by using simple trigonometry to taking the inverse tangent \cite{campbell}:
+Datasets were captured at five separate locations, split between indoor and outdoor sites to provide variation in lighting conditions in addition to terrain type:
 
-$$ maths $$
+\begin{enumerate}
+	\item \textbf{Site 1:} Living room rug with brightly-coloured simple-shapes (Indoors) (Natural light entering from the right)
+	\item \textbf{Site 2:} Brick-paved residential drive (Outside) (Natural light)
+	\item \textbf{Site 3:} Slate-tiled footpath (Outside) (Natural light)
+	\item \textbf{Site 4:} Heavily-patterned asian rug upon white-tiled floor (Inside) (Partial natural light from behind camera, partial artificial light (incandescent))
+	\item \textbf{Site 5:} Slate chips (Outside) (Natural light)
+\end{enumerate}
 
-\subsubsection{Environments}
+\subsubsection{Calibration of Physical Setup}
+
+Although one of the aims of the investigation hypothesis was to avoid the need for calibration of the camera, it was decided that in the interests of good experiment practice, measurements regarding the physical setup of the camera rig should be taken in case of future need. 
+
+Following the process outlined in the work of Campbell \textit{et al.} \cite{campbell}, the calibration would provide a future opportunity, should the need arise, to calculate the mapping between coordinates in the image plane and the ground plane.
+
+The physical setup of the camera rig is shown in Figure \ref{}, where $h$ refers to the height of the camera from the ground, and $d$ refers to the distance between the front edge of the rig base and the position at which the principle ray from the camera lens intersects with the ground plane \cite{campbell}.
+
+To establish the distance $d$, a target $T$ was positioned on the ground such that it lay within the centre of the camera's viewfinder (Figure \ref{}). The distance between the position of the target $T$ and the front of the rig was then manually measured in order to arrive at the final length. 
+
+After also manually measuring the height $h$, it became possible to calculate the tilt $ \alpha $ of the camera using basic trigonometry:
+
+\begin{equation}
+	\tan(\alpha) = \frac{h}{d}
+\end{equation}
+
+\textbf{Note to the reader:}
+
+The remaining steps of the calibration model outlined below did not form part of the main project investigation, however following the decision by the author to investigate them as part of improving their own understanding, they have been included in this report for completeness.
+
+The next step was to define the relationship between the vertical offset of a point in the image $v$ and the associated vertical angle between that same point and the principle point along the ground plane $\beta$ \cite{campbell}:
+
+\begin{equation}
+	\tan(\beta) = (2v - V)\tan(\frac{VFOV}{2})
+\end{equation}  
+
+where $ V $ refers to the height of the image in pixels, and $VFOV$ represents the vertical field of view from the camera:
+
+\begin{equation}
+	VFOV = 2\tan^{-1}(\frac{d}{2f})
+\end{equation}
+
+where (in this case) $d$ represents the vertical dimension of the camera sensor (but can also represent the horizontal dimension if wishing to calculate the horizontal FOV), and $f$ represents the camera focal length \cite{bourke}.
+
+Obtaining values for $d$ and $f$ involved consulting the manufacturer specifications document for the camera \cite{camera-spec}, in which the following information was identified:
+
+\begin{itemize}
+	\item \textbf{Sensor Type:} 1/2.33" CCD
+	\item \textbf{Lens Aspect Ratio:} 4:3
+	\item \textbf{Focal Length:} 5-20mm 
+\end{itemize}
+
+In calculating $d$, there was some confusion about how to establish the dimensions of the sensor from the published sensor type. It was assumed initially that the diagonal dimension of the camera would match that of dimension representing the sensor type (i.e. 1/2.33"). 
+
+However following some further research, it came to light that this was not actually the case, and in fact the dimension listed as the sensor type was not representative of the true sensor size, but instead was one of many industry-standard type designations used to classify image sensors \cite{gum}. Subsequently, the vertical dimension of the camera sensor was obtained using an online guide providing dimensions for standard types of sensor \cite{bockaert}.
+
+The final step in the calibration process published by Campbell \textit{et al.} \cite{campbell} involved recovering the distance $y$ from the observed point along the ground plane to the camera rig:
+
+\begin{equation}
+	y = \frac{h}{\tan{\alpha + \beta}}
+\end{equation}
+
+and the associated depth $z$:
+
+\begin{equation}
+	z = \frac{H\cos(\beta)}{\sin(\alpha + \beta)} 
+\end{equation}
+
+Through the use of this calibration model, the actual displacement of any point along the ground plane that is represented in the image plane, can be calculated by taking into account the depth between that point along the ground plane and the camera \cite{campbell}.
+
+
+\subsection{Artificial Datasets}
+
+While unfortunately never pursued in this project due to time limitations, an alternative approach to gathering robust testing data was to capture motion sequences set within a 3D virtual environment. 
+
+A key advantage of creating artificial image datasets stems from the level of control that becomes available over properties including the choice of lighting, terrain textures and landscape geometry. It is this high degree of granularity that makes using computer-generated datasets a popular choice for many vision-based projects, perhaps especially within earlier stages of a project, where one is simply attempting to identify bugs in the system, rather than necessarily evaluating hypotheses. 
+
+Other potentially very useful consequences of using computer-generated datasets include control over the amount of noise an image may contain (e.g. choice to include or remove specular reflections), and the high degree of speed at which new datasets adopting different condition configurations could be created almost ``on the fly" in order to test new ideas and approaches within an experiment. 
+
+The creation of artificial datasets would certainly have provided an opportunity to test the robustness of the experiment methods against a much broader range of conditions than what was feasibly possible using only real-world imagery. However the use of datasets captured from real-world environments was still arguably the most crucial in terms of evaluating the performance of experiment methods, given that these would ultimately provide the closest representation to the input expected within a live deployment. 
+
+% ADD EXAMPLES OF ARTIFICIAL DATASETS FROM PUBLISHED DATASETS
+
+While there was no time available for the author to learn how to build 3D environments for use in artificial datasets, some simple 2D-shape image datasets were created as part of evaluating the correct functioning of the template-matching approach adopting geometric scaling (discussed further in Section \ref{tm-scaled}).
 
 \section{Establishment of Ground Truth}
 
-\section{Test Harness}
+With respect to scientific investigation, the term ``\textit{ground truth}" refers to measurement data or results that are known to represent the \textit{absolute truth} of a particular condition or observation which can as such, subsequently be used to determine the accuracy of reported results from a system or method currently undergoing testing and evaluation.
 
-\section{Template Matching (Full-width Patches) - Non Scaled}
+In the specific context of computer vision, ground truth data will represent observations within image datasets that are known to actually exist in the real-world, and be accurate.
 
-\subsection{Perspective Distortion Calibration Tool}
+Due to the very nature of what ground truth data represents, generating such data can still typically only be accomplished through means of manual verification, where human observation continues to be deemed as the `state of art' in terms of providing the best possible accuracy available as to the \textit{fundamental} truth of a condition or observation \cite{kondermann}. A fundamental issue with this approach to the collection and verification of ground truth data, is that it tends towards being very costly in terms of both time and resources. Kondermann \cite{kondermann} states that this large requirement in effort to generate ground truth data in combination with its relatively limited applicability in terms of evaluation, consequently results in many vision-based projects failing to provide reference data that is either sufficiently comprehensive or accurate.
 
-\subsection{Calibration Evaluation Images}
+For particular types of reference data, some semi-automated methods do exist for gathering high-accuracy measurement results (e.g. extracting depth information about a 3D environment using laser scanning techniques) \cite{haltakov}. However, these approaches still require at least some form of manual verification in ensuring that this accuracy is at a level sufficient enough for it to be trusted as ground truth.
 
-\section{Template Matching (Full-width Patches) - Scaled}
+In terms of generating ground truth, one of the most challenging types of visual behaviour to document is optical flow \cite{kondermann}. This is because no sensor currently exists that is capable of detecting the effects of optical flow directly, and in most situations (except perhaps within very simple artificial datasets) attempting to perform manual annotation also proves to be an extremely difficult task to achieve with the kind of accuracy that is expected for use as ground truth data \cite{haltakov}. 
 
-\section{Investigating Alternative Existing Methods}
+As this was a problem that had potential implications for this project, thoughts began to turn to ways of developing a utility application that could assist a human in manually generating ground truth data for the observed displacement of features across a series of images. 
 
-\subsection{Feature-based matching techniques}
+\subsection{Ground Truth Utility Tool}
 
-\subsection{Edge-based matching techniques}
+Following discussions with the project supervisor a simple, yet effective solution was devised for determining the vertical displacement between a series of images. 
+
+For each image dataset, it was proposed that an additional pair of images would also be captured for the exclusive purpose of establishing ground truth. While obtained using the exact same method as the rest of the dataset, these two images would differ from the main collection by the fact that they would also contain a ruler positioned within the centre of each image. The choice to capture the ruler would be important, as the measurement increments it possessed would allow a user to clearly identify the same `feature' within both images (e.g. find the 10cm mark in both images).
+
+The next stage involved the design and implementation of a small, GUI-based utility tool that would allow a user to perform the following actions:
+
+\begin{enumerate}
+	\item Load in the pair of dedicated ground truth source images;
+	\item Using the mouse, click to select a number of `feature points' that the user deemed easily-identifiable within the first image (e.g. a particular measure mark along the length of the ruler);
+	\item Cycle through each `feature point' identified in the first image, and click on the location corresponding to the new position of that same `feature point' within the second image;
+	\item Export the calculated ground truth measurements for use in future experiments. 
+\end{enumerate}
+
+% ADD FIGURE SHOWING IDEA BEHIND CALIBRATION TOOL
+
+Following this process, a collection of sparse measurements would be obtained detailing the calculated number of pixels between the Y-coordinate of a `feature point' located in the first image, and the Y-coordinate of the corresponding `feature point' subsequently located within the second image. As it would not be possible for a user to manually identify and select features at an individual pixel level, interpolation would be required to estimate the intermediate values in order to arrive at a recorded displacement for every row in the image.
+
+Naturally, as with any means of human verification this approach was susceptible to human error, both in terms how accurately a user could position their mouse upon a feature, and also ensuring that they matched the correct features to each other. However, following the conclusions of a number papers within this topic area \cite{kondermann} \cite{haltakov} \cite{}, human verification was deemed to still provide the best possible level of accuracy for generating ground truth data relating to optical flow.
+
+\textbf{Note to the reader:}
+
+Within the context of the experiments that were conducted it was agreed by both the author and the project supervisor that in the interests of time, the expected behaviour predicted in the hypothesis (namely  ``\textit{greater vertical displacement is shown approaching the bottom of an image than towards the top}") would serve as sufficient `un-official' ground truth from which the performance of the methods implemented could be evaluated.
+
+\section{Design of Experiment Setup}
+
+Prior to beginning the implementation of specific experiments, it was first necessary to design and implement an underlying software infrastructure with the aim of maximising the \textit{efficiency}, \textit{flexibility} and \textit{repeatability} of the experiments conducted:
+
+\begin{itemize}
+	\item \textbf{Efficiency:} The testing infrastructure should execute each experiment in a way that makes efficient use of data and system resources (including but not limited to: imagery datasets, experiment parameters and host computer CPU and memory allowance).
+	\item \textbf{Flexibility:} The testing infrastructure should provide support for conducting an experiment under multiple combinations of method parameters entered by the user prior to initiation.  
+	\item \textbf{Repeatability:} The testing infrastructure should ensure that each run of an experiment is treated as new and conducted in complete isolation to any previous run. 
+\end{itemize}
+
+\subsection{Choice of Programming Language}
+
+For this project, it was primarily the selection of specific external libraries that determined the programming languages that would be adopted.
+
+The original intention saw the entire project developed in C++, as this matched the `native' development language of the OpenCV library \cite{opencv} that was expected to provide a significant contribution to the implementation of the appearance-based similarity measures under investigation. While the OpenCV library did provide a comprehensive range of bindings for other programming languages including Python, Java and C\#, it was felt that choosing to develop in C++ would prove to be the most beneficial in terms of maximising available functionality (i.e. not all functions within OpenCV were available for alternative languages) and maximising the level of support available from both official documentation and wider community. 
+
+\subsection{Choice of Development Tools}
+
+\subsection{Choice of Core Libraries}
+
+\subsection{Implementation of Template Matching Similarity Measures}
+
+\subsection{Execution of Experiment Methods}
+
+\subsubsection{Automated Test Rig}
+
+\subsubsection{Library of `Core' Functions}
+
+\subsection{Display \& Analysis of Results}
+
+\section{Experiment Methods}
+
+\subsection{Experiment 1: Template Matching (Multiple Small Patches)}
+\subsection{Experiment 2: Template Matching (Full-width Patches - Non-Scaled)}
+\subsection{Experiment 3: Template Matching (Full-width Patches - Geometric Scaled)}
+\label{tm-scaled}
+
+\subsection{Additional Experiments}
+
+\subsection{Feature-based matching}
+\subsection{Edge-based matching}
 
 
 
