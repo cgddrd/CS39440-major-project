@@ -15,8 +15,10 @@ using namespace std;
 
 vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& rows, int patchSize = 10);
 void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
-void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
-void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, int& highScoreIndexY);
+void calcPatchMatchScoreExhaustive(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY);
+
+void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, double& highScoreIndexY);
+
 vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vector<Mat> patch_templates, vector<Point2f> patch_template_coords, string histFileName);
 void exportResults(vector<vector<double > > all_results, vector<int> rows, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "result_patch_");
 void exportTimeResults(vector<double> timeTaken, vector<int> methods, int roiSize, int patchSize, string fileNamePrefix = "time_test_");
@@ -28,9 +30,10 @@ Mat img1;
 Mat img2;
 double imgROIStartX = 0;
 
-bool simplePatches = true;
-bool useGUI = true;
+bool simplePatches = false;
+bool useGUI = false;
 bool exhaustiveSearch = false;
+bool useHistogramMatching = false;
 
 enum
 {
@@ -49,13 +52,13 @@ int main(int argc, char** argv) {
         return -1;
     }
     
-    vector<int> methods {CUSTOM_ED_NORM};
+    vector<int> methods {CUSTOM_ED_NORM, CV_COMP_CORREL};
     
     string fileRootPath = "../../../eval_data/motion_images/wiltshire_outside_10cm/";
     
-    vector<vector<string> > files {{"IMG1.JPG", "IMG2.JPG"}};
+    vector<vector<string> > files {{"IMG1.JPG", "IMG2.JPG"},{"IMG3.JPG", "IMG4.JPG"},{"IMG5.JPG", "IMG6.JPG"},{"IMG7.JPG", "IMG8.JPG"},{"IMG9.JPG", "IMG10.JPG"},{"IMG11.JPG", "IMG12.JPG"},{"IMG12.JPG", "IMG14.JPG"},{"IMG15.JPG", "IMG16.JPG"},{"IMG17.JPG", "IMG18.JPG"},{"IMG19.JPG", "IMG20.JPG"}};
     
-    vector<int> patchSizes {50};
+    vector<int> patchSizes {100};
     
     vector<int> roiSizes {40};
     
@@ -125,30 +128,51 @@ int main(int argc, char** argv) {
 
 string getMatchMethodName(int matchMethod) {
     
-    switch (matchMethod) {
-        case CV_TM_SQDIFF_NORMED:
-            return "SQDIFF_NORMED";
-        case CV_TM_SQDIFF:
-            return "SQDIFF";
-        case CV_TM_CCORR_NORMED:
-            return "CCORR_NORMED";
-        case CV_TM_CCORR:
-            return "CCORR";
-        case CV_TM_CCOEFF_NORMED:
-            return "CCOEFF_NORMED";
-        case CV_TM_CCOEFF:
-            return "CCOEFF";
-        case CUSTOM_ED_NORM:
-            return "CUSTOM_ED_NORM";
-        case CUSTOM_ED:
-            return "CUSTOM_ED";
-        case CUSTOM_CORR:
-            return "CUSTOM_CORR";
-        case CUSTOM_CORR_NORM:
-            return "CUSTOM_CORR_NORM";
-        default:
-            return "UNKNOWN";
+    if (matchMethod == CV_COMP_CHISQR || matchMethod == CV_COMP_CORREL || matchMethod == CV_COMP_HELLINGER || matchMethod == CV_COMP_INTERSECT) {
+        
+        switch (matchMethod) {
+            case CV_COMP_CORREL:
+                return "HIST_CORREL";
+            case CV_COMP_HELLINGER:
+                return "HIST_HELLINGER";
+            case CV_COMP_INTERSECT:
+                return "HIST_INTERSECT";
+            case CV_COMP_CHISQR:
+                return "HIST_CHISQR";
+            default:
+                return "UNKNOWN";
+        }
+        
+        
+    } else {
+        
+        switch (matchMethod) {
+            case CV_TM_SQDIFF_NORMED:
+                return "SQDIFF_NORMED";
+            case CV_TM_SQDIFF:
+                return "SQDIFF";
+            case CV_TM_CCORR_NORMED:
+                return "CCORR_NORMED";
+            case CV_TM_CCORR:
+                return "CCORR";
+            case CV_TM_CCOEFF_NORMED:
+                return "CCOEFF_NORMED";
+            case CV_TM_CCOEFF:
+                return "CCOEFF";
+            case CUSTOM_ED_NORM:
+                return "CUSTOM_ED_NORM";
+            case CUSTOM_ED:
+                return "CUSTOM_ED";
+            case CUSTOM_CORR:
+                return "CUSTOM_CORR";
+            case CUSTOM_CORR_NORM:
+                return "CUSTOM_CORR_NORM";
+            default:
+                return "UNKNOWN";
+        }
+        
     }
+    
 }
 
 void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> roiDimensions, vector<int> patchDimensions, vector<int> match_type, int pairNo) {
@@ -182,6 +206,15 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
             
             
             for(vector<int>::iterator it3 = match_type.begin(); it3 != match_type.end(); ++it3) {
+                
+                if (*it3 == CV_COMP_CHISQR || *it3 == CV_COMP_CORREL || *it3 == CV_COMP_HELLINGER || *it3 == CV_COMP_INTERSECT) {
+                    
+                    useHistogramMatching = true;
+                    
+                } else {
+                    
+                    useHistogramMatching = false;
+                }
                 
                 cout << "BEGIN: Test #" << testCount << ": ROI Size: " << *it1 << ", Patch Size: " << *it2 << ", Match Method: " << getMatchMethodName(*it3) << ", Pair No: " << pairNo << endl;
                 
@@ -376,7 +409,16 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         
         localisedSearchWindow = image2ROI(Rect(originPixelCoords.x - (templatePatch.cols / 2), originPixelCoords.y - (templatePatch.cols / 2), localisedWindowWidth, localisedWindowHeight));
         
-        calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, highestScore, displacement);
+        if (useHistogramMatching) {
+            
+            calcHistMatchScore(localisedSearchWindow, templatePatch, match_method, highestScore, displacement);
+            
+            
+        } else {
+            
+            calcPatchMatchScore(localisedSearchWindow, templatePatch, match_method, highestScore, displacement);
+            
+        }
         
         if (useGUI) {
             
@@ -388,11 +430,6 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
             imshow("Output", img2);
             
         }
-        
-        //        if (displacement <= (templatePatch.rows*2)) {
-        //            // break;
-        //            raw_result.push_back(displacement);
-        //        }
         
         raw_result.push_back(displacement);
         
@@ -447,7 +484,7 @@ vector<Mat> getROIPatches(Mat inputMat, vector<Point2f>& points, vector<int>& ro
     return mats;
 }
 
-void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY) {
+void calcPatchMatchScoreExhaustive(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY) {
     
     Mat resultMat, currentPatch;
     
@@ -490,6 +527,95 @@ void calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int matc
         bestScore = maxVal;
         
         bestScoreYIndex = matchLoc.y;
+    }
+    
+    highScore = bestScore;
+    highScoreIndexY = bestScoreYIndex;
+    
+}
+
+void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, double& highScoreIndexY) {
+    
+    Mat currentPatch, histCurrentPatch, histTemplatePatch;
+    
+    //Set "initialiser" value for best match score.
+    double bestScoreYIndex = -1;
+    double bestScore = -1;
+    
+    bool stop = false;
+    
+    /// Using 50 bins for hue and 60 for saturation
+    int h_bins = 50; int s_bins = 60;
+    int histSize[] = { h_bins, s_bins };
+    
+    // hue varies from 0 to 179, saturation from 0 to 255
+    float h_ranges[] = { 0, 180 };
+    float s_ranges[] = { 0, 256 };
+    
+    const float* ranges[] = { h_ranges, s_ranges };
+    
+    // Use the o-th and 1-st channels
+    int channels[] = { 0, 1 };
+    
+    for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
+    {
+        currentPatch = localisedSearchWindow.clone();
+        currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
+        
+        calcHist( &currentPatch, 1, channels, Mat(), histCurrentPatch, 2, histSize, ranges, true, false );
+        calcHist( &templatePatch, 1, channels, Mat(), histTemplatePatch, 2, histSize, ranges, true, false );
+        
+        double result = compareHist( histCurrentPatch, histTemplatePatch, hist_match_method );
+        
+        
+        if( hist_match_method == CV_COMP_CORREL || hist_match_method == CV_COMP_INTERSECT )
+        {
+            
+            if (bestScore == -1 || result > bestScore) {
+                
+                bestScore = result;
+                bestScoreYIndex = i;
+                
+            } else {
+                
+                stop = true;
+                
+            }
+        }
+        else
+        {
+            
+            if (bestScore == -1 || result < bestScore) {
+                
+                bestScore = result;
+                bestScoreYIndex = i;
+                
+            } else {
+                
+                stop = true;
+                
+            }
+            
+        }
+        
+        if (useGUI) {
+            
+            Mat searchWindowGUI = localisedSearchWindow.clone();
+            
+            rectangle( searchWindowGUI, Point(0, i), Point(templatePatch.cols , i + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
+            
+            //CG - Allows the output window displaying the current patch to be updated automatically.
+            cv::waitKey(50);
+            imshow("Search Window", searchWindowGUI);
+            imshow("Template Patch", templatePatch);
+            
+        }
+        
+        if (stop) {
+            
+            break;
+            
+        }
     }
     
     highScore = bestScore;
@@ -637,7 +763,7 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
         
     } else {
         
-        calcPatchMatchScore2(localisedSearchWindow, templatePatch, match_method, highScore, highScoreIndexY);
+        calcPatchMatchScoreExhaustive(localisedSearchWindow, templatePatch, match_method, highScore, highScoreIndexY);
         
     }
     

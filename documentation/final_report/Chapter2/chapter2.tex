@@ -238,6 +238,7 @@ A further reason for switching to the Python language, which would in time becom
 One of the most commonly noted disadvantages of using Python describes the fact that as a scripted language, its general performance is considered to be slower overall than that of compiled languages such as C++. While this was initially of some concern, it was later addressed through the use of a third-party library (Cython \cite{cython}) that enabled computationally expensive functions originally written in Python to be converted automatically into compiled C code.
 
 \subsection{Development Tools}
+\label{develtools}
 
 Given the author's lack of prior knowledge in C++ or Python, it was decided that the use of an IDE for development would be most suitable for development, as they would be able to provide support facilities including code completion, automatic refactoring and powerful debugging facilities. 
 
@@ -249,9 +250,109 @@ Version control was managed by git, with repositories hosted on both Github and 
 
 \subsection{Core Libraries}
 
+While making use of only a small selection of libraries, these libraries were used rather extensively, in particular opencv and bumpy. python and python were pretty big aswell.
 
+The project made use of a selection of libraries to support in the development of the both the experiment testing framework, and the experiment methods themselves.
 
+The largest single contributing library was \textit{OpenCV} \cite{opencv}. Originally developed by Intel, \textit{OpenCV} is one of the most popular open source computer vision and machine learning libraries currently available, providing over 2500 optimised functions that implement some of the most renowned computer vision algorithms including SIFT (Scale Invariant Feature Transform)\footnote{\url{http://docs.opencv.org/modules/nonfree/doc/feature_detection.html}}, Viola-Jones face detection\footnote{\url{http://docs.opencv.org/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html}} and Lucas-Kanade optical flow\footnote{\url{http://docs.opencv.org/modules/video/doc/motion_analysis_and_object_tracking.html#calcopticalflowpyrlk}}. 
+
+\textit{OpenCV} became a vital tool in the development of this project, providing a large number of ``core" image processing and computer vision facilities including colour space manipulation, sub-region extraction and template matching (see Section \ref{templmatchopencv}). This project referenced the latest stable release at the time of writing (2.11.0), and made use of both the C++ and Python bindings as discussed in Section \ref{develtools}.
+
+For aspects of the implementation developed in Python (approximately 75\% of code written), the project made extensive use of the \textit{Numpy} \cite{numpy}, \textit{Cython} \cite{cython}, \textit{Matplotlib} \cite{matplotlib} and \textit{iPython} \cite{ipython} libraries. 
+
+\textit{Numpy} \cite{numpy} is a very popular third-party extension library providing optimised array-type objects in addition to a wide range of mathematical operations associated with numeric collections including matrix manipulation\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.linalg.htm}}, statistical analysis\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.statistics.html}} and Fourier transforms\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.fft.html}}. One of the core data structures provided by \textit{Numpy} is the multidimensional array\footnote{\url{http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html}}, which happened to be the data structure of choice within the \textit{OpenCV} Python bindings for representing an image.
+
+The \textit{Cython} library \cite{cython} is an advanced tool utilised within the project for translating computationally expensive functions written originally in Python, into optimised C code. The library came with its own dialect of Python, that while being almost identical, enabled developers to add additional `C-specific instructions' (such as specifying type declarations for variables) to allow for full conversion from Python to C without the need for the developer to write any C code themselves. \textit{Cython} source files were distinguished from ``true" Python source files through the use of the \textit{``.pyx"} file extension (as opposed to the \textit{``.py"} extension for Python source files). While \textit{Cython} did also possess the ability to convert native Python code, the resulting compiled C files would not be fully optimised.
+
+\textit{Matplotlib} \cite{matplotlib} is a popular plotting library for Python providing high-level support for producing a wide range of scientific graphs and figures in both 2D and 3D. It was used extensively throughout this project for depicting experiment results and analysing method behaviour (e.g. plotting the behaviour of template matching similarity scores).
+
+\textit{iPython} \cite{ipython} provides an interactive environment for running computational operations where a dedicated graphical user interface may not be appropriate. It is becoming very popular amongst the scientific and data-analysis communities as a means of quickly and easily implementing, running and sharing computational tasks and experiments within an intuitive web-based environment (known as an \textit{iPython notebook}\footnote{http://ipython.org/notebook.html}).
+ 
 \subsection{Implementation of Template Matching Similarity Measures}
+\label{templmatchopencv}
+
+All of the experiments conducted within this project focussed on the analysis of four specific template matching similarity measures for identifying corresponding sub-regions between two subsequent images of a forward-motion sequence.
+
+The general process for performing template matching, regardless of the choice of similarity metric, remains fundamentally the same \cite{opencvtemplatematching}:
+
+\begin{algorithm}
+\caption{Template Matching}
+\label{templatematchalgorithm}
+\begin{algorithmic}[1]
+
+\Procedure{Template\_Matching}{\textit{template\_image}, \textit{search\_image}}
+
+\State let \textit{high\_score} = $-1$
+\State let \textit{high\_score\_position} = $(-1, -1)$ \Comment{Initialise high score and position.}
+\State let \textit{template\_image\_height} = len(\textit{template\_image})
+\State let \textit{template\_image\_width} = len(\textit{template\_image}[0])\\\\
+
+\Comment{Convolve the template image through the image we are searching.}
+\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_image}) - 1) - \textit{template\_image\_height} \textbf{step} $1$}
+\For{$j \coloneqq 0$ \textbf{to} (len(\textit{search\_image[0]}) - 1) - \textit{template\_image\_width} \textbf{step} $1$} \\
+
+\State let current\_window = search\_image[$i$][$j$]
+\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_image}, \textit{current\_window}) \\
+
+\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})}
+
+\State \textit{high\_score} = \textit{current\_match\_score}
+\State \textit{high\_score\_position} = $(i, j)$
+
+\EndIf \\
+
+\EndFor
+\EndFor \\
+
+\\ \Return \textit{high\_score\_position} \\
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+where a template image (i.e. the image we are searching for) is convolved through a (typically) larger search image (i.e. moved through the search image 1 pixel at a time). At each increment in position,  a similarity ``score" is calculated using a specific similarity metric calculation, if this new score is deemed ``better" than the current high score (which can be lower or higher depending on the similarity metric chosen) then that position within the search image becomes the new location where the item in the template image is most likely to be.
+
+The similarity measures subsequently implemented in the experiments were chosen specifically in order to compare the performance between the two major categories of appearance-based matching technique. 
+
+\subsubsection{Distance-Based Similarity Measures}
+
+The first two measures were implementations of \textit{distance-based} matching. Under this approach (also known as \textit{correlation-based} matching), the similarity between two images is calculated by comparing the pixel-wise properties of each image (i.e. each pixel is compared with the corresponding pixel in the other image) using a particular type of measure. \cite{szeliski}. 
+
+For this investigation, the \textit{Euclidean Distance} and \textit{Normalised Cross-Correlation} measures were selected as they both demonstrated differences suitable for comparison with respect to their approach to calculating pixel-similarity and robustness to changes in lighting. 
+
+In the field of mathematics, the Euclidean Distance is a measure of the length of the vector that connects two distinct points located within Euclidean space \cite{szeliski}. In the context of appearance-based template matching, it is possible to utilise the Euclidean Distance to calculate a measure of similarity between pixel values of two images as defined by:
+
+\begin{equation}
+d(x, y) = \sqrt{\sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j) - \mathcal{A}(i, j)]^2}
+\end{equation}
+
+where $\mathcal{A}$ is the template image containing the pattern we are searching for within image $\mathcal{I}$. 
+
+A crucial characteristic of the Euclidean Distance (and indeed similar approaches including Sum of Squared Difference), is that it relies on comparing the \textit{intensity} of pixels in order to provide a measure of image similarity. This is very important, as it subsequently enforces an implicit assumption (known as the \textit{brightness constancy constraint}), that the values of corresponding pixels do not change between the two images\cite{szeliski}. This in effect, means that the measure can be substantially affected by changes in brightness between the two images under comparison.  
+
+Normalised cross-correlation takes its roots from the field of signal processing, and unlike Euclidean Distance does not rely on differences in pixel intensity to establish the similarity between two images. Instead, this approach takes the product (known as the \textit{cross-correlation}) of pixel values as defined by:
+
+\begin{equation}
+d(x, y) = \sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j) \cdot \mathcal{A}(i, j)]^2
+\end{equation}
+
+However as it stands, this equation currently remains susceptible to the effects of differences in image brightness just in the same way as the Euclidean Distance. It is however possible to overcome this issue by first \textit{normalising} the pixel values prior to scoring: 
+
+\begin{equation}
+d(x, y) = \frac{\sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j) \cdot \mathcal{A}(i, j)]^2}{\sqrt{\sum\limits_{i}\sum\limits_{j}[\mathcal{A}(i, j)]^2 \cdot \sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j)]^2}}
+\end{equation}
+
+As well as dramatically improving resilience to differences in image exposure, normalising also guarantees the returned score will fall between -1 and 1. This can prove helpful when used as part of larger application.  
+
+%
+%As the image patches that are compared share the \textit{same dimensions}, the final distance function becomes a modified version of the \textbf{Sum of Squared Differences}:
+%
+%\begin{equation}
+%d(x, y) = \sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x, y) - \mathcal{A}(i, j)]^2
+%\label{eq:ed2}
+%\end{equation}
+
+\subsubsection{Histogram-Based Similarity Measures}
 
 \subsection{Execution of Experiment Methods}
 

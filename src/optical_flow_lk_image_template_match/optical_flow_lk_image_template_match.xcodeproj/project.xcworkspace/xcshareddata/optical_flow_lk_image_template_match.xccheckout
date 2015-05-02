@@ -11,17 +11,17 @@
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>C25EF85B8BBB7D57FFB3ACF7E8B7EBB8BBC8453A</key>
-		<string>https://github.com/cgddrd/CS39440-major-project.git</string>
+		<string>https://github.com/cgddrd/cs39440-major-project.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>experiments/optical_flow_lk_image_template_match/optical_flow_lk_image_template_match.xcodeproj</string>
+	<string>src/optical_flow_lk_image_template_match/optical_flow_lk_image_template_match.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>C25EF85B8BBB7D57FFB3ACF7E8B7EBB8BBC8453A</key>
 		<string>../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>https://github.com/cgddrd/CS39440-major-project.git</string>
+	<string>https://github.com/cgddrd/cs39440-major-project.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
