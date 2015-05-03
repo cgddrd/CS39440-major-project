@@ -218,16 +218,17 @@ Prior to beginning the implementation of specific experiments, it was first nece
 \end{itemize}
 
 \subsection{Programming Languages}
+\label{lang}
 
 For this project, it was primarily the selection of specific external libraries that determined the programming languages that would be adopted.
 
 The original intention saw the entire project developed in C++, as this matched the `native' development language of the OpenCV library \cite{opencv} that was expected to provide a significant contribution to the implementation of the appearance-based similarity measures under investigation. While the OpenCV library did provide a comprehensive range of bindings for other programming languages including Python, Java and C\#, it was felt that choosing to develop in C++ would prove to be the most beneficial in terms of maximising available functionality (i.e. not all functions within OpenCV were available for alternative languages) and maximising the level of support available from both official documentation and the wider community. 
 
-Following the completed implementation of the \textit{first experiment} (detailed in Section \ref{ex1}), this original intention was altered to instead change from C++ to Python as the primary development language. 
+Following the completed implementation of the \textit{first experiment} (detailed in Section \ref{ex1}), this original intention was altered to instead change from C++11 to Python 2.7 as the primary development language. 
 
 This decision was not taken lightly, with the author being very much aware that by choosing a language with which they were unfamiliar, there was a high probability of the project incurring delays resulting from both learning the actual language, while also having to most likely dedicate additional time to fixing ``common" bugs typically associated with being new to the language. In spite of this, it was decided that while it may potentially cost time in the short term, switching to Python would provide a number of key benefits in the long term. 
 
-The first of these benefits was that in comparison to C++, the language provided significantly more functionality ``out of the box" due to it being situated at a ``higher" level programmatically. While reviewing the implementation of the first experiment, it was found that on a number of occasions, a function that had to written manually in C++ (e.g. standard deviation and variance of a numeric collection), was already available within the Python language itself, or one of its primary third-party libraries (e.g. numpy \cite{numpy} and scipy \cite{scipy}). While it was true that many of these functions did not take particularly long to implement in C++, there was a clear benefit to having such functions already implemented in libraries that were known to be both optimised and peer-tested. 
+The first of these benefits was that in comparison to C++, the language provided significantly more functionality ``out of the box" due to it being situated at a ``higher" level programmatically. While reviewing the implementation of the first experiment, it was found that on a number of occasions, a function that had to written manually in C++ (e.g. standard deviation and variance of a numeric collection), was already available within either the Python language as standard, or one of its primary third-party libraries (e.g. \textit{numpy} \cite{numpy} and \textit{scipy} \cite{scipy}). While it was true that many of these functions did not take particularly long to implement in C++, there was a clear benefit to having such functions already implemented in libraries that were known to be both optimised and peer-tested. 
 
 Secondly, following research into the Python language, it soon became clear that it was a popular choice amongst scientific and engineering teams due mainly to its impressive level of support for scientific and numeric computing \cite{perez} and promotion of `natural language' within its syntax that is known to aid in supporting rapid prototyping \cite{ramanujam}. These were both characteristics that could be applied to the needs of this project, and hence were deemed beneficial to future development.
 
@@ -249,6 +250,7 @@ Python development was conducted within the PyCharm IDE making use of the educat
 Version control was managed by git, with repositories hosted on both Github and a separate private git server. The project also made use of the Travis CI continuous integration platform to provide automated building and testing of software. Integrating directly with the Github service, new builds would be triggered automatically upon pushing of a new commit to the remote repository. Should any part of the build process fail (including unit test failures), the service would send an email notification detailing the type and source of the error.  
 
 \subsection{Core Libraries}
+\label{libs}
 
 While making use of only a small selection of libraries, these libraries were used rather extensively, in particular opencv and bumpy. python and python were pretty big aswell.
 
@@ -418,42 +420,107 @@ As a result it then becomes possible to compare the two images using only the \t
 
 Within this investigation, all testing images were converted from RGB (loaded as BGR in \textit{OpenCV}) to the \textit{Hue-Saturation-Value} colour space prior to the beginning of any experiment tests. This was achieved using the \texttt{cvtColor}\footnote{\url{http://docs.opencv.org/modules/imgproc/doc/miscellaneous_transformations.html#cvtcolor}} \textit{OpenCV} function with the \texttt{BGR2HSV} conversion type parameter. This later allowed the `Value' channel to be ignored as part of all image comparisons made during the template matching procedures conducted within an experiment.
 
-\subsection{Execution of Experiment Methods}
+%\subsection{Execution of Experiment Methods}
 
-\subsubsection{Automated Test Rig}
+\subsection{Automated Test Rig}
 
-One of the major design aspects of the project was the decision to implement an automated testing rig to facilitate in the conducting of experiments. The core motivation behind the test rig, was to find an efficient approach to executing experiments wishing to test a wide combination of potential method parameters, in a manner that was both comprehensive and repeatable. 
+One of the most significant design aspects of the project was the decision to implement an automated testing rig to facilitate in the conducting of experiments. The core motivation behind the test rig, was to find an efficient approach to executing experiments wishing to test a wide combination of potential method parameters, in a manner that was both comprehensive and repeatable. 
 
-While of course defining these parameters would remain the responsibility of the user, the primary use case of the system saw the user specify all of the possible test parameters \textit{up front}, before instructing the test rig to repeatedly perform and document each experiment in isolation, until all possible combinations of the test parameters for that experiment had been attempted. The most obvious advantage to this system was the significant reduction that could be made in terms of human resources. Thus allowing the user to focus on tasks that were less suited or perhaps not possible for a computer to achieve, such identifying key aspects within the results gathered from the last run of the test rig. 
+While of course defining these parameters would remain the responsibility of the user, the primary use case of the system would see all of the possible test parameters specified \textit{right at the start}, before initiating the test rig to repeatedly perform and document each experiment in isolation, until all possible combinations of the test parameters for that experiment had been attempted. 
+
+The most obvious advantage to using such a system was the significant reduction that could be made in terms of human resources. Thus, allowing the user to focus on tasks that were less suited or perhaps not possible for a computer to achieve, such identifying key aspects within the results gathered from the last run of the test rig. 
 
 However, another advantage perhaps not as immediately visible, was the almost complete removal of the risk for human error that otherwise (assuming a moderate number of potential parameters) would be set fairly high, given the situation where a user had to manually run each possible combination of experiment. Although, it should be noted that as the user would continue to interact in some form, there was always still a risk of experiment results being tainted as a consequence of human error being introduced. 
 
 % Add UML USECASE DIAG
 
-In terms of interaction with the user, the test rig provided a command-line based interface that provided support for the input of all test parameters and configuration options using a collection of specific parameter arguments. While certain arguments related to specific experiment, a number of arguments common to all experiments conducted under this investigation were defined as follows:
+\subsubsection{Execution of Experiment Tests}
+
+In terms of interaction with the user, the test rig provided a command-line based interface that provided support for the input of all test parameters and configuration options using a collection of specific parameter arguments. 
+
+While certain arguments related only to specific experiments, an example selection of arguments common to all were defined as follows:
 
 \begin{table}[h]
 \small
-\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{4cm}|p{3cm}|}
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{3.5cm}|p{3.5cm}|}
 \hline
 Parameter Name & Argument Specifier & Type  & Input Format & Description \\ \hline
-Image Pairs & \texttt{--images} & \texttt{(String, String)[]} & \texttt{"\textless pair\_1\_image\_1\textgreater, \textless pair\_1\_image\_2\textgreater", "\textless pair\_1\_image\_1\textgreater, \textless pair\_1\_image\_2\textgreater"} & test \\
-\hline   
+Image Pairs & \texttt{--images} & \texttt{(String, String)[]} & \texttt{"\textless pair\_1\_image\_1\textgreater, \textless pair\_1\_image\_2\textgreater", "\textless pair\_2\_image\_1\textgreater, \textless pair\_2\_image\_2\textgreater"} & Specifies the file paths for one or more pairs of images. \\ \hline
+Patch Sizes & \texttt{--patches} & \texttt{Int[]} & \texttt{[50, 100, 200]} & Specifies a collection of square-dimension sizes to use for extracting template patches. \\ \hline  
+Matching Methods & \texttt{--methods} & \texttt{String[]} & \texttt{["DistEuclidean", "HistCorrel"]} & Specifies which similarity measures to use in matching corresponding patches. \\ \hline   
+Draw Plot of Results & \texttt{--drawplot} & \texttt{Boolean} & \texttt{--drawplot} & If specified, instructs the test rig to render a graphical plot of the results for each experiment. \\ \hline  
 \end{tabular}
 \end{table}
 
+In addition to the command-line interface, it was also possible to interact with the test rig programatically. This was an approach utilised extensively while generating the final results as discussed in Section \ref{display}.
 
+\subsubsection{Storage of Results}
 
-\subsubsection{Library of `Core' Functions}
+Upon the completion of an individual experiment test, the results were appended to a dictionary-based data store that would allow for the results of any specific experiment test to be re-extracted at a later stage. In order to achieve this, a specific naming convention for dictionary indices was defined:
 
-\subsection{Display \& Analysis of Results}
+% ADD FIGURE SHOWING DICTIONARY NAMING CONVENTION SPLIT!
 
-\subsection{Testing?}
+\subsection{Library of `Core' Functions}
 
-- Unit test suites
-- Coveralls.io
+During a review of the completed C++ implementation for the first experiment, it came to light that it would be desirable in many cases to reuse the same functions that had previously been written across a number of future experiments. 
+
+Following the decision at that same point to switch from C++ to Python (discussed in Section \ref{lang}), it was deemed as an opportune moment to re-factor all of the common functions into a single library that could be shared across all projects, but whose code remained de-coupled from any single experiment implementation. 
+
+\subsubsection{Structure}
+
+The design of the \textit{`Terrain Shape Estimation'} (TSE) library saw the creation of nine key components, each focussing on providing functions for a specific set of tasks:
+
+\begin{itemize}
+	\item \textbf{TSEImageUtils:} Provides functionality relating to image processing and template matching.
+	\item \textbf{TSECImageUtils:} Provides compiled (C code) versions of certain functions available in \textit{TSEImageUtils} which are known to be computationally expensive (Cython \texttt{.pyx} source class)
+	\item \textbf{TSEDataUtils:} Provides common data handling and statistical processing functionality for use with single and multi-dimensional data structures.
+	\item \textbf{TSEFileIO:} Provides functions relating to data file input and output (not images - this is provided by the \textit{OpenCV} library).
+	\item \textbf{TSEGeometry:} Provides mathematical functions relating to the geometric transformation of image pixel coordinates (primarily scaling).
+%	\item \textbf{TSEEnum:} Represents the definition of an \texttt{enum} type for use in Python which does not come as standard in Python 2.7.
+	\item \textbf{TSEMatchMethod:} \texttt{Enum} type used to represent the three possible matching metric categories available: distance-based (normal), distance-based (Euclidean) and histogram-based (The two types of distance-based category are as a result of the way \textit{OpenCV} handles calculation of Euclidean Distance in a separate manner to other distance-based similarity measures).
+	\item \textbf{TSEMatchType:} Provides a class representation for a single appearance-based similarity measure to hold specific properties regarding each metric.
+	\item \textbf{TSEPoint:} Provides a class representation for a single 2D-coordinate point within an image used when performing geometric transformations of pixel coordinates.
+	\item \textbf{TSEResult:} Provides a class representation for a single `result unit' recorded within an experiment.
+\end{itemize}
+
+% ADD UML CLASS DIAG OF TSE LIBRARY.
+
+\subsubsection{Deployment}
+
+Falling in line with standard Python convention \cite{setup}, the library also included an additional \texttt{setup.py} file that allowed it to be installed upon a computer via the use of common Python package managers including \textit{Pip}\footnote{\url{https://pypi.python.org/pypi/pip}} and \textit{Setuptools}\footnote{\url{https://pypi.python.org/pypi/setuptools}}.
+
+Each separate `experiment-specific' Python application was able to subsequently add the installed \textit{`TSE'} library as a package dependency in order to then access the functions provided.
+
+\subsection{Presentation \& Analysis of Results}
+\label{display}
+
+The ability to present results in a clear and organised fashion is naturally an aspect that has great importance within scientific experimentation. 
+
+One of the key issues facing this project was how to present the results of a potentially large number of individual experiment tests, in manner that a human could observe, manipulate and compare. While the solutions that were eventually chosen differed between the first experiment implemented in C++ and the rest implemented in Python, all had the same aim of providing the user with a means of easily extracting and viewing the results that were of particular interest to their own needs.
+
+For the first experiment it was decided that, in the interests of both time and the primary project objective, it would be best to provide support only for exporting results data to file, rather than attempting to implement plotting and visualisation facilities directly. 
+
+In order to allow for further analysis of the results obtained from the first experiment, the project made use of third-party plotting application called \textit{Veusz} \cite{}. This tool supported an impressive number of useful facilities including importing (and automatic re-importing) of data files, common statistical analysis functions (including moving average and linear interpolation) and a WYSIWYG interactive graphical plot creation and editing suite. 
+
+Within Veusz, it was possible to extract specific result sets from an imported results data file, before plotting them as 2D scatter plots, configuring aspects such as the marker style, axis titles and axis ranges as needed.   
+
+For experiments implemented in Python (i.e. all experiments except the first) the project instead made extensive use of the \textit{iPython} framework \cite{ipython} discussed previously in Sections \ref{lang} and \ref{libs}. This library proved to be an invaluable asset to the project investigation, providing not only support for extracting and viewing result data, but an entire ecosystem tailored towards the setup, running and analysis of computational experiments from within a single web-based environment. 
+
+A major feature provided within \textit{iPython} is the ability to \textit{interactively} write and run Python code within isolated computational environments known as `notebooks'\footnote{\url{http://ipython.org/notebook.html}}. By communicating with the test rig programmatically, it was possible to define all of the required test parameters within Python code, before passing these over to the test rig in order to then start the tests. Should any changes need to be made, this was accomplished within the web-based user interface, without the need for any interaction with the command line whatsoever. By creating multiple notebooks for each experiment, it was even possible to instruct iPython to automatically trigger either a selection, or indeed all of the tests for each experiment to start at the same time. 
+
+Through the use of the \textit{Matplotlib} library \cite{matplotlib}, the results for each experiment were plotted automatically upon the completion of the test rig before being embedded into the same `notebook' that contained the Python code used to define and initiate that very same test. This meant in effect, that it had become possible to analyse all of the input and output of a single test, performed as part of specific experiment, all within one ``document" (Figure \ref{}).
+
+% Show figure of ipython notebook.
+
+\subsection{Software Testing}
+
+For testing aspects of the software (predominantly the testing rig and implementations of template matching methods), standard software-based testing practices were adopted. This constituted mainly of unit tests written to test for each specific function written in code, and regression tests for confirming that software continued to work as expected following the correction of a bug.
+
+For unit tests written in Python, the \textit{Nose} \cite{nose} third-party testing framework was selected in favour of the ``default" testing framework (\textit{unittest}) due to its ability to generate code coverage reports in partnership with the \textit{Coverage.py} \cite{coverage} library. This was later enhanced by integrating with the \textit{Coveralls.io} web service \cite{coveralls}, which provided automatic analysis and notification of changes in the level of code coverage following each new commit to the remote project git repository hosted at \textit{Github.com}.
 
 \section{Experiment Methods}
+
+This section describes the three main experiments conducted within the scope of the project investigation, relating to the first primary research aim detailed in Section \ref{primary-aims}. In addition, this section also contains details of any further exploratory work performed in tandem with these experiments.
 
 \subsection{Experiment 1: Template Matching (Multiple Small Patches)}
 \label{ex1}
