@@ -5,7 +5,7 @@
 
 This chapter aims to provide a discussion into the experiments implemented with respect to the investigation detailed in Chapter 1, providing an emphasis on the approaches that were adopted and the resulting actions of handling issues encountered.
 
-The results subsequently collected from these experiments are presented in the Chapter 3.
+The results subsequently collected from these experiments are presented in Chapter 3.
 
 \section{Collection of Appropriate Test Data}
 
@@ -360,7 +360,7 @@ By choosing to keep within the OpenCV eco-system, it also became possible to uti
 
 \subsubsection{Histogram-Based Similarity Measures}
 
-An alternative approach to calculating a measure of similarity of two images using only their ``appearance", is that of \textit{histogram-based} matching.
+An alternative approach to calculating the measure of similarity between two images using only their ``appearance", is that of \textit{histogram-based} matching.
 
 While also focussing on the value of image pixels as a measure of similarity, this approach differs from distance-based approaches by choosing to represent and later compare this data as \textit{histograms}, rather than comparing between the actual value of corresponding pixels directly.
 
@@ -516,15 +516,35 @@ Through the use of the \textit{Matplotlib} library \cite{matplotlib}, the result
 
 For testing aspects of the software (predominantly the testing rig and implementations of template matching methods), standard software-based testing practices were adopted. This constituted mainly of unit tests written to test for each specific function written in code, and regression tests for confirming that software continued to work as expected following the correction of a bug.
 
-For unit tests written in Python, the \textit{Nose} \cite{nose} third-party testing framework was selected in favour of the ``default" testing framework (\textit{unittest}) due to its ability to generate code coverage reports in partnership with the \textit{Coverage.py} \cite{coverage} library. This was later enhanced by integrating with the \textit{Coveralls.io} web service \cite{coveralls}, which provided automatic analysis and notification of changes in the level of code coverage following each new commit to the remote project git repository hosted at \textit{Github.com}.
+For unit tests written in Python, the \textit{Nose} \cite{nose} third-party testing framework was selected in favour of the default testing framework (\textit{unittest}), due to its ability to generate code coverage reports in partnership with the \textit{Coverage.py} \cite{coverage} library. This was later enhanced by integrating with the \textit{Coveralls.io} web service \cite{coveralls}, which provided automatic analysis and notification of changes in the level of code coverage following each new commit to the remote project git repository hosted at \textit{Github.com}.
 
 \section{Experiment Methods}
 
-This section describes the three main experiments conducted within the scope of the project investigation, relating to the first primary research aim detailed in Section \ref{primary-aims}. In addition, this section also contains details of any further exploratory work performed in tandem with these experiments.
+This section provides an overview the three main experiment methods conducted within the scope of the project investigation, that all relate to the first primary research aim discussed in Section \ref{primary-aims}. Details of any additional exploratory work considered to have contributed to the overall investigation are also discussed within this section.
 
+While not specifically intended, as the investigation progressed the focus began to change from  exploring a series of reasonably ``generalised" research aims, to instead concentrating almost exclusively on one small, but very important aspect; \textit{ensuring that accurate results for appearance-based motion displacement could continue to be achieved, across terrain lacking any significant features and/or demonstrating highly repetitive patterns}.
+
+  As a result, each of the three primary experiments detailed in this section, focussed on testing and evaluating subsequent evolutions of the same fundamental approach, with the hope of eventually identifying a method that could provide sufficient accuracy across all types of potential terrain. 
+  
 \subsection{Experiment 1: Template Matching (Multiple Small Patches)}
 \label{ex1}
+
+This experiment focussed on the extraction and subsequent matching of multiple overlapping small (no larger than 100px) square patches in order to provide an appearance-based approach to performing dense optical flow, in the hope that it would be possible to generate a vertical displacement model confirming the predicted behaviour stated in Section \ref{hypo-model}. 
+
+The method followed a \textit{six-stage} process to build the vertical displacement model used later to compare vertical motion displacement for the identification of obstacles and terrain slopes:
+
+\begin{enumerate}
+\item Import two consecutive images from one of the test datasets, convert both images from RGB to HSV colour space, subsequently ``remove" the 'V' channel by setting all the corresponding channel values to 0.
+\item Extract a percentage-width region of interest (ROI) from centre of first image.
+\item Extract square patches of a fixed size around each pixel within the extracted ROI.
+\item For each patch extracted from image one, move down through a localised search window (column) in image two searching for the best match against the template patch.
+\item Identify the patch within the localised search window that provides the ``best match" via appearance-based matching.
+\item Average all measured vertical displacement values for each pixel along a given row, and append to vertical displacement model.
+\end{enumerate}
+
 \subsection{Experiment 2: Template Matching (Full-width Patches - Non-Scaled)}
+
+
 \subsection{Experiment 3: Template Matching (Full-width Patches - Geometric Scaled)}
 \label{tm-scaled}
 
