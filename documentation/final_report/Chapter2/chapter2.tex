@@ -318,7 +318,7 @@ The similarity measures subsequently implemented in the experiments were chosen 
 
 The first two measures were implementations of \textit{distance-based} matching. Under this approach (also known as \textit{correlation-based} matching), the similarity between two images is calculated by comparing the pixel-wise properties of each image (i.e. each pixel is compared with the corresponding pixel in the other image) using a particular type of measure. \cite{szeliski}. 
 
-For this investigation, the \textit{Euclidean Distance} and \textit{Normalised Cross-Correlation} measures were selected as they both demonstrated differences suitable for comparison with respect to their approach to calculating pixel-similarity and robustness to changes in lighting. 
+For this investigation, the \textit{Euclidean Distance} and \textit{Normalised Cross-Correlation} measures were selected as they both demonstrated differences that were suitable for comparison with respect to their approach to calculating pixel-similarity and robustness to changes in lighting. 
 
 In the field of mathematics, the Euclidean Distance is a measure of the length of the vector that connects two distinct points located within Euclidean space \cite{szeliski}. In the context of appearance-based template matching, it is possible to utilise the Euclidean Distance to calculate a measure of similarity between pixel values of two images as defined by:
 
@@ -330,7 +330,7 @@ where $\mathcal{A}$ is the template image containing the pattern we are searchin
 
 A crucial characteristic of the Euclidean Distance (and indeed similar approaches including Sum of Squared Difference), is that it relies on comparing the \textit{intensity} of pixels in order to provide a measure of image similarity. This is very important, as it subsequently enforces an implicit assumption (known as the \textit{brightness constancy constraint}), that the values of corresponding pixels do not change between the two images\cite{szeliski}. This in effect, means that the measure can be substantially affected by changes in brightness between the two images under comparison.  
 
-Normalised cross-correlation takes its roots from the field of signal processing, and unlike Euclidean Distance does not rely on differences in pixel intensity to establish the similarity between two images. Instead, this approach takes the product (known as the \textit{cross-correlation}) of pixel values as defined by:
+Normalised cross-correlation takes its roots from the field of signal processing, and unlike Euclidean Distance does not rely on differences in pixel intensity to establish the similarity between two images \cite{szeliski}. Instead, this approach takes the product (known as the \textit{cross-correlation}) of pixel values as defined by:
 
 \begin{equation}
 d(x, y) = \sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j) \cdot \mathcal{A}(i, j)]^2
@@ -342,7 +342,11 @@ However as it stands, this equation currently remains susceptible to the effects
 d(x, y) = \frac{\sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j) \cdot \mathcal{A}(i, j)]^2}{\sqrt{\sum\limits_{i}\sum\limits_{j}[\mathcal{A}(i, j)]^2 \cdot \sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j)]^2}}
 \end{equation}
 
-As well as dramatically improving resilience to differences in image exposure, normalising also guarantees the returned score will fall between -1 and 1. This can prove helpful when used as part of larger application.  
+As well as dramatically improving resilience to differences in image exposure, normalising also guarantees the returned score will fall between -1 and 1 \cite{szeliski}. This can prove helpful when used as part of larger application. 
+
+Given that both Euclidean Distance and Normalised Cross-Correlation were already available as optimised functions within the \textit{OpenCV} library (\texttt{norm} (specifically the \texttt{L2\_NORM} type)\footnote{\url{http://docs.opencv.org/modules/core/doc/operations_on_arrays.html#norm}} and \texttt{CV\_TM\_CCORR\_NORMED}\footnote{\url{http://docs.opencv.org/doc/tutorials/imgproc/histograms/template_matching/template_matching.html}} respectively), it was decided that in terms of performance, no real benefits would be gained from choosing to re-implement the functions manually. However during early stages of the investigation, some attempts were made to implement these functions regardless as part of a drive to enhance the author's own understand of these key topics.
+
+By choosing to keep within the OpenCV eco-system, it also became possible to utilise the extensive template-matching facilities already supported within the library through the use of the \texttt{matchTemplate}\footnote{\url{http://docs.opencv.org/modules/imgproc/doc/object_detection.html?highlight=matchtemplate#matchtemplate}} function.
 
 %
 %As the image patches that are compared share the \textit{same dimensions}, the final distance function becomes a modified version of the \textbf{Sum of Squared Differences}:
@@ -354,9 +358,91 @@ As well as dramatically improving resilience to differences in image exposure, n
 
 \subsubsection{Histogram-Based Similarity Measures}
 
+An alternative approach to calculating a measure of similarity of two images using only their ``appearance", is that of \textit{histogram-based} matching.
+
+While also focussing on the value of image pixels as a measure of similarity, this approach differs from distance-based approaches by choosing to represent and later compare this data as \textit{histograms}, rather than comparing between the actual value of corresponding pixels directly.
+
+By choosing to represent an image as a histogram, it becomes possible to organise the various data aspects that of an image's appearance into a collection of value-specific counts (known otherwise as \textit{bins}). One of the advantages to using histograms is that it becomes easy to generate alternative representations of the same image, where each focusses upon a specific type of `metric' for describing that image (e.g. A separate histogram for each channel in the `RGB' colour space). 
+
+In order to use histogram representations for the comparison of two or more images, the histogram for each image must first be calculated. As such, when performing histogram-based matching a couple of additional stages are required:
+
+\begin{enumerate}
+	\item Compute the histogram for the first image;
+	\item Compute the histogram for the second image;
+	\item Perform comparison between the first and second histograms;
+\end{enumerate}
+
+This is in contrast to distance-based approaches, which as a result of working within the original representation of an image, can be completed within a single comparison operation. 
+
+The approach to comparing between two histograms follows closely with the method of comparison adopted within distance-based matching, whereby a specific \textit{distance metric} is calculated in order to provide a measure of similarity \cite{bradski2008learning}. 
+
+The two metrics selected for evaluation within this investigation were \textit{Correlation} and \textit{Chi-Square}. Unlike the distance-based metrics chosen previously, these were selected entirely at random from four possible similarity measures provided by the \textit{OpenCV} library (Correlation, Chi-Square, Intersection and Bhattacharyya distance)\footnote{\url{http://docs.opencv.org/doc/tutorials/imgproc/histograms/histogram_comparison/histogram_comparison.html}}.
+
+The Correlation metric is defined within the \textit{OpenCV} library \cite{opencvhistogram} as:
+
+\begin{equation}
+d(H_{1}, H_{2}) = \frac{\sum\nolimits_{I}[(H_{1}(I) - \bar{H_{1}})(H_{2}(I) - \bar{H_{2}})]}{\sqrt{\sum\nolimits_{I}[(H_{1}(I) - \bar{H_{1}})^2(H_{2}(I) - \bar{H_{2}})^2]}}
+\end{equation}
+
+where
+
+\begin{equation}
+\bar{H_{n}} = \frac{1}{N}\sum\limits_{J}[H_{n}(J)]
+\end{equation}
+
+and $N$ represents the number of `bins' used to organise histogram data. 
+
+When scoring the similarity between two histograms via correlation, a higher score represents a better match, with 1 representing a complete match, 0 representing that no correlation could be obtained (i.e. random) and -1 representing a complete mismatch \cite{bradski2008learning}.
+
+Originating from the field of statistical analysis, the Chi-Square metric defines a class of tests that can be used to determine how closely a collection of `observed' data matches the data that would be expected according to a particular hypothesis \cite{mclaughlin}. 
+
+For the purposes of comparing image histograms, the \textit{OpenCV} library provides an implementation of a specific type of chi-squared test known as Pearson's chi-square test \cite{bradski2008learning}:
+
+\begin{equation}
+d(H_{1}, H_{2}) = \sum\limits_{I}\frac{(H_{1}(I) - H_{2}(I))^2}{H_{1}(I) + H_{2}(I)}
+\end{equation}
+
+For chi-square, scoring is conducted in the opposite fashion to correlation, where a lower score indicates a better match. In this case, 0 represents a perfect match and any value greater than 0 represents a worse match.
+
+Just as in the case of the distance-based metrics, the \textit{OpenCV} library provided optimised support for computing and subsequently comparing image histograms via the \texttt{calcHist}\footnote{\url{http://docs.opencv.org/modules/imgproc/doc/histograms.html#calchist}} and \texttt{compareHist}\footnote{\url{http://docs.opencv.org/modules/imgproc/doc/histograms.html#comparehist}} functions respectively. 
+
+While histograms provide an alternative representation of an image, they still contain fundamentally the same data. This means that in the case where one image is significantly brighter than the other, it becomes unlikely that a histogram-based technique will be successful in identifying a correct match or non-match. 
+
+Using the same underlying theory as Normalised Cross-Correlation, it was possible to help minimise brightness-relating matching errors by ensuring that both histograms were normalised. Although none of the histogram similarity metrics included a built-in normalisation step (as is the case with Normalised Cross-Correlation), \textit{OpenCV} provided a specific \texttt{normalize}\footnote{\url{http://docs.opencv.org/modules/core/doc/operations_on_arrays.html#normalize}} function that enabled the histograms to become normalised prior to any comparison.
+
+\subsubsection{Colour Space}
+
+While the normalisation of image data can help reduce matching errors caused by changes in brightness between two images, a means of further enhancing this resilience is to convert the colour space of both images to one that is capable of separating the \textit{colour} of a pixel from its \textit{brightness} \cite{ulrich-nourbakhsh}. 
+
+As a result it then becomes possible to compare the two images using only the \textit{colour information}, effectively ignoring the effects of changing brightness that can cause two pixels that are in fact visually the same, to be deemed as different.
+
+Within this investigation, all testing images were converted from RGB (loaded as BGR in \textit{OpenCV}) to the \textit{Hue-Saturation-Value} colour space prior to the beginning of any experiment tests. This was achieved using the \texttt{cvtColor}\footnote{\url{http://docs.opencv.org/modules/imgproc/doc/miscellaneous_transformations.html#cvtcolor}} \textit{OpenCV} function with the \texttt{BGR2HSV} conversion type parameter. This later allowed the `Value' channel to be ignored as part of all image comparisons made during the template matching procedures conducted within an experiment.
+
 \subsection{Execution of Experiment Methods}
 
 \subsubsection{Automated Test Rig}
+
+One of the major design aspects of the project was the decision to implement an automated testing rig to facilitate in the conducting of experiments. The core motivation behind the test rig, was to find an efficient approach to executing experiments wishing to test a wide combination of potential method parameters, in a manner that was both comprehensive and repeatable. 
+
+While of course defining these parameters would remain the responsibility of the user, the primary use case of the system saw the user specify all of the possible test parameters \textit{up front}, before instructing the test rig to repeatedly perform and document each experiment in isolation, until all possible combinations of the test parameters for that experiment had been attempted. The most obvious advantage to this system was the significant reduction that could be made in terms of human resources. Thus allowing the user to focus on tasks that were less suited or perhaps not possible for a computer to achieve, such identifying key aspects within the results gathered from the last run of the test rig. 
+
+However, another advantage perhaps not as immediately visible, was the almost complete removal of the risk for human error that otherwise (assuming a moderate number of potential parameters) would be set fairly high, given the situation where a user had to manually run each possible combination of experiment. Although, it should be noted that as the user would continue to interact in some form, there was always still a risk of experiment results being tainted as a consequence of human error being introduced. 
+
+% Add UML USECASE DIAG
+
+In terms of interaction with the user, the test rig provided a command-line based interface that provided support for the input of all test parameters and configuration options using a collection of specific parameter arguments. While certain arguments related to specific experiment, a number of arguments common to all experiments conducted under this investigation were defined as follows:
+
+\begin{table}[h]
+\small
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{4cm}|p{3cm}|}
+\hline
+Parameter Name & Argument Specifier & Type  & Input Format & Description \\ \hline
+Image Pairs & \texttt{--images} & \texttt{(String, String)[]} & \texttt{"\textless pair\_1\_image\_1\textgreater, \textless pair\_1\_image\_2\textgreater", "\textless pair\_1\_image\_1\textgreater, \textless pair\_1\_image\_2\textgreater"} & test \\
+\hline   
+\end{tabular}
+\end{table}
+
+
 
 \subsubsection{Library of `Core' Functions}
 
