@@ -614,7 +614,7 @@ In order to achieve this, the system required knowledge of what the \textit{corr
 
 To provide this information, a small utility tool was developed that would allow a user to export a calibration data file defining the shape of required region of interest positioned along the ground plane (Figure \ref{}). 
 
-Designed to be intuitive, the Python application employed the mouse and keyboard listener features included within the \textit{Matplotlib} library \cite{matplotlib} to create a minimal graphical user interface that enabled the user to define either one or both of the long-side edges that would form the trapezoidal region of interest along the ground plane of the scene within the image. This was achieved through the use of a special `calibration' image from the current image dataset containing a guide (i.e. tape along the floor) (Figure \ref{}) that would provide a visual indication as to the effects of the observed perspective distortion. 
+The Python application employed the mouse and keyboard listener features included within the \textit{Matplotlib} library \cite{matplotlib} to create a minimal graphical user interface that enabled the user to define either one or both of the long-side edges that would form the trapezoidal region of interest along the ground plane of the scene within the image. This was achieved through the use of a special `calibration' image from the current image dataset containing a guide (i.e. tape along the floor) (Figure \ref{}) that would provide a visual indication as to the effects of the observed perspective distortion. 
 
 Following the selection of line end-points via mouse clicks (Figure \ref{}), the application made use of the \textit{Bresenham line algorithm} \cite{bresenham} to linearly interpolate the remaining coordinate points in order to arrive at what would become the full long-side edge of the region of interest. 
 
@@ -652,14 +652,19 @@ P_{ScaleTarget} = (C_{x} + \vec{CPS}_{1}, C_{y} + \vec{CPS}_{2})
 		
 where $C$ refers to the centre position coordinate within the template patch, $P$ refers to the original pixel coordinate position, $S_{Width}$ and $S_{Height}$ refer to the scale factor for the width and height respectively, and $P_{ScaleTarget}$ refers to the final scaled position of $P$. 
 
-\item For each scaled pixel coordinate, extract the value of the pixel at the \text{corresponding position} with the search window and add to a temporary ``image" data structure.
+\item For each scaled pixel coordinate, extract the value of the pixel at the \textit{corresponding position} with the search window and add to a temporary ``image" data structure.
 
 \item Perform ``standard" template matching between the original template patch, and the newly created temporary image.
 	
 \end{enumerate}
 
-By extracting the value of pixels from the larger search window whose 2D position corresponds to the scaled position of each pixel in the original template patch, it remains possible to continue performing template matching between two images of different dimensions, as a result of
+By extracting the value , it remains possible to continue performing template matching between two images of different dimensions, as a result of
 
+Due to the reliance that appearance-based similarity measures hold on the evaluation of \textit{corresponding} pixel values between two images, a key condition of using such an approach is that both of the images to be compared demonstrate an \textit{equal size} (i.e. there are the \textit{same number of pixels in both images}). One of key challenges associated with the proposed method was how to still uphold this condition, while also wanting to potentially compare images of two different sizes (i.e. original template patch and larger search window). 
+
+The solution to this issue lay in the \textit{extraction} of pixels from the larger search window, whose 2D position corresponded to the \textit{scaled} position of each pixel in the original template patch. By subsequently comparing the original template patch, with the collection of newly-extracted corresponding pixels from the search window, it was possible to continue to use all of the appearance-based similarity measures as had previously been utilised in experiments one and two. 
+
+Another important point to realise, was that no additional information regarding the scene represented by the two images was being either \textit{lost} or \textit{gained} as a result of utilising pixel 2D position scaling and subsequent extraction. This however, would not have been the case had the method naively attempted to ``resize" the template patch in order to have the same dimensions as the larger search window. This is because to enlarge the entire template patch image, it would be necessary to linearly interpolate between each of the original pixels, causing new, and most likely incorrect information to be added prior to perform appearance-based matching, which subsequently may have caused the results to be very different to the actual true similarity between the current template patch and search window.
 
 \subsection{Additional Exploratory Work}
 
