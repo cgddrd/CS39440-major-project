@@ -24,12 +24,12 @@
 
 \subsection{Introduction}
 
-As human beings, we are expected to make decisions both large and small as part of everyday life. While the act of making a decision is constitutes an action that is rarely consciously observed, others that may have potentially life-changing consequences will force an individual to consider much more closely.
+%As human beings, we are expected to make decisions both large and small as part of everyday life. While the act of making a decision is constitutes an action that is rarely consciously observed, others that may have potentially life-changing consequences will force an individual to consider much more closely.
+%
+%For a human faced with making such decisions, identifying which out of a number of possible choices constitutes the ``right" decision is often regarded as a challenging and highly subjective task. %Each decision that a person makes will vary based upon their individual characteristics, which as a consequence can often result in contrasting decisions being taken in response to the same situation.% 
+%Before settling on a final decision, an individual will typically identify and evaluate all possible choices by considering each upon a weighting of merit \cite{rational-decision-model}. While variations in weighting between specific individuals can cause different decision outcomes, an important realisation comes from the understanding that all considerations made by an individual rely on their \textit{trust} in the accuracy and truth of information gathered during the identification and comparison of these alternative choices.
 
-For a human faced with making such decisions, identifying which out of a number of possible choices constitutes the ``right" decision is often regarded as a challenging and highly subjective task. %Each decision that a person makes will vary based upon their individual characteristics, which as a consequence can often result in contrasting decisions being taken in response to the same situation.% 
-Before settling on a final decision, an individual will typically identify and evaluate all possible choices by considering each upon a weighting of merit \cite{rational-decision-model}. While variations in weighting between specific individuals can cause different decision outcomes, an important realisation comes from the understanding that all considerations made by an individual rely on their \textit{trust} in the accuracy and truth of information gathered during the identification and comparison of these alternative choices.
-
- In considering any kind of autonomous system that is expected to make unattended decisions, a crucial yet not always obvious aspect is a reliance upon this idea of \textit{trust}. In the same way as observed in humans, a system will typically depend upon underlying information from which it can assess that the final decision when made is most appropriate for a given situation.
+ In considering any kind of autonomous system expected to make unattended decisions, a crucial yet not always obvious aspect is a reliance upon the idea of \textit{trust}. In the same way as observed in humans, a system will typically depend upon underlying information from which it can assess that the final decision when made is most appropriate for a given situation.
  
  This information may be obtained from a variety of sources, ranging from raw sensor data up to the output of a sophisticated high-level algorithm. While the type and source of information may vary wildly from system-to-system, the underlying notion that at the time of making the final decision this information can, in one form or another, be \textit{trusted} to provide a reliable and accurate representation of the actual situation remains exactly the same. 
  
@@ -288,9 +288,11 @@ Taking inspiration from the work of Campbell \textit{et al.}, it is predicted th
 \label{hypo-speed}
 For supporting both the inference of terrain gradient conditions and detection of potential obstacles, it is the role of the vertical displacement model (Section \ref{hypo-model})  to provide a delineation of the distance by which tracked features within an image have moved, relative to the position at which they were last detected. 
 
-Quite simply, using the relationship defined by the \textit{speed-distance-time} equation \cite{}:
+Quite simply, using the relationship defined by the \textit{speed-distance-time} equation:
 
-$$\text{Speed} = \frac{\text{Distance}}{\text{Time}}$$ 
+\begin{equation}
+\text{Speed} = \frac{\text{Distance}}{\text{Time}} 
+\end{equation}
 
 it becomes possible to estimate the speed at which the robot the travelling when it is assumed that the time interval between the capture of subsequent images remains constant.
 

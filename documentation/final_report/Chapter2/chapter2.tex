@@ -529,29 +529,140 @@ While not specifically intended, as the investigation progressed the focus began
 \subsection{Experiment 1: Template Matching (Multiple Small Patches)}
 \label{ex1}
 
-This experiment focussed on the extraction and subsequent matching of multiple overlapping small (no larger than 100px) square patches in order to provide an appearance-based approach to performing dense optical flow, in the hope that it would be possible to generate a vertical displacement model confirming the predicted behaviour stated in Section \ref{hypo-model}. 
+This experiment focussed on the extraction and subsequent matching of multiple overlapping square patches in order to provide an appearance-based approach to performing dense optical flow, in the hope that it would be possible to generate a vertical displacement model confirming the predicted behaviour stated in Section \ref{hypo-model}. 
 
 The method followed a \textit{six-stage} process to build the vertical displacement model used later to compare vertical motion displacement for the identification of obstacles and terrain slopes:
 
 \begin{enumerate}
 \item Import two consecutive images from one of the test datasets, convert both images from RGB to HSV colour space, subsequently ``remove" the 'V' channel by setting all the corresponding channel values to 0.
-\item Extract a percentage-width region of interest (ROI) from centre of first image.
-\item Extract square patches of a fixed size around each pixel within the extracted ROI.
+\item Extract a percentage-width region of interest (ROI) from centre of first image (discussed further in Section \ref{hypo-calib}).
+\item Extract square patches of a fixed size around the centre each pixel within the extracted ROI. These patches would act as the \textit{templates} when performing the appearance-based template matching. 
 \item For each patch extracted from image one, move down through a localised search window (column) in image two searching for the best match against the template patch.
 \item Identify the patch within the localised search window that provides the ``best match" via appearance-based matching.
-\item Average all measured vertical displacement values for each pixel along a given row, and append to vertical displacement model.
+\item Average all measured vertical displacement values for each pixel along a given row, removing outliers by ignoring any displacements that lie outside of (2 x standard deviation) of the mean, before appending to the vertical displacement model.
 \end{enumerate}
 
 \subsection{Experiment 2: Template Matching (Full-width Patches - Non-Scaled)}
 
+This second experiment focussed on establishing if adopting \textit{larger patches} in fewer numbers provided better appearance-based matching accuracy than the method attempted in the first experiment of using many more, but critically \textit{much smaller} overlapping patches 
 
-\subsection{Experiment 3: Template Matching (Full-width Patches - Geometric Scaled)}
+ While the underlying method remained the same as in the first experiment, some crucial changes had been made:
+ 
+ \begin{itemize}
+ 	\item Extracting a central region of interest relative to the \textit{ground plane}, as opposed to extracting a fixed-width column from the image plane (Figure \ref{})
+ 	\item Moving away from multiple overlapping small patches, in favour of adopting a single, \textit{full-width} patch to represent a single row in the image (Figure \ref{}). 
+ \end{itemize}
+
+\subsubsection{Exhaustive \& Non-Exhaustive Searching}
+
+As part of the localised search detailed in stage five of the method from experiment one (Section \ref{ex1}), the current implementation saw the adoption of \textit{non-exhaustive} searching behaviour for identifying the corresponding region within a localised search window that provided the ``best match" overall. 
+
+The motivation behind non-exhaustive searching prevented the need to continue searching down the entire localised search window column, if it was believed that the best match for that search window had \textit{already been located}. 
+
+The criteria for stopping a search, focussed around the observed scoring behaviour of appearance-based matching metrics, where in the case of Euclidean Distance, the score would demonstrate a uniform decline, until reaching a minima representing the best possible match, before subsequently beginning to rise once more (Figure \ref{}). That is to say, the search should continue until such a time as the score no longer continues to become progressively ``better", at which point the last score recorded \textit{previously} to this would also represent the best possible score for that search.
+
+\begin{algorithm}
+\caption{Non-Exhaustive Search of Localised Search Window}
+\label{nonexhautivesearch}
+\begin{algorithmic}[1]
+
+\Procedure{Localised\_Search\_NonExhaustive}{\textit{template\_patch}, \textit{search\_column}}
+
+\State let \textit{high\_score} = $-1$
+\State let \textit{vertical\_displacement} = $0$
+\State let \textit{template\_patch\_height} = len(\textit{template\_patch})\\
+
+ \LineComment{Localised search window originates relative to the top of the extracted template patch within the image.}\\
+\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_column}) - 1) - \textit{template\_patch\_height} \textbf{step} $1$} \\
+
+\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_patch}, \textit{search\_column}) \\
+
+\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})} \\
+
+\LineComment{If no high score has been set (i.e. the search has just begun) or the new score is deemed ``better" than the previous high score, then we have found the new best match.} \\
+\State \textit{high\_score} = \textit{current\_match\_score}
+\State \textit{vertical\_displacement} = $i$
+
+
+\Else
+
+\LineComment{Otherwise, if the new score is \textit{worse}, then stop the search at this point.}
+
+\State \Return \textit{vertical\_displacement}
+
+\EndIf
+
+\EndFor
+
+\\ \Return \textit{vertical\_displacement} \\
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+While in theory this approach appeared reasonable, it was later identified that it had the potential to suffer greatly upon the onset of image noise. The issue that was presented, involved the search terminating prematurely as a result of arriving at a local minima caused by noise, rather than terminating at the ``global" minima that represented the \textit{true} best match within the search window column (Figure \ref{}). 
+
+In order to confirm this observation, all of the tests conducted over experiments two and three were run twice, one time using the non-exhaustive search, and the other using an exhaustive search.
+
+\subsubsection{Perspective Distortion Calibration Tool}
+
+A consequence of choosing to isolate a central region-of-interest relative to the ground plane rather than the image plane, described how the shape of the search region would become subject to distortion caused by changes in perspective, where the ground within the image appears to `converge' towards a central point along the horizon line (Figure \ref{}). In particular, the shape would change from a uniform rectangle, to an isosceles trapezium \cite{trapezium}.
+
+As template patches were now expected to span the \textit{full width} of the region of interest, it became necessary for the width of the extracted template patches to increase as the search moved towards the bottom of the image. 
+
+In order to achieve this, the system required knowledge of what the \textit{corresponding width} should be for every \textit{image row} that represented the ground plane (i.e from the central horizon line to the bottom of the image). 
+
+To provide this information, a small utility tool was developed that would allow a user to export a calibration data file defining the shape of required region of interest positioned along the ground plane (Figure \ref{}). 
+
+Designed to be intuitive, the Python application employed the mouse and keyboard listener features included within the \textit{Matplotlib} library \cite{matplotlib} to create a minimal graphical user interface that enabled the user to define either one or both of the long-side edges that would form the trapezoidal region of interest along the ground plane of the scene within the image. This was achieved through the use of a special `calibration' image from the current image dataset containing a guide (i.e. tape along the floor) (Figure \ref{}) that would provide a visual indication as to the effects of the observed perspective distortion. 
+
+Following the selection of line end-points via mouse clicks (Figure \ref{}), the application made use of the \textit{Bresenham line algorithm} \cite{bresenham} to linearly interpolate the remaining coordinate points in order to arrive at what would become the full long-side edge of the region of interest. 
+
+For convenience, the application also included a feature whereby the user could horizontally \textit{reflect} an edge defined on one side of the image over to the other. This helped to ensure that the area in which the region of interest occupied remained \textit{horizontally symmetrical}.
+
+Upon the definition of both long-side edges forming the trapezium-shaped area along the ground plane, the application would finally export calibration data, by calculating the distance in pixels between the two corresponding `X' coordinates that positioned along both of the opposite edges with respect to each row (Figure \ref{}).
+
+\subsection{Experiment 3: Template Matching (Full-width Patches - Geometric Scaling)}
 \label{tm-scaled}
 
-\subsection{Additional Experiments}
+The final experiment aimed to investigate if it could be possible to further increase the matching accuracy reported in experiment two, by adding the additional step of \textit{geometrically-scaling} the current template patch as the search progressed down the trapezoidal-shaped region of interest.
 
-\subsection{Feature-based matching}
-\subsection{Edge-based matching}
+The underlying theory adopted for this proposal related back to the idea that, if a camera was to move \textit{closer} to an object on the ground between the capture of two consecutive images, then upon the subsequent visual inspection of both these images, it would be possible to observe that the same object appears \textit{larger} within the second image than in the first. Thus, by geometrically \textit{scaling} the template patch (extracted from the first image), it may then be possible to find a better match within the second image, as a result of the partial scene represented by the template patch subsequently appearing to have become visually larger within the second image due to the effects of perspective distortion (Figure \ref{}).
+
+In the context of this experiment, the specific task of geometrically-scaling and subsequently matching the template patch took form of the following stages:
+
+\begin{enumerate}
+	\item Obtain the width and height of the current template patch;
+	\item Obtain the calibrated \textit{width} of the search window with respect to the current image row;
+	\item Calculate the independent scale factor for the width and height between the template patch and the search window where:
+	
+	\begin{equation}
+		\text{Scale Factor} = \frac{\text{Target Value}}{\text{Current Value}}
+	\end{equation}
+	 
+	\item Treating each pixel as a 2D coordinate in geometric space, scale the position of each pixel coordinate within the template patch relative to the position of centre coordinate:
+
+	\begin{gather} 
+ \vec{CP} = (P_{x} - C_{x}, P_{y} - C_{y})
+ \\
+\vec{CPS} = \begin{bmatrix} \vec{CP}_{1} \\ \vec{CP}_{2} \end{bmatrix}\begin{bmatrix} S_{Width} & 0 \\ 0 & S_{Height} \end{bmatrix} = \begin{bmatrix} \vec{CP}_{1}S \\ \vec{CP}_{2}S \end{bmatrix}
+\\
+P_{ScaleTarget} = (C_{x} + \vec{CPS}_{1}, C_{y} + \vec{CPS}_{2}) 
+\end{gather} 
+		
+where $C$ refers to the centre position coordinate within the template patch, $P$ refers to the original pixel coordinate position, $S_{Width}$ and $S_{Height}$ refer to the scale factor for the width and height respectively, and $P_{ScaleTarget}$ refers to the final scaled position of $P$. 
+
+\item For each scaled pixel coordinate, extract the value of the pixel at the \text{corresponding position} with the search window and add to a temporary ``image" data structure.
+
+\item Perform ``standard" template matching between the original template patch, and the newly created temporary image.
+	
+\end{enumerate}
+
+By extracting the value of pixels from the larger search window whose 2D position corresponds to the scaled position of each pixel in the original template patch, it remains possible to continue performing template matching between two images of different dimensions, as a result of
+
+
+\subsection{Additional Exploratory Work}
+
 
 
 
