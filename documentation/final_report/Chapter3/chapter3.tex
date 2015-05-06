@@ -222,7 +222,7 @@ As previously observed in the experiment two results for dataset three (Figure \
 \label{fig:ex3_4_2}
 \end{figure}
 
-The results of dataset four show that for the non-exhaustive tests (Figure \ref{fig:ex3_4_1}), all of the similarity measures appear to demonstrate significant of levels of noise, with the two distance-based metrics showing a greater level of variability in the recorded results than that observed from the two histogram-based metrics. Within the exhaustive results (Figure \ref{fig:ex3_4_2}), a clear performance difference between the two categories of similarity measure is apparent, with the Normalised Cross-Correlation metric showing better overall correlation behaviour than the Euclidean Distance.
+The results for dataset four show that for the non-exhaustive tests (Figure \ref{fig:ex3_4_1}), all of the similarity measures appear to demonstrate significant of levels of noise, with the two distance-based metrics showing a greater level of variability in the recorded results than that observed from the two histogram-based metrics. Within the exhaustive results (Figure \ref{fig:ex3_4_2}), a clear performance difference between the two categories of similarity measure is apparent, with the Normalised Cross-Correlation metric showing better overall correlation behaviour than the Euclidean Distance.
 
 
 \clearpage
@@ -230,7 +230,7 @@ The results of dataset four show that for the non-exhaustive tests (Figure \ref{
 
 Across all three experiments and within all four datasets tested, the results obtained appear to be mixed in terms of the producing the expected performance, however the relative successes and failures of each experiment can be decomposed into a number of different aspects.
 
-\subsubsection{Fixed Dimension of Patches}
+\subsection{Fixed Dimension of Patches}
 
 The first of these aspects to consider is the variety of patch sizes, as these have remained consistent across all tests for each experiment and dataset. 
 
@@ -242,19 +242,23 @@ It should be noted that this behaviour only appears to begin following the intro
 
 Overall a patch size of 100px (fixed height of 100px for experiments two and three) appears to provide the best compromise between the reduction of noise and sensitivity to displacement.
 
-\subsubsection{Appearance-Based Similarity Matching Measures}
+\subsection{Appearance-Based Similarity Matching Measures}
 
 With respect to evaluation of the four appearance-based similarity measures, the results appear to indicate that the performance of a specific measure can vary significantly in relation to both \textit{itself}, and the relative performance of alternative measures, across the various tests conducted within all three experiments. 
 
 In an example from the experiment one results, it can be seen that while the Euclidean Distance (distance-based) measure appears to perform very well across the brightly coloured `spot' carpet within the first dataset (Figure \ref{fig:ex1_1_1} Graph 2), it then suffers a clear decline in performance across the next two datasets, both of which feature \textit{heavily textured terrain} (brick-paved road (dataset two) and asian rug (dataset three)) (Figures \ref{fig:ex1_1_2} and \ref{fig:ex1_1_4}). 
 
-This observation of the poor performance of Euclidean Distance in relation to the histogram-based metrics within datasets containing a high level of texture, is indicative of the differences in approach that each metric demonstrates in determining image similarity. For the two histogram-based metrics, the similarity between two image patches is measured at a \textit{global} level, which in this case is the overall frequency and distribution of colour within both images. As a consequence, all of the image `noise' that may have existed originally (\textit{including examples of detailed textures}), subsequently becomes lost. Therefore, when comparing the similarity between two colour histograms, all of the finite detail contained within the original image is in effect ignored, thus leading to an increased chance of finding at least some kind of match, even if this subsequently this match is not particularly accurate. In contrast to this, distance-based measures such as the Euclidean Distance retain all of the finite detail when comparing the similarity between two images. While this allows for a greater level of sensitivity and thus potentially better accuracy, it can also result in a failure to identify a correct match due to an acute misalignment of features within the two patches.
+This observation of the poor performance of Euclidean Distance in relation to the histogram-based metrics within datasets containing a high level of texture, is indicative of the differences in approach that each metric demonstrates in determining image similarity. For the two histogram-based metrics, the similarity between two image patches is measured at a \textit{global} level, which in this case is the overall frequency and distribution of colour within both images. 
+
+As a consequence, all of the image `noise' that may have existed originally (\textit{including examples of detailed textures}), subsequently becomes lost. Therefore, when comparing the similarity between two colour histograms, all of the finite detail contained within the original image is in effect ignored, thus leading to an increased chance of finding at least some kind of match, even if this subsequently this match is not particularly accurate. 
+
+In contrast to this, distance-based measures such as the Euclidean Distance retain all of the finite detail when comparing the similarity between two images. While this allows for a greater level of sensitivity and thus potentially better accuracy, it can also result in a failure to identify a correct match due to an acute misalignment of features within the two patches.
 
 While Normalised Cross-Correlation is also a distance-based metric, it appears to perform remarkably similar to the Histogram Correlation metric when tested under the same ``heavy texture" terrain conditions as the Euclidean distance (Figures \ref{fig:ex1_1_2} and \ref{fig:ex1_1_4}). The most likely cause for this is as a result of the normalisation step, whereby a considerable proportion of the finer detail within the original image is potentially lost as a consequence of equalising the range in pixel values can lie. 
 
-In the final dataset within experiment one (Figure \ref{fig:ex1_1_4}), there was a clear difference in the level of recorded displacement between the histogram-based and distance-based similarity measures. In this situation, the poor performance demonstrated by the two distance-based approaches can, in all probability, be attributed to a lack of distinct features available within the dataset, as a result of the terrain consisting almost exclusively of uniform slate tiles.
+Within the final dataset for experiment one (Figure \ref{fig:ex1_1_4}), there was a clear difference in the level of recorded displacement between the histogram-based and distance-based similarity measures. In this situation, the poor performance demonstrated by the two distance-based approaches can be attributed to a lack of distinct features available within the dataset, as a result of the terrain consisting almost exclusively of uniform slate tiles.
 
-\subsubsection{Exhaustive vs Non-Exhaustive Search}
+\subsection{Exhaustive vs Non-Exhaustive Search}
 
 As part of an enquiry conducted following the end of experiment one into establishing potential causes for the significant reduction in performance observed between the results for dataset one, and the remaining datasets, it was predicted that a most likely partial cause was attributed to an unintended consequence of adopting a \textit{non-exhaustive} approach to searching for matching image patches, as discussed further in Section \ref{searching}. For experiments two and three, additional tests were conducted in order to confirm if any performance gains could be observed between adopting an \textit{exhaustive} vs. \textit{non-exhaustive} search approach. 
 
@@ -262,7 +266,21 @@ Within the tests for experiments two and three, the use of the exhaustive search
 
 An additional observation from the comparison of results between the exhaustive and non-exhaustive searches highlighted how in a large proportion of cases, the increase in performance for the \textit{distance-based} similarity measures far outweighed the level of improvement demonstrated by the \textit{histogram-based} measures (Figures). Given that in these cases all four similarity measures were tested under the same relative conditions (i.e. all were tested together under either a non-exhaustive or exhaustive search), the most likely explanation for these significant differences in performance gain is simply that under those specific conditions (i.e. current dataset, patch size etc.) the distance-based similarity measures genuinely were able to perform better than the histogram-based measures, but in the results for the non-exhaustive search, this observation was in fact ``masked" for the reasons detailed in Section \ref{searching}.
 
-\subsubsection{Experiment Methods}
+\subsection{Conclusion of Results}
 
-While within the tests for each of the three experiments, 
+Following analysis of all the results gathered across the three primary experiments, it is not possible to identify one specific combination of experiment method, patch size and appearance-based similarity metric, that is capable of demonstrating an optimum solution across all variations in terrain type.
+
+% in order to generate a vertical displacement model that is able to confirm the predicted positive correlation between the vertical position of a feature within the current scene, and the level of vertical displacement that it demonstrates between two consecutive images.
+
+When exclusively considering the four variations in terrain type selected for use within this investigation, the overall best solution was provided through the use of geometrically-scaled template patches, evaluated within the method for experiment three.
+
+More specifically, it was found that performing geometric scaling of full-width 100px-high template patches, in conjunction with exhaustive appearance-based template matching using the Euclidean Distance similarity metric, provided the best available example of a well-defined vertical displacement model (Figure \ref{fig:ex3_1_2} (Graph 2)) that accurately demonstrated the behaviour predicted in the hypothesis (see Section \ref{hypo-calib}).
+
+While this particular combination happens to demonstrate the best performance with respect to this specific dataset, there are other instances where this exact same combination would fail to produce such a successful outcome. An example of such an instance can be observed within Figure \ref{fig:ex3_2_2}. This is an observation that appears to be common within a large proportion of the various possible experimental parameters evaluated as part of this study. 
+
+As a result of analysing the experiments, the overarching conclusion to be drawn, is that the results obtain may be regarded as inconclusive. However, while certainly further research is required this investigation and it's results have highlighted that it is unlikely one particular solution will suffice. Therefore, a key focus for any further investigation to develop upon this work, would be to attempt to identify the most appropriate configuration setting for each particular terrain type, thereby hopefully ensuring that the maximum possible accuracy can be obtained, regardless of a robot's surrounding environment. 
+  
+
+ 
+  
 
