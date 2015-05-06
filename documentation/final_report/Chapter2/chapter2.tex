@@ -3,7 +3,7 @@
 %
 %This section should discuss the overall hypothesis being tested and justify the approach selected in the context of the research area.  Describe the experiment design that has been selected and how measurements and comparisons of results are to be made. %%You should concentrate on the more important aspects of the method. Present an overview before going into detail. As well as describing the methods adopted, discuss other approaches that were considered. You might also discuss areas that you had to revise after some investigation. %%You should also identify any support tools that you used. You should discuss your choice of implementation tools or simulation tools. For any code that you have written, you can talk about languages and related tools. For any simulation and analysis tools, identify the tools and how they are used on the project. %%If your project includes some engineering (hardware, software, firmware, or a mixture) to support the experiments, include details in your report about your design and implementation. You should discuss with your supervisor whether it is better to include a different top-level section to describe any engineering work.  
 
-This chapter aims to provide a discussion into the experiments implemented with respect to the investigation detailed in Chapter 1, providing an emphasis on the approaches that were adopted and the resulting actions of handling issues encountered.
+This chapter aims to provide a discussion into the experiments implemented with respect to the investigation detailed in Chapter 1, with emphasis on the adopted approaches adopted and the resulting actions of handling issues encountered.
 
 The results subsequently collected from these experiments are presented in Chapter 3.
 
@@ -13,31 +13,31 @@ Prior to beginning the implementation of any experiments, it was first necessary
 
 \subsection{Image Data Requirements}
 
-As discussed previously in Section \ref{assumptions}, for the purposes of simplifying the \textit{primary aims} presented in the working hypothesis, the assumption was drawn that at least in early stages of investigation, the system would make exclusive use of images captured from a single camera positioned to face in front of the robot that was also limited to moving in the same direction as the camera (i.e. forward-motion only).
+As discussed previously in Section \ref{assumptions}, for the simplification of the \textit{primary aims} presented in the working hypothesis, the assumption was drawn that at least in early stages of investigation, the system would make exclusive use of images captured from a single camera positioned to face in front of the robot that was also limited to moving in the same direction as the camera (i.e. forward-motion only).
 
-Therefore when identifying appropriate test data for use in experiments, a the following characteristics were considered:
+When identifying appropriate test data for use in experiments, a the following characteristics were considered:
 
 \begin{itemize}
-	\item The images must provide a reasonable field of view of the current scene both above and below the horizon line (i.e it was important to capture objects within the scene located both far away and close to the camera)
+	\item The images must provide a reasonable field of view of the current scene above and below the horizon line (i.e it was important to capture objects within the scene located both far away and close to the camera)
 	\item The images must show the act of forward translation through the current environment. This would be most obvious through the observation of a vertical displacement in the negative direction (i.e. downwards) visible in features located along the ground plane.
 	\item The images must not show forward translation as horizontal movement across the image plane (i.e. no images captured from cameras looking out from the side of a robot moving in a forwards direction).
 	\item The images must be of a size and quality reasonably expected of a standard ``point-and-shoot" consumer-grade camera.
 	\item The images must have been originally captured in colour, using the ``default" colour space supported by the camera (typically this would be RGB for standard consumer-grade camera).
-	 \item The images should demonstrate minimal change in rotation or pitch (i.e. should be taken across a flat surface), and should be 
+	 \item The images should demonstrate minimal change in rotation or pitch (i.e. should be taken across a flat surface).
 \end{itemize}
 
-In addition to these ``baseline" requirements, additional requirements were also defined with the intention for use within specific experiments focussing on the identification of particular aspects in motion behaviour. These secondary requirements were very much intended to be used on an ``as needed" basis and came with the possibility of the opposite statement to the ones detailed below being desired in certain situations:
+In addition to these ``baseline" requirements, additional requirements were also defined with the intention for use within specific experiments focussing on the identification of particular aspects in motion behaviour. These secondary requirements were intended to be used on an ``as needed" basis and came with the possibility of the opposite statement to the ones detailed below being desired in certain situations:
 
 \begin{itemize}
 	\item The images should demonstrate minimal rotational motion (i.e. no examples of the robot turning to change direction)
 	\item The images should capture terrain that is predominately flat and free of major obstacles both positive (e.g. rocks) and negative (e.g. pits).
 \end{itemize}
 
-Unfortunately due to time constraints, some the planned experiments could not be completed within the scope of the major project, and as a consequence of this, not all examples of images meeting every one these requirements were actually captured. However, it was still important to define these requirements before beginning any experimentation and given more time, would still prove to be valid.
+Unfortunately due to time constraints, some the planned experiments could not be completed within the the major project, as a consequence of this, not all examples of images meeting every one these requirements were captured. However, it was still important to define these requirements before beginning any experimentation and given more time, would still prove to be valid.
 
 \subsection{Existing Datasets}
 
-At the beginning of the project, some time was initially devoted to searching for any existing datasets that could provide suitable imagery. One of the main advantages to using existing datasets, is that typically other previous projects have already had the opportunity to verify that the data is both accurate, and provides a sufficient level of variability that proves crucial in testing the robustness of the systems that make use them as part of their evaluation.
+At the beginning of the project, some time was initially devoted to searching for any existing datasets that could provide suitable imagery. One main advantage to using existing datasets, is that typically other previous projects have already had the opportunity to verify that the data is both accurate, and provides a sufficient level of variability that proves crucial in testing the robustness of the systems that make use them as part of their evaluation.
 
 In the majority of cases, existing datasets also come pre-packaged with appropriately verified ground truth data, thereby preventing the need for projects that subsequently chose to use them having to produce their own ground truth results, consequently saving on both time and resources.
 
@@ -45,7 +45,7 @@ While a number of previously published datasets were found to be available \cite
 
 \subsection{Manual Datasets}
 
-Following the lack of appropriate existing datasets with the field, it was deemed necessary that bespoke datasets would instead have to be created manually. While in the short term this meant an increased work load, it also presented the opportunity to capture datasets that would could specifically meet the needs of the investigation and its experiments.
+Following the lack of appropriate existing datasets with the field, it was necessary that a bespoke datasets would have to be created manually. While in the short term this meant an increased work load, it also presented the opportunity to capture datasets that would specifically meet the needs of the experiments.
 
 \subsubsection{Camera Rig Setup}
 
@@ -55,7 +55,7 @@ As part of a particularly elaborate setup, it would have perhaps been feasible t
 
 While these approaches would certainly provide an ample solution, following a discussion with the project supervisor, it was deemed that, at such an early stage in an investigation that was already limited in time remaining, efforts would be better spent focussing on conducting actual research, as opposed to the collection of test data.
 
-Nevertheless, a means of manually capturing image datasets was still required. As such, the decision was taken to adopt a much more `simplified' approach, that in exchange for greater manual involvement, could consequently be brought into service within a vastly shorter timeframe. 
+Nevertheless, a means of manually capturing image datasets was still required. As such, the decision was taken to adopt a `simplified' approach, that in exchange for greater manual involvement, could consequently be brought into service in a shorter timeframe. 
 
 Compared to the use of the robot, this approach was certainly less `sophisticated' in terms of its setup, consisting only of:
 
@@ -71,7 +71,7 @@ However, as well as being quick to initially build, this setup would go on to pr
 
 \subsubsection{Capturing Process}
 
-The method behind the use of the `homemade' camera rig to capture the image datasets also proved simple in design. This was regarded as favourable, given that it solely relied on manual involvement where human error subsequently becomes a potentially big issue. 
+The method behind the use of the `homemade' camera rig to capture the image datasets also proved simple in design. This was regarded as favourable, given that it relied on manual involvement where human error subsequently becomes a potentially big issue. 
 
 Figure \ref{} below details the outline of the method used to capture an individual image dataset:
 
@@ -83,21 +83,18 @@ While the method for capturing images followed a ``fixed" procedure, it did allo
 
 A selection of locations were chosen for the purposes of capturing datasets. To ensure an appropriate level of variability, each dataset focussed on a different type of terrain environment that it was predicted a robot may face during live deployment.
 
-Datasets were captured at five separate locations, split between indoor and outdoor sites to provide variation in lighting conditions in addition to terrain type:
+Datasets were captured at four separate locations, split between indoor and outdoor sites to provide variation in lighting conditions and terrain type:
 
 \begin{enumerate}
 	\item \textbf{Site 1:} Living room rug with brightly-coloured simple-shapes (Indoors) (Natural light entering from the right)
 	\item \textbf{Site 2:} Brick-paved residential drive (Outside) (Natural light)
-	\item \textbf{Site 3:} Slate-tiled footpath (Outside) (Natural light)
-	\item \textbf{Site 4:} Heavily-patterned asian rug upon white-tiled floor (Inside) (Partial natural light from behind camera, partial artificial light (incandescent))
-	\item \textbf{Site 5:} Slate chips (Outside) (Natural light)
+	\item \textbf{Site 3:} Heavily-patterned asian rug upon white-tiled floor (Inside) (Partial natural light from behind camera, partial artificial light)
+	\item \textbf{Site 4:} Slate-tiled footpath (Outside) (Natural light)
 \end{enumerate}
 
 \subsubsection{Calibration of Physical Setup}
 
-Although one of the aims of the investigation hypothesis was to avoid the need for calibration of the camera, it was decided that in the interests of good experiment practice, measurements regarding the physical setup of the camera rig should be taken in case of future need. 
-
-Following the process outlined in the work of Campbell \textit{et al.} \cite{campbell}, the calibration would provide a future opportunity, should the need arise, to calculate the mapping between coordinates in the image plane and the ground plane.
+Although one of the aims of the hypothesis was to avoid the need for calibration of the camera, it was decided that in the interests of good experiment practice, measurements regarding the physical setup of the camera rig should be taken. Following the process outlined in the work of Campbell \textit{et al.} \cite{campbell}, the calibration would provide a future opportunity, should the need arise, to calculate the mapping between coordinates in the image plane and the ground plane.
 
 The physical setup of the camera rig is shown in Figure \ref{}, where $h$ refers to the height of the camera from the ground, and $d$ refers to the distance between the front edge of the rig base and the position at which the principle ray from the camera lens intersects with the ground plane \cite{campbell}.
 
@@ -137,7 +134,7 @@ Obtaining values for $d$ and $f$ involved consulting the manufacturer specificat
 
 In calculating $d$, there was some confusion about how to establish the dimensions of the sensor from the published sensor type. It was assumed initially that the diagonal dimension of the camera would match that of dimension representing the sensor type (i.e. 1/2.33"). 
 
-However following some further research, it came to light that this was not actually the case, and in fact the dimension listed as the sensor type was not representative of the true sensor size, but instead was one of many industry-standard type designations used to classify image sensors \cite{gum}. Subsequently, the vertical dimension of the camera sensor was obtained using an online guide providing dimensions for standard types of sensor \cite{bockaert}.
+However following some further research, it came to light that this was not the case, and in fact the dimension listed as the sensor type was not representative of the true sensor size, but instead was one of many industry-standard type designations used to classify image sensors \cite{gum}. Subsequently, the vertical dimension of the camera sensor was obtained using an online guide providing dimensions for standard types of sensor \cite{bockaert}.
 
 The final step in the calibration process published by Campbell \textit{et al.} \cite{campbell} involved recovering the distance $y$ from the observed point along the ground plane to the camera rig:
 
@@ -158,11 +155,11 @@ Through the use of this calibration model, the actual displacement of any point 
 
 While unfortunately never pursued in this project due to time limitations, an alternative approach to gathering robust testing data was to capture motion sequences set within a 3D virtual environment. 
 
-A key advantage of creating artificial image datasets stems from the level of control that becomes available over properties including the choice of lighting, terrain textures and landscape geometry. It is this high degree of granularity that makes using computer-generated datasets a popular choice for many vision-based projects, perhaps especially within earlier stages of a project, where one is simply attempting to identify bugs in the system, rather than necessarily evaluating hypotheses. 
+A key advantage of creating artificial image datasets stems from the level of control that becomes available over properties including the choice of lighting, terrain textures and landscape geometry. This high degree of granularity that makes using computer-generated datasets a popular choice for many vision-based projects, perhaps especially within earlier stages of a project, where one is simply attempting to identify bugs in the system, rather than evaluating hypotheses. 
 
 Other potentially very useful consequences of using computer-generated datasets include control over the amount of noise an image may contain (e.g. choice to include or remove specular reflections), and the high degree of speed at which new datasets adopting different condition configurations could be created almost ``on the fly" in order to test new ideas and approaches within an experiment. 
 
-The creation of artificial datasets would certainly have provided an opportunity to test the robustness of the experiment methods against a much broader range of conditions than what was feasibly possible using only real-world imagery. However the use of datasets captured from real-world environments was still arguably the most crucial in terms of evaluating the performance of experiment methods, given that these would ultimately provide the closest representation to the input expected within a live deployment. 
+The creation of artificial datasets would have provided an opportunity to test the robustness of the experiment methods against a much broader range of conditions than what was feasibly possible using only real-world imagery. However the use of datasets captured from real-world environments was still arguably the most crucial in terms of evaluating the performance of experiment methods, given that these would ultimately provide the closest representation to the input expected within a live deployment. 
 
 % ADD EXAMPLES OF ARTIFICIAL DATASETS FROM PUBLISHED DATASETS
 
@@ -170,13 +167,13 @@ While there was no time available for the author to learn how to build 3D enviro
 
 \section{Establishment of Ground Truth}
 
-With respect to scientific investigation, the term ``\textit{ground truth}" refers to measurement data or results that are known to represent the \textit{absolute truth} of a particular condition or observation which can as such, subsequently be used to determine the accuracy of reported results from a system or method currently undergoing testing and evaluation.
+With respect to scientific investigation, the term ``\textit{ground truth}" refers to measurement data or results that are known to represent the \textit{absolute truth} of a particular condition or observation which subsequently can be used to determine the accuracy of reported results from a system or method currently undergoing testing and evaluation.
 
-In the specific context of computer vision, ground truth data will represent observations within image datasets that are known to actually exist in the real-world, and be accurate.
+In the context of computer vision, ground truth data will represent observations within image datasets that are known to exist in the real-world, and be accurate.
 
-Due to the very nature of what ground truth data represents, generating such data can still typically only be accomplished through means of manual verification, where human observation continues to be deemed as the `state of art' in terms of providing the best possible accuracy available as to the \textit{fundamental} truth of a condition or observation \cite{kondermann}. A fundamental issue with this approach to the collection and verification of ground truth data, is that it tends towards being very costly in terms of both time and resources. Kondermann \cite{kondermann} states that this large requirement in effort to generate ground truth data in combination with its relatively limited applicability in terms of evaluation, consequently results in many vision-based projects failing to provide reference data that is either sufficiently comprehensive or accurate.
+Due to the very nature of what ground truth data represents, generating such data can still typically only be accomplished through means of manual verification, where human observation continues to be deemed as the `state of art' in terms of providing the best possible accuracy available as to the \textit{fundamental} truth of a condition or observation \cite{kondermann}. A fundamental issue with this approach to the collection and verification of ground truth data, is it tends to be costly in terms of both time and resources. Kondermann \cite{kondermann} states that this large requirement in effort to generate ground truth data in combination with its relatively limited applicability in terms of evaluation, consequently results in many vision-based projects failing to provide reference data that is either comprehensive or accurate.
 
-For particular types of reference data, some semi-automated methods do exist for gathering high-accuracy measurement results (e.g. extracting depth information about a 3D environment using laser scanning techniques) \cite{haltakov}. However, these approaches still require at least some form of manual verification in ensuring that this accuracy is at a level sufficient enough for it to be trusted as ground truth.
+For particular types of reference data, some semi-automated methods do exist for gathering high-accuracy measurement results (e.g. extracting depth information about a 3D environment using laser scanning techniques) \cite{haltakov}. However, these approaches still require at least some manual verification in ensuring that this accuracy is at a level sufficient enough for it to be trusted as ground truth.
 
 In terms of generating ground truth, one of the most challenging types of visual behaviour to document is optical flow \cite{kondermann}. This is because no sensor currently exists that is capable of detecting the effects of optical flow directly, and in most situations (except perhaps within very simple artificial datasets) attempting to perform manual annotation also proves to be an extremely difficult task to achieve with the kind of accuracy that is expected for use as ground truth data \cite{haltakov}. 
 
@@ -186,9 +183,9 @@ As this was a problem that had potential implications for this project, thoughts
 
 Following discussions with the project supervisor a simple, yet effective solution was devised for determining the vertical displacement between a series of images. 
 
-For each image dataset, it was proposed that an additional pair of images would also be captured for the exclusive purpose of establishing ground truth. While obtained using the exact same method as the rest of the dataset, these two images would differ from the main collection by the fact that they would also contain a ruler positioned within the centre of each image. The choice to capture the ruler would be important, as the measurement increments it possessed would allow a user to clearly identify the same `feature' within both images (e.g. find the 10cm mark in both images).
+For each image dataset, it was proposed that an additional pair of images would also be captured for the exclusive purpose of establishing ground truth. While obtained using the exact same method as the rest of the dataset, these two images would differ from the main collection by the addition of a ruler positioned within the centre of each image. The choice to capture the ruler would be important, as the measurement increments it possessed would allow a user to clearly identify the same `feature' within both images (e.g. find the 10cm mark in both images).
 
-The next stage involved the design and implementation of a small, GUI-based utility tool that would allow a user to perform the following actions:
+The next stage involved the design and implementation of a, GUI-based utility tool that would allow a user to perform the following actions:
 
 \begin{enumerate}
 	\item Load in the pair of dedicated ground truth source images;
@@ -201,7 +198,7 @@ The next stage involved the design and implementation of a small, GUI-based util
 
 Following this process, a collection of sparse measurements would be obtained detailing the calculated number of pixels between the Y-coordinate of a `feature point' located in the first image, and the Y-coordinate of the corresponding `feature point' subsequently located within the second image. As it would not be possible for a user to manually identify and select features at an individual pixel level, interpolation would be required to estimate the intermediate values in order to arrive at a recorded displacement for every row in the image.
 
-Naturally, as with any means of human verification this approach was susceptible to human error, both in terms how accurately a user could position their mouse upon a feature, and also ensuring that they matched the correct features to each other. However, following the conclusions of a number papers within this topic area \cite{kondermann} \cite{haltakov} \cite{}, human verification was deemed to still provide the best possible level of accuracy for generating ground truth data relating to optical flow.
+Naturally, as with any means of human verification this approach was susceptible to human error in terms how accurately a user could position their mouse upon a feature, and also ensuring that they matched the correct features to each other. However, following the conclusions of a number papers within this topic area \cite{kondermann} \cite{haltakov}, human verification was deemed to still provide the best possible level of accuracy for generating ground truth data relating to optical flow.
 
 \textbf{Note to the reader:}
 
