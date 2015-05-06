@@ -17,12 +17,74 @@
 %
 %Review the discussion on the Evaluation section from the lectures. A recording is available on Blackboard. 
 
-\section{Experiment Results}
 
 \section{Research Aims}
 
+At the initial outset of this project, a number of research aims were proposed based upon the ideas established within the investigation hypothesis (Section \ref{aims}). While originally, these relatively ``high-level" tasks were deemed to be feasible within the time available, as the project progressed, so to did the oncoming realisation that the actual work required to accomplish these aims had been grossly underestimated by myself. 
+
+A crucial example of such underestimation, came as a result of not fully appreciating the difficulties that would subsequently be faced in attempting to accurately generate the vertical displacement model (Section \ref{hypo-model}) across terrain that, from a computer vision perspective, presented significant challenges both in terms of noise and lack of a sufficient number of ``unique" features.
+
+Following the discovery of such issues, priorities regarding the allocation of work effort had to be changed. These changes resulted in the exclusive focus on investigating potential solutions for improving the reliability and accuracy of the approach adopted for tracking the vertical displacement of features within the image using appearance-based matching techniques. 
+
+I am disappointed that further progress could not be made with regards to the other primary and secondary research aims. However, I feel that given the expectation upon the vertical displacement model for confirming the main underpinning theory within the hypothesis, the decision to focus on providing the highest possible accuracy towards generation of the model was ultimately the right choice to make.
+
+% (i.e. the proposed relationship between the row height within an image, and the level of vertical displacement demonstrated)
+
 \section{Technical Achievement}
+
+%apperance-based good
+
+I believe that in general, the project has demonstrated a good level of technical achievement, showcasing examples of developed software relating to both \textit{scientific} and \textit{engineering} aspects of the project. With respect to the development of the research proposals, I feel that a clear and methodical approach was shown towards the design of the investigation hypothesis, incorporating relevant ideas from related work and providing sufficient justification for the decisions that were subsequently made.
+
+In terms of later implementing the proposals detailed within the hypothesis, I feel that the software developed for each experiment accurately reflected the intended behaviour. Many of the underlying computer vision algorithms required within the project were utilised from an external library (OpenCV), under the reasoning that these implementations were known to already be optimised and throughly tested. While it would have certainly been beneficial to implement these algorithms myself in order to further enhance my own understanding, I continue to stand by the decision to use the library given the lack of available time, and my limited knowledge of the finer details for such algorithms.  
+
+The experiment testing rig is one aspect of the technical work that I believe was a particular success. While the test rig certainly made executing batches of experiments both significantly easier and faster under the command line, it was when combined with the \textit{iPython} computational framework library that the experiment setup really began to come into it's own, providing an effectively `seamless' ecosystem for the setup, execution and analysis of experiments. While the system was in no doubt faster than a human at conducting experiments, one major criticism would be the fact that it only held the ability to run tests sequentially. Given more time, I would have liked to have addressed this issue by implementing an approach whereby multiple experiments could be conducted simultaneously within isolation. 
+
+On reflection, I also believe that the decision to switch primary programming language from C++ to Python was necessary in enabling the project to be progress as it has up to this point. Although choosing to make the switch halfway though the project did prove to be costly at the time, I believe that in addition to learning a new programming language, the decision also resulted in development becoming more efficient and the software more maintainable, due primarily to the wide range of high-level functions already implemented within third-party libraries. 
+
+With respect to the choice of external libraries, I believe that sensible decisions were made regarding which ones would provide the most benefit to the project, and how they could be integrated as part of the system design. 
+
+%good; test rig good, iplayon good, approachea choice of libary and used ones that made a differacnes/contributed to the project 
+%swaping form langare 
+%learnt python
+%systme in early stages there as been proof that the curve has be geragted thus seting the seen for further resarch 
+%shared libary 
+%
+%bad; diserpointed that a fully working systme was not proudces that could have been test on a robot
+%there could have been more test data, with more vearation within the data
 
 \section{Project Management}
 
-\section{Conclusion}
+Although the project did not accomplish all its original high-level aims, the planning and management of tasks was an area that in general worked well. The adoption of SCRUM as the development methodology seemed to overall be a success, and in particular I found the planning of future sprint and release backlogs to be a very good way of remaining firmly grounded in what tasks still needed to be completed across both the shorter and longer term.  
+
+I also found that using the online Kanban board\footnote{\url{https://waffle.io/cgddrd/cs39440-major-project}} made the task of reorganising work much more efficient, and as such I found myself being much more inclined to actually re-plan my work schedule rather than simply ``pressing on" with development work regardless. 
+
+One small criticism would be that on occasion, it did prove to be somewhat problematic trying to map between a planned SCRUM `release', and the somewhat ``ad-hoc" development work conducted as a result of the research. The solution chosen for this, was to create a new release for each of the three primary experiments conducted.
+
+%spent to much time on addtional exploration of alteratve mean 
+%good use of ajile appoach but scrum unstutable TDD would have been a better appoach 
+%new to resarch the concpet of things not working but still profviding infoamtion 
+%used to defined set of rquirems having to set own chlange could be one reason why overestermated work to undertake 
+%hard to know where to stop no defined boundaries 
+
+\section{Final Conclusion}
+%ethos of resarch poject chalange and out of confort zone 
+%the poject was enjoyed the poject and enjyoed working with in the area of computer vision i did find my sefl taking consderably longer that first antispeated to full gain an understating and apreceation into the specifc detatils that form the basis of computer vision MATHS 
+
+Throughout the entirety of this project, it was a lack of available time that provided the single biggest challenge.
+
+ With hindsight, it is of course now easy to identify many potential factors that could have contributed to, what appeared to be at the time, a rapid acceleration towards the project deadline. Most likely of these is a combination between a shortfall of prior experience of working within both the fields of computer vision and indeed scientific research in general, along with the fact that the project was attempting to solve a non-trivial problem, of which there was no definitive solution. 
+ 
+ From a personal perspective, I found the project in general to be significantly more difficult than originally anticipated. One aspect in particular was simply the fact that as a \textit{research-based} project, there were no truely \textit{fixed} requirements that could be used to define when a particular task should be deemed as `complete'. As a developer who, prior to beginning this project, only really had experience working on ``standard" software-engineering projects with clearly defined requirements, I found it at times to be very hard to know at which point to stop investigating one research aspect, in order to begin with another. As I became better at planning my work, this did progressively become less of an issue, and is certainly a lesson that I will take away for future. 
+ 
+ As well representing my first attempt towards conducting a research-based project, this was also my first experience of working closely with computer vision as a technology. While many of the concepts utilised within the project were familiar to me following the completion of the Computer Vision module in semester one, I found that actually developing experiments and software using these algorithms and techniques could at times prove very challenging (in particular the mathematical concepts). As such a significant proportion of time had to be dedicated to ensure that I fully understood the details of relevant concepts, and is knowledge that I intend to utilise again in the future should the opportunity arise.
+ 
+To conclude, this project has opened my eyes to aspects of software development that I had never experienced before. I was presented with the opportunity to investigate an aspect of research that was truly of interest to me, and there are great number of lessons that I have taken from as a result. 
+ 
+In retrospect, it would be easy to state that the original aims of the project were certainly over ambitious, if not perhaps even naive. While this maybe true, there is little doubt as to the contribution that this project has made in paving the way towards future research and development work in this area.
+ 
+ 
+  
+ 
+
+
