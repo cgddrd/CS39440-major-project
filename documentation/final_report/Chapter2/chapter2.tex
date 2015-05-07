@@ -55,9 +55,9 @@ As part of a particularly elaborate setup, it would have perhaps been feasible t
 
 While these approaches would certainly provide an ample solution, following a discussion with the project supervisor, it was deemed that, at such an early stage in an investigation that was already limited in time remaining, efforts would be better spent focussing on conducting actual research, as opposed to the collection of test data.
 
-Nevertheless, a means of manually capturing image datasets was still required. As such, the decision was taken to adopt a `simplified' approach, that in exchange for greater manual involvement, could consequently be brought into service in a shorter timeframe. 
+Nevertheless, a means of manually capturing image datasets was still required. As such, the decision was taken to adopt a `simplified' approach, that in exchange for greater manual involvement, could consequently be brought into service in a shorter timeframe.
 
-Compared to the use of the robot, this approach was certainly less `sophisticated' in terms of its setup, consisting only of:
+Compared to the use of the robot, this approach was certainly less `sophisticated' in terms of its setup (Figure \ref{fig:rig}, consisting only of:
 
 \begin{itemize}
 	\item Two cardboard boxes (one rectangular and one angled);
@@ -68,14 +68,26 @@ Compared to the use of the robot, this approach was certainly less `sophisticate
 
 However, as well as being quick to initially build, this setup would go on to prove to be a lot more portable and a great deal cheaper to modify and fix than one of the Pioneer robots. 
 
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.1]{images/rig_setup}
+  \caption{The camera-rig setup used to capture the experiment datasets from the front and back profiles.}
+\label{fig:rig}
+\end{figure} 
+
 
 \subsubsection{Capturing Process}
 
 The method behind the use of the `homemade' camera rig to capture the image datasets also proved simple in design. This was regarded as favourable, given that it relied on manual involvement where human error subsequently becomes a potentially big issue. 
 
-Figure \ref{} below details the outline of the method used to capture an individual image dataset:
+Figure \ref{fig:flow} below details the outline of the method used to capture an individual image dataset.
 
-% ADD FIGURE SHOWING FLOW CHART FOR METHOD (STEP 1 - GO TO START POSITION)...
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.5]{images/camera_flow.pdf}
+  \caption{General method process employed for capturing dataset images.}
+\label{fig:flow}
+\end{figure}
 
 While the method for capturing images followed a ``fixed" procedure, it did allow for changes in the type of terrain captured, and the level of set displacement by which the camera was moved between subsequent images.
 
@@ -83,22 +95,51 @@ While the method for capturing images followed a ``fixed" procedure, it did allo
 
 A selection of locations were chosen for the purposes of capturing datasets. To ensure an appropriate level of variability, each dataset focussed on a different type of terrain environment that it was predicted a robot may face during live deployment.
 
-Datasets were captured at four separate locations, split between indoor and outdoor sites to provide variation in lighting conditions and terrain type:
+Datasets were captured at four separate locations (Figure \ref{fig:location}), split between indoor and outdoor sites to provide variation in lighting conditions and terrain type:
 
 \begin{enumerate}
 	\item \textbf{Site 1:} Living room rug with brightly-coloured simple-shapes (Indoors) (Natural light entering from the right)
-	\item \textbf{Site 2:} Brick-paved residential drive (Outside) (Natural light)
+	\item \textbf{Site 2:} Brick-paved road (Outside) (Natural light)
 	\item \textbf{Site 3:} Heavily-patterned asian rug upon white-tiled floor (Inside) (Partial natural light from behind camera, partial artificial light)
 	\item \textbf{Site 4:} Slate-tiled footpath (Outside) (Natural light)
 \end{enumerate}
 
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.4]{images/locations.png}
+  \caption{Examples of the first frame captured from each of the four location datasets.}
+\label{fig:location}
+\end{figure}
+
 \subsubsection{Calibration of Physical Setup}
 
-Although one of the aims of the hypothesis was to avoid the need for calibration of the camera, it was decided that in the interests of good experiment practice, measurements regarding the physical setup of the camera rig should be taken. Following the process outlined in the work of Campbell \textit{et al.} \cite{campbell}, the calibration would provide a future opportunity, should the need arise, to calculate the mapping between coordinates in the image plane and the ground plane.
+Although one of the aims of the hypothesis was to avoid the need for calibration of the camera, it was decided that in the interests of good experiment practice, measurements regarding the physical setup of the camera rig should be taken. 
 
-The physical setup of the camera rig is shown in Figure \ref{}, where $h$ refers to the height of the camera from the ground, and $d$ refers to the distance between the front edge of the rig base and the position at which the principle ray from the camera lens intersects with the ground plane \cite{campbell}.
+\begin{wrapfigure}{r}{0.5\textwidth}
+\vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.49\textwidth]{images/cam_setup.png}
+  \end{center}
+  \vspace{-10pt}
+  \caption{Diagram originally produced by Campbell \textit{et al.} \cite{campbell} depicting the physical setup of the camera rig used within their work. The camera rig built for this project followed a very similar setup.}
+  \label{fig:setup}
+\end{wrapfigure}
 
-To establish the distance $d$, a target $T$ was positioned on the ground such that it lay within the centre of the camera's viewfinder (Figure \ref{}). The distance between the position of the target $T$ and the front of the rig was then manually measured in order to arrive at the final length. 
+Following the process outlined in the work of Campbell \textit{et al.} \cite{campbell}, the calibration would provide a future opportunity, should the need arise, to calculate the mapping between coordinates in the image plane and the ground plane.
+
+\begin{wrapfigure}{l}{0.5\textwidth}
+  \begin{center}
+    \includegraphics[width=0.49\textwidth]{images/cam_target.png}
+  \end{center}
+  \vspace{-10pt}
+  \caption{Image indication the visual target used as part of the manual calibration of the camera rig setup.}
+  \label{fig:target}
+  \vspace{-10pt}
+\end{wrapfigure}
+
+The physical setup of the camera rig matched the same general setup as described by Campbell \textit{et al.} \cite{campbell} (Figure \ref{fig:setup}), where $h$ refers to the height of the camera from the ground, and $d$ refers to the distance between the front edge of the rig base and the position at which the principle ray from the camera lens intersects with the ground plane \cite{campbell}.
+
+To establish the distance $d$, a target $T$ was positioned on the ground such that it lay within the centre of the camera's viewfinder (Figure \ref{fig:target}). The distance between the position of the target $T$ and the front of the rig was then manually measured in order to arrive at the final length. 
 
 After also manually measuring the height $h$, it became possible to calculate the tilt $ \alpha $ of the camera using basic trigonometry:
 
@@ -109,6 +150,7 @@ After also manually measuring the height $h$, it became possible to calculate th
 \textbf{Note to the reader:}
 
 The remaining steps of the calibration model outlined below did not form part of the main project investigation, however following the decision by the author to investigate them as part of improving their own understanding, they have been included in this report for completeness.
+
 
 The next step was to define the relationship between the vertical offset of a point in the image $v$ and the associated vertical angle between that same point and the principle point along the ground plane $\beta$ \cite{campbell}:
 
@@ -155,8 +197,8 @@ Through the use of this calibration model, the actual displacement of any point 
 
 While unfortunately never pursued in this project due to time limitations, an alternative approach to gathering robust testing data was to capture motion sequences set within a 3D virtual environment. 
 
-A key advantage of creating artificial image datasets stems from the level of control that becomes available over properties including the choice of lighting, terrain textures and landscape geometry. This high degree of granularity that makes using computer-generated datasets a popular choice for many vision-based projects, perhaps especially within earlier stages of a project, where one is simply attempting to identify bugs in the system, rather than evaluating hypotheses. 
-
+A key advantage of creating artificial image datasets stems from the level of control that becomes available over properties including the choice of lighting, terrain textures and landscape geometry. This high degree of granularity that makes using computer-generated datasets a popular choice for many vision-based projects, perhaps especially within earlier stages of a project, where one is simply attempting to identify bugs in the system, rather than evaluating hypotheses \cite{ucl-dataset}, \cite{baker-dataset}, \cite{mpi-dataset}.
+ 
 Other potentially very useful consequences of using computer-generated datasets include control over the amount of noise an image may contain (e.g. choice to include or remove specular reflections), and the high degree of speed at which new datasets adopting different condition configurations could be created almost ``on the fly" in order to test new ideas and approaches within an experiment. 
 
 The creation of artificial datasets would have provided an opportunity to test the robustness of the experiment methods against a much broader range of conditions than what was feasibly possible using only real-world imagery. However the use of datasets captured from real-world environments was still arguably the most crucial in terms of evaluating the performance of experiment methods, given that these would ultimately provide the closest representation to the input expected within a live deployment. 
@@ -225,13 +267,13 @@ Following the completed implementation of the \textit{first experiment} (detaile
 
 This decision was not taken lightly, with the author being very much aware that by choosing a language with which they were unfamiliar, there was a high probability of the project incurring delays resulting from both learning the actual language, while also having to most likely dedicate additional time to fixing ``common" bugs typically associated with being new to the language. In spite of this, it was decided that while it may potentially cost time in the short term, switching to Python would provide a number of key benefits in the long term. 
 
-The first of these benefits was that in comparison to C++, the language provided significantly more functionality ``out of the box" due to it being situated at a ``higher" level programmatically. While reviewing the implementation of the first experiment, it was found that on a number of occasions, a function that had to written manually in C++ (e.g. standard deviation and variance of a numeric collection), was already available within either the Python language as standard, or one of its primary third-party libraries (e.g. \textit{numpy} \cite{numpy} and \textit{scipy} \cite{scipy}). While it was true that many of these functions did not take particularly long to implement in C++, there was a clear benefit to having such functions already implemented in libraries that were known to be both optimised and peer-tested. 
+The first of these benefits was that in comparison to C++, the language provided significantly more functionality ``out of the box" due to it being situated at a ``higher" level programmatically. While reviewing the implementation of the first experiment, it was found that on a number of occasions, a function that had to written manually in C++ (e.g. standard deviation and variance of a numeric collection), was already available within either the Python language as standard, or one of its primary third-party libraries (e.g. \textit{Numpy} \cite{numpy}). While it was true that many of these functions did not take particularly long to implement in C++, there was a clear benefit to having such functions already implemented in libraries that were known to be both optimised and peer-tested. 
 
 Secondly, following research into the Python language, it soon became clear that it was a popular choice amongst scientific and engineering teams due mainly to its impressive level of support for scientific and numeric computing \cite{perez} and promotion of `natural language' within its syntax that is known to aid in supporting rapid prototyping \cite{ramanujam}. These were both characteristics that could be applied to the needs of this project, and hence were deemed beneficial to future development.
 
 %Thirdly, the process and technologies used to deploy Python applications appeared to be significantly less complicated than that for C++ applications. While  
 
-A further reason for switching to the Python language, which would in time become one of the most significant, was the prospect of being able to make use of the iPython interactive computing library \cite{ipython}. Following the discovery of this library during research looking into the use of Python within scientific applications, it became apparent that it had the potential to provide significant capabilities in terms of supporting the automated execution and presentation of experiments and their results. This approach provided a more  intuitive means of displaying and analysis than what was originally available using just a command-line based interface. 
+A further reason for switching to the Python language, which would in time become one of the most significant, was the prospect of being able to make use of the \textit{iPython} interactive computing library \cite{ipython}. Following the discovery of this library during research looking into the use of Python within scientific applications, it became apparent that it had the potential to provide significant capabilities in terms of supporting the automated execution and presentation of experiments and their results. This approach provided a more  intuitive means of displaying and analysis than what was originally available using just a command-line based interface. 
 
 One of the most commonly noted disadvantages of using Python describes the fact that as a scripted language, its general performance is considered to be slower overall than that of compiled languages such as C++. While this was initially of some concern, it was later addressed through the use of a third-party library (Cython \cite{cython}) that enabled computationally expensive functions originally written in Python to be converted automatically into compiled C code.
 
@@ -240,76 +282,31 @@ One of the most commonly noted disadvantages of using Python describes the fact 
 
 Given the author's lack of prior knowledge in C++ or Python, it was decided that the use of an IDE for development would be most suitable for development, as they would be able to provide support facilities including code completion, automatic refactoring and powerful debugging facilities. 
 
-For C++ development, the Xcode IDE \cite{xcode} was chosen. While this was primarily a decision based on ease of having the IDE already installed, Xcode did provide a high level of support for managing the deployment of C++ applications, including a facility to automatically generate the `Makefiles' used to install the released version on another computer. 
+For C++ development, the Xcode IDE\footnote{\url{https://developer.apple.com/xcode/}} was chosen. While this was primarily a decision based on ease of having the IDE already installed, Xcode did provide a high level of support for managing the deployment of C++ applications, including a facility to automatically generate the `Makefiles' used to install the released version on another computer. 
 
-Python development was conducted within the PyCharm IDE making use of the educational license provided by JetBrains. Of particular benefit was the support provided for the automatic management of external dependencies and libraries, which included the ability to export a complete list of a project's dependencies and their precise version numbers.
+Python development was conducted within the PyCharm IDE\footnote{\url{https://www.jetbrains.com/pycharm}} making use of the educational license provided by JetBrains. Of particular benefit was the support provided for the automatic management of external dependencies and libraries, which included the ability to export a complete list of a project's dependencies and their precise version numbers.
 
-Version control was managed by git, with repositories hosted on both Github and a separate private git server. The project also made use of the Travis CI continuous integration platform to provide automated building and testing of software. Integrating directly with the Github service, new builds would be triggered automatically upon pushing of a new commit to the remote repository. Should any part of the build process fail (including unit test failures), the service would send an email notification detailing the type and source of the error.  
+Version control was managed by git, with repositories hosted on both Github\footnote{\url{https://github.com/cgddrd/CS39440-major-project}} and a separate private git server. The project also made use of the Travis CI\footnote{\url{https://travis-ci.org/cgddrd/CS39440-major-project}} continuous integration platform to provide automated building and testing of software. Integrating directly with the Github service, new builds would be triggered automatically upon pushing of a new commit to the remote repository. Should any part of the build process fail (including unit test failures), the service would send an email notification detailing the type and source of the error.  
 
 \subsection{Core Libraries}
 \label{libs}
 
-While making use of only a small selection of libraries, these libraries were used rather extensively, in particular opencv and bumpy. python and python were pretty big aswell.
+The project made use of a selection of libraries to support in the development of the both the experiment testing framework, and the experiment methods themselves. 
 
-The project made use of a selection of libraries to support in the development of the both the experiment testing framework, and the experiment methods themselves.
-
-The largest single contributing library was \textit{OpenCV} \cite{opencv}. Originally developed by Intel, \textit{OpenCV} is one of the most popular open source computer vision and machine learning libraries currently available, providing over 2500 optimised functions that implement some of the most renowned computer vision algorithms including SIFT (Scale Invariant Feature Transform)\footnote{\url{http://docs.opencv.org/modules/nonfree/doc/feature_detection.html}}, Viola-Jones face detection\footnote{\url{http://docs.opencv.org/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html}} and Lucas-Kanade optical flow\footnote{\url{http://docs.opencv.org/modules/video/doc/motion_analysis_and_object_tracking.html#calcopticalflowpyrlk}}. 
-
-\textit{OpenCV} became a vital tool in the development of this project, providing a large number of ``core" image processing and computer vision facilities including colour space manipulation, sub-region extraction and template matching (see Section \ref{templmatchopencv}). This project referenced the latest stable release at the time of writing (2.11.0), and made use of both the C++ and Python bindings as discussed in Section \ref{develtools}.
+The \textit{OpenCV} library \cite{opencv} became a vital tool in the development of this project, providing a large number of ``core" image processing and computer vision facilities including colour space manipulation, sub-region extraction and template matching (see Section \ref{templmatchopencv}). This project referenced the latest stable release at the time of writing (2.11.0), and made use of both the C++ and Python bindings as discussed in Section \ref{develtools}.
 
 For aspects of the implementation developed in Python (approximately 75\% of code written), the project made extensive use of the \textit{Numpy} \cite{numpy}, \textit{Cython} \cite{cython}, \textit{Matplotlib} \cite{matplotlib} and \textit{iPython} \cite{ipython} libraries. 
 
-\textit{Numpy} \cite{numpy} is a very popular third-party extension library providing optimised array-type objects in addition to a wide range of mathematical operations associated with numeric collections including matrix manipulation\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.linalg.htm}}, statistical analysis\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.statistics.html}} and Fourier transforms\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.fft.html}}. One of the core data structures provided by \textit{Numpy} is the multidimensional array\footnote{\url{http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html}}, which happened to be the data structure of choice within the \textit{OpenCV} Python bindings for representing an image.
+Please see Appendix A for a detailed description of all third-party libraries utilised within this project.
 
-The \textit{Cython} library \cite{cython} is an advanced tool utilised within the project for translating computationally expensive functions written originally in Python, into optimised C code. The library came with its own dialect of Python, that while being almost identical, enabled developers to add additional `C-specific instructions' (such as specifying type declarations for variables) to allow for full conversion from Python to C without the need for the developer to write any C code themselves. \textit{Cython} source files were distinguished from ``true" Python source files through the use of the \textit{``.pyx"} file extension (as opposed to the \textit{``.py"} extension for Python source files). While \textit{Cython} did also possess the ability to convert native Python code, the resulting compiled C files would not be fully optimised.
-
-\textit{Matplotlib} \cite{matplotlib} is a popular plotting library for Python providing high-level support for producing a wide range of scientific graphs and figures in both 2D and 3D. It was used extensively throughout this project for depicting experiment results and analysing method behaviour (e.g. plotting the behaviour of template matching similarity scores).
-
-\textit{iPython} \cite{ipython} provides an interactive environment for running computational operations where a dedicated graphical user interface may not be appropriate. It is becoming very popular amongst the scientific and data-analysis communities as a means of quickly and easily implementing, running and sharing computational tasks and experiments within an intuitive web-based environment (known as an \textit{iPython notebook}\footnote{http://ipython.org/notebook.html}).
- 
 \subsection{Implementation of Template Matching Similarity Measures}
 \label{templmatchopencv}
 
 All of the experiments conducted within this project focussed on the analysis of four specific template matching similarity measures for identifying corresponding sub-regions between two subsequent images of a forward-motion sequence.
 
-The general process for performing template matching, regardless of the choice of similarity metric, remains fundamentally the same \cite{opencvtemplatematching}:
+The general process for performing template matching, regardless of the choice of similarity metric, remains fundamentally the same \cite{opencvtemplatematching}. Where a template image (i.e. the image we are searching for) is convolved through a (typically) larger search image (i.e. moved through the search image 1 pixel at a time). At each increment in position, a similarity ``score" is calculated using a specific similarity metric calculation, if this new score is deemed ``better" than the current high score (which can be lower or higher depending on the similarity metric chosen) then that position within the search image becomes the new location where the item in the template image is most likely to be.
 
-\begin{algorithm}
-\caption{Template Matching}
-\label{templatematchalgorithm}
-\begin{algorithmic}[1]
-
-\Procedure{Template\_Matching}{\textit{template\_image}, \textit{search\_image}}
-
-\State let \textit{high\_score} = $-1$
-\State let \textit{high\_score\_position} = $(-1, -1)$ \Comment{Initialise high score and position.}
-\State let \textit{template\_image\_height} = len(\textit{template\_image})
-\State let \textit{template\_image\_width} = len(\textit{template\_image}[0])\\\\
-
-\Comment{Convolve the template image through the image we are searching.}
-\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_image}) - 1) - \textit{template\_image\_height} \textbf{step} $1$}
-\For{$j \coloneqq 0$ \textbf{to} (len(\textit{search\_image[0]}) - 1) - \textit{template\_image\_width} \textbf{step} $1$} \\
-
-\State let current\_window = search\_image[$i$][$j$]
-\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_image}, \textit{current\_window}) \\
-
-\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})}
-
-\State \textit{high\_score} = \textit{current\_match\_score}
-\State \textit{high\_score\_position} = $(i, j)$
-
-\EndIf \\
-
-\EndFor
-\EndFor \\
-
-\\ \Return \textit{high\_score\_position} \\
-\EndProcedure
-
-\end{algorithmic}
-\end{algorithm}
-
-where a template image (i.e. the image we are searching for) is convolved through a (typically) larger search image (i.e. moved through the search image 1 pixel at a time). At each increment in position,  a similarity ``score" is calculated using a specific similarity metric calculation, if this new score is deemed ``better" than the current high score (which can be lower or higher depending on the similarity metric chosen) then that position within the search image becomes the new location where the item in the template image is most likely to be.
+An outline of the process described via pseudocode is available in Appendix B - Algorithm \ref{appen:code1}.
 
 The similarity measures subsequently implemented in the experiments were chosen specifically in order to compare the performance between the two major categories of appearance-based matching technique. 
 
@@ -327,7 +324,7 @@ d(x, y) = \sqrt{\sum\limits_{i}\sum\limits_{j}[\mathcal{I}(x + i, y + j) - \math
 
 where $\mathcal{A}$ is the template image containing the pattern we are searching for within image $\mathcal{I}$. 
 
-A crucial characteristic of the Euclidean Distance (and indeed similar approaches including Sum of Squared Difference), is that it relies on comparing the \textit{intensity} of pixels in order to provide a measure of image similarity. This is very important, as it subsequently enforces an implicit assumption (known as the \textit{brightness constancy constraint}), that the values of corresponding pixels do not change between the two images\cite{szeliski}. This in effect, means that the measure can be substantially affected by changes in brightness between the two images under comparison.  
+A crucial characteristic of the Euclidean Distance (and indeed similar approaches including Sum of Squared Difference), is that it relies on comparing the \textit{intensity} of pixels in order to provide a measure of image similarity. This is very important, as it subsequently enforces an implicit assumption (known as the \textit{brightness constancy constraint}), that the values of corresponding pixels do not change between the two images \cite{szeliski}. This in effect, means that the measure can be substantially affected by changes in brightness between the two images under comparison.  
 
 Normalised cross-correlation takes its roots from the field of signal processing, and unlike Euclidean Distance does not rely on differences in pixel intensity to establish the similarity between two images \cite{szeliski}. Instead, this approach takes the product (known as the \textit{cross-correlation}) of pixel values as defined by:
 
@@ -377,7 +374,7 @@ The approach to comparing between two histograms follows closely with the method
 
 The two metrics selected for evaluation within this investigation were \textit{Correlation} and \textit{Chi-Square}. Unlike the distance-based metrics chosen previously, these were selected entirely at random from four possible similarity measures provided by the \textit{OpenCV} library (Correlation, Chi-Square, Intersection and Bhattacharyya distance)\footnote{\url{http://docs.opencv.org/doc/tutorials/imgproc/histograms/histogram_comparison/histogram_comparison.html}}.
 
-The Correlation metric is defined within the \textit{OpenCV} library \cite{opencvhistogram} as:
+The Correlation metric is defined within the \textit{OpenCV} library as:
 
 \begin{equation}
 d(H_{1}, H_{2}) = \frac{\sum\nolimits_{I}[(H_{1}(I) - \bar{H_{1}})(H_{2}(I) - \bar{H_{2}})]}{\sqrt{\sum\nolimits_{I}[(H_{1}(I) - \bar{H_{1}})^2(H_{2}(I) - \bar{H_{2}})^2]}}
@@ -451,9 +448,9 @@ Draw Plot of Results & \texttt{--drawplot} & \texttt{Boolean} & \texttt{--drawpl
 
 In addition to the command-line interface, it was also possible to interact with the test rig programatically. This was an approach utilised extensively while generating the final results as discussed in Section \ref{display}.
 
-\subsubsection{Storage of Results}
-
-Upon the completion of an individual experiment test, the results were appended to a dictionary-based data store that would allow for the results of any specific experiment test to be re-extracted at a later stage. In order to achieve this, a specific naming convention for dictionary indices was defined:
+%\subsubsection{Storage of Results}
+%
+%Upon the completion of an individual experiment test, the results were appended to a dictionary-based data store that would allow for the results of any specific experiment test to be re-extracted at a later stage. In order to achieve this, a specific naming convention for dictionary indices was defined:
 
 % ADD FIGURE SHOWING DICTIONARY NAMING CONVENTION SPLIT!
 
@@ -467,13 +464,20 @@ Following the decision at that same point to switch from C++ to Python (discusse
 
 The design of the \textit{`Terrain Shape Estimation'} (TSE) library saw the creation of nine key components, each focussing on providing functions for a specific set of tasks:
 
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.25]{images/tse_class_diagram}
+  \caption{UML class diagram describing the structure of the `Terrain Shape Estimation'  Python-based library utilised extensively throughout the investigation for providing common functionality shared across experiments.}
+\label{fig:rig}
+\end{figure} 
+
 \begin{itemize}
 	\item \textbf{TSEImageUtils:} Provides functionality relating to image processing and template matching.
 	\item \textbf{TSECImageUtils:} Provides compiled (C code) versions of certain functions available in \textit{TSEImageUtils} which are known to be computationally expensive (Cython \texttt{.pyx} source class)
 	\item \textbf{TSEDataUtils:} Provides common data handling and statistical processing functionality for use with single and multi-dimensional data structures.
 	\item \textbf{TSEFileIO:} Provides functions relating to data file input and output (not images - this is provided by the \textit{OpenCV} library).
 	\item \textbf{TSEGeometry:} Provides mathematical functions relating to the geometric transformation of image pixel coordinates (primarily scaling).
-%	\item \textbf{TSEEnum:} Represents the definition of an \texttt{enum} type for use in Python which does not come as standard in Python 2.7.
+	\item \textbf{TSEEnum:} Represents the definition of an \texttt{enum} type for use in Python which does not come as standard in Python 2.7.
 	\item \textbf{TSEMatchMethod:} \texttt{Enum} type used to represent the three possible matching metric categories available: distance-based (normal), distance-based (Euclidean) and histogram-based (The two types of distance-based category are as a result of the way \textit{OpenCV} handles calculation of Euclidean Distance in a separate manner to other distance-based similarity measures).
 	\item \textbf{TSEMatchType:} Provides a class representation for a single appearance-based similarity measure to hold specific properties regarding each metric.
 	\item \textbf{TSEPoint:} Provides a class representation for a single 2D-coordinate point within an image used when performing geometric transformations of pixel coordinates.
@@ -497,27 +501,48 @@ One of the key issues facing this project was how to present the results of a po
 
 For the first experiment it was decided that, in the interests of both time and the primary project objective, it would be best to provide support only for exporting results data to file, rather than attempting to implement plotting and visualisation facilities directly. 
 
-In order to allow for further analysis of the results obtained from the first experiment, the project made use of third-party plotting application called \textit{Veusz} \cite{}. This tool supported an impressive number of useful facilities including importing (and automatic re-importing) of data files, common statistical analysis functions (including moving average and linear interpolation) and a WYSIWYG interactive graphical plot creation and editing suite. 
+In order to allow for further analysis of the results obtained from the first experiment, the project made use of third-party plotting application called \textit{Veusz} \cite{veusz}. This tool supported an impressive number of useful facilities including importing (and automatic re-importing) of data files, common statistical analysis functions (including moving average and linear interpolation) and a WYSIWYG interactive graphical plot creation and editing suite. 
 
 Within Veusz, it was possible to extract specific result sets from an imported results data file, before plotting them as 2D scatter plots, configuring aspects such as the marker style, axis titles and axis ranges as needed.   
 
-For experiments implemented in Python (i.e. all experiments except the first) the project instead made extensive use of the \textit{iPython} framework \cite{ipython} discussed previously in Sections \ref{lang} and \ref{libs}. This library proved to be an invaluable asset to the project investigation, providing not only support for extracting and viewing result data, but an entire ecosystem tailored towards the setup, running and analysis of computational experiments from within a single web-based environment. 
+For experiments implemented in Python (i.e. all experiments except the first) the project instead made extensive use of the \textit{iPython} framework \cite{ipython} discussed previously in Section \ref{lang}. This library proved to be an invaluable asset to the project investigation, providing not only support for extracting and viewing result data, but an entire ecosystem tailored towards the setup, running and analysis of computational experiments from within a single web-based environment. 
+
+\begin{wrapfigure}{r}{0.5\textwidth}
+\vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.49\textwidth]{images/ipython.png}
+  \end{center}
+  \vspace{-10pt}
+  \caption{Example screenshot of the iPython web-based interface running the Python testing rig and displaying the subsequent results all from within a single `notebook'.}
+     \label{fig:ipython}
+  \vspace{-10pt}
+\end{wrapfigure}
 
 A major feature provided within \textit{iPython} is the ability to \textit{interactively} write and run Python code within isolated computational environments known as `notebooks'\footnote{\url{http://ipython.org/notebook.html}}. By communicating with the test rig programmatically, it was possible to define all of the required test parameters within Python code, before passing these over to the test rig in order to then start the tests. Should any changes need to be made, this was accomplished within the web-based user interface, without the need for any interaction with the command line whatsoever. By creating multiple notebooks for each experiment, it was even possible to instruct iPython to automatically trigger either a selection, or indeed all of the tests for each experiment to start at the same time. 
 
-Through the use of the \textit{Matplotlib} library \cite{matplotlib}, the results for each experiment were plotted automatically upon the completion of the test rig before being embedded into the same `notebook' that contained the Python code used to define and initiate that very same test. This meant in effect, that it had become possible to analyse all of the input and output of a single test, performed as part of specific experiment, all within one ``document" (Figure \ref{}).
 
-% Show figure of ipython notebook.
+Through the use of the \textit{Matplotlib} library \cite{matplotlib}, the results for each experiment were plotted automatically upon the completion of the test rig before being embedded into the same `notebook' that contained the Python code used to define and initiate that very same test. This meant in effect, that it had become possible to analyse all of the input and output of a single test, performed as part of specific experiment, all within one ``document" (Figure \ref{fig:ipython}).
 
 \subsection{Software Testing}
 
 For testing aspects of the software (predominantly the testing rig and implementations of template matching methods), standard software-based testing practices were adopted. This constituted mainly of unit tests written to test for each specific function written in code, and regression tests for confirming that software continued to work as expected following the correction of a bug.
 
-For unit tests written in Python, the \textit{Nose} \cite{nose} third-party testing framework was selected in favour of the default testing framework (\textit{unittest}), due to its ability to generate code coverage reports in partnership with the \textit{Coverage.py} \cite{coverage} library. This was later enhanced by integrating with the \textit{Coveralls.io} web service \cite{coveralls}, which provided automatic analysis and notification of changes in the level of code coverage following each new commit to the remote project git repository hosted at \textit{Github.com}.
+\begin{wrapfigure}{l}{0.5\textwidth}
+\vspace{-20pt}
+  \begin{center}
+    \includegraphics[width=0.49\textwidth]{images/coveralls.png}
+  \end{center}
+  \vspace{-10pt}
+  \caption{Example screenshot of the Coveralls.io\footnote{\url{https://coveralls.io/r/cgddrd/CS39440-major-project}} web interface providing a breakdown of unit test code coverage.}
+     \label{fig:coveralls}
+  \vspace{-10pt}
+\end{wrapfigure}
+
+For unit tests written in Python, the \textit{Nose}\footnote{\url{https://nose.readthedocs.org/en/latest/}} third-party testing framework was selected in favour of the default testing framework (\textit{unittest}), due to its ability to generate code coverage reports in partnership with the \textit{Coverage.py}\footnote{\url{http://nedbatchelder.com/code/coverage/}} library. This was later enhanced by integrating with the \textit{Coveralls.io}\footnote{\url{https://coveralls.io/r/cgddrd/CS39440-major-project}} web service (Figure \ref{fig:coveralls}), which provided automatic analysis and notification of changes in the level of code coverage following each new commit to the remote project git repository hosted at Github.
 
 \section{Experiment Methods}
 
-This section provides an overview the three main experiment methods conducted within the scope of the project investigation, that all relate to the first primary research aim discussed in Section \ref{primary-aims}. Details of any additional exploratory work considered to have contributed to the overall investigation are also discussed within this section.
+This section provides an overview the three main experiment methods conducted within the scope of the project investigation, that all relate to the first primary research aim discussed in Section \ref{primary-aims}.
 
 While not specifically intended, as the investigation progressed the focus began to change from  exploring a series of reasonably ``generalised" research aims, to instead concentrating almost exclusively on one small, but very important aspect; \textit{ensuring that accurate results for appearance-based motion displacement could continue to be achieved, across terrain lacking any significant features and/or demonstrating highly repetitive patterns}.
 
@@ -528,7 +553,7 @@ While not specifically intended, as the investigation progressed the focus began
 
 This experiment focussed on the extraction and subsequent matching of multiple overlapping square patches in order to provide an appearance-based approach to performing dense optical flow, in the hope that it would be possible to generate a vertical displacement model confirming the predicted behaviour stated in Section \ref{hypo-model}. 
 
-The method followed a \textit{six-stage} process to build the vertical displacement model used later to compare vertical motion displacement for the identification of obstacles and terrain slopes:
+The method followed a \textit{six-stage} process (Figure \ref{fig:ex1process})to build the vertical displacement model used later to compare vertical motion displacement for the identification of obstacles and terrain slopes:
 
 \begin{enumerate}
 \item Import two consecutive images from one of the test datasets, convert both images from RGB to HSV colour space, subsequently ``remove" the 'V' channel by setting all the corresponding channel values to 0.
@@ -538,6 +563,14 @@ The method followed a \textit{six-stage} process to build the vertical displacem
 \item Identify the patch within the localised search window that provides the ``best match" via appearance-based matching.
 \item Average all measured vertical displacement values for each pixel along a given row, removing outliers by ignoring any displacements that lie outside of (2 x standard deviation) of the mean, before appending to the vertical displacement model.
 \end{enumerate}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.2]{images/ex1stages.pdf}
+  \caption{Process model for the method undertaken within Experiment 1 to evaluate the use of multiple small-sizes template patches in order to infer the vertical displacement of corresponding features between two consecutive images.}
+\label{fig:ex1process}
+\end{figure} 
+
 
 \subsection{Experiment 2: Template Matching (Full-width Patches - Non-Scaled)}
 
@@ -557,46 +590,7 @@ As part of the localised search detailed in stage five of the method from experi
 
 The motivation behind non-exhaustive searching prevented the need to continue searching down the entire localised search window column, if it was believed that the best match for that search window had \textit{already been located}. 
 
-The criteria for stopping a search, focussed around the observed scoring behaviour of appearance-based matching metrics, where in the case of Euclidean Distance, the score would demonstrate a uniform decline, until reaching a minima representing the best possible match, before subsequently beginning to rise once more (Figure \ref{}). That is to say, the search should continue until such a time as the score no longer continues to become progressively ``better", at which point the last score recorded \textit{previously} to this would also represent the best possible score for that search.
-
-\begin{algorithm}
-\caption{Non-Exhaustive Search of Localised Search Window}
-\label{nonexhautivesearch}
-\begin{algorithmic}[1]
-
-\Procedure{Localised\_Search\_NonExhaustive}{\textit{template\_patch}, \textit{search\_column}}
-
-\State let \textit{high\_score} = $-1$
-\State let \textit{vertical\_displacement} = $0$
-\State let \textit{template\_patch\_height} = len(\textit{template\_patch})\\
-
- \LineComment{Localised search window originates relative to the top of the extracted template patch within the image.}\\
-\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_column}) - 1) - \textit{template\_patch\_height} \textbf{step} $1$} \\
-
-\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_patch}, \textit{search\_column}) \\
-
-\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})} \\
-
-\LineComment{If no high score has been set (i.e. the search has just begun) or the new score is deemed ``better" than the previous high score, then we have found the new best match.} \\
-\State \textit{high\_score} = \textit{current\_match\_score}
-\State \textit{vertical\_displacement} = $i$
-
-
-\Else
-
-\LineComment{Otherwise, if the new score is \textit{worse}, then stop the search at this point.}
-
-\State \Return \textit{vertical\_displacement}
-
-\EndIf
-
-\EndFor
-
-\\ \Return \textit{vertical\_displacement} \\
-\EndProcedure
-
-\end{algorithmic}
-\end{algorithm}
+The criteria for stopping a search, focussed around the observed scoring behaviour of appearance-based matching metrics, where in the case of Euclidean Distance, the score would demonstrate a uniform decline, until reaching a minima representing the best possible match, before subsequently beginning to rise once more (Figure \ref{}). That is to say, the search should continue until such a time as the score no longer continues to become progressively ``better", at which point the last score recorded \textit{previously} to this would also represent the best possible score for that search (See Appendix B - Algorithm \ref{appen:code2} for an pseudocode outline for this approach).
 
 While in theory this approach appeared reasonable, it was later identified that it had the potential to suffer greatly upon the onset of image noise. The issue that was presented, involved the search terminating prematurely as a result of arriving at a local minima caused by noise, rather than terminating at the ``global" minima that represented the \textit{true} best match within the search window column (Figure \ref{}). 
 
@@ -604,7 +598,7 @@ In order to confirm this observation, all of the tests conducted over experiment
 
 \subsubsection{Perspective Distortion Calibration Tool}
 
-A consequence of choosing to isolate a central region-of-interest relative to the ground plane rather than the image plane, described how the shape of the search region would become subject to distortion caused by changes in perspective, where the ground within the image appears to `converge' towards a central point along the horizon line (Figure \ref{}). In particular, the shape would change from a uniform rectangle, to an isosceles trapezium \cite{trapezium}.
+A consequence of choosing to isolate a central region-of-interest relative to the ground plane rather than the image plane, described how the shape of the search region would become subject to distortion caused by changes in perspective, where the ground within the image appears to `converge' towards a central point along the horizon line (Figure \ref{}).
 
 As template patches were now expected to span the \textit{full width} of the region of interest, it became necessary for the width of the extracted template patches to increase as the search moved towards the bottom of the image. 
 
@@ -663,10 +657,3 @@ Due to the reliance that appearance-based similarity measures hold on the evalua
 The solution to this issue lay in the \textit{extraction} of pixels from the larger search window, whose 2D position corresponded to the \textit{scaled} position of each pixel in the original template patch. By subsequently comparing the original template patch, with the collection of newly-extracted corresponding pixels from the search window, it was possible to continue to use all of the appearance-based similarity measures as had previously been utilised in experiments one and two. 
 
 Another important point to realise, was that no additional information regarding the scene represented by the two images was being either \textit{lost} or \textit{gained} as a result of utilising pixel 2D position scaling and subsequent extraction. This however, would not have been the case had the method naively attempted to ``resize" the template patch in order to have the same dimensions as the larger search window. This is because to enlarge the entire template patch image, it would be necessary to linearly interpolate between each of the original pixels, causing new, and most likely incorrect information to be added prior to perform appearance-based matching, which subsequently may have caused the results to be very different to the actual true similarity between the current template patch and search window.
-
-\subsection{Additional Exploratory Work}
-
-
-
-
-

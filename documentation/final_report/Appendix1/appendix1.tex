@@ -11,3 +11,39 @@
 %Apache POI library Ð The project has been used to read and write Microsoft Excel files (XLS) as part of the interaction with the clientÕs existing system for processing data. Version 3.10-FINAL was used. The library is open source and it is available from the Apache Software Foundation 
 %\cite{apache_poi}. The library is released using the Apache License 
 %\cite{apache_license}. This library was used without modification. 
+
+\textbf{OpenCV} \cite{opencv}
+
+Originally developed by Intel, \textit{OpenCV} is one of the most popular open source computer vision and machine learning libraries currently available, providing over 2500 optimised functions that implement some of the most renowned computer vision algorithms including SIFT (Scale Invariant Feature Transform)\footnote{\url{http://docs.opencv.org/modules/nonfree/doc/feature_detection.html}}, Viola-Jones face detection\footnote{\url{http://docs.opencv.org/doc/tutorials/objdetect/cascade_classifier/cascade_classifier.html}} and Lucas-Kanade optical flow\footnote{\url{http://docs.opencv.org/modules/video/doc/motion_analysis_and_object_tracking.html#calcopticalflowpyrlk}}. 
+
+Available as open source under the BSD license \cite{opencv-lic}.
+
+\textbf{Numpy} \cite{numpy} 
+
+Third-party extension library providing optimised array-type objects in addition to a wide range of mathematical operations associated with numeric collections including matrix manipulation\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.linalg.htm}}, statistical analysis\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.statistics.html}} and Fourier transforms\footnote{\url{http://docs.scipy.org/doc/numpy/reference/routines.fft.html}}. 
+
+One of the core data structures provided by \textit{Numpy} is the multidimensional array\footnote{\url{http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html}}, which happened to be the data structure of selected to represent images within the Python bindings for the \textit{OpenCV} library \cite{opencv}.
+
+Extensively utilised throughout the project to provide statistical analysis of results and in order to work with the Python bindings within OpenCV.
+ 
+Available as open source under the BSD license \cite{numpy-lic}.
+
+\textbf{Cython} \cite{cython} 
+
+Provided facilities to translate computationally expensive functions written originally in Python, into optimised C code. The library came with its own dialect of Python, that while being almost identical, enabled developers to add additional `C-specific instructions' (such as specifying type declarations for variables) to allow for full conversion from Python to C without the need for the developer to write any C code themselves. \textit{Cython} source files were distinguished from ``true" Python source files through the use of the \textit{``.pyx"} file extension (as opposed to the \textit{``.py"} extension for Python source files).
+
+Available as open source under the Apache Software license \cite{cython-lic}.
+
+\textbf{Matplotlib} \cite{matplotlib}
+
+Plotting library for Python providing high-level support for producing a wide range of scientific graphs and figures in both 2D and 3D. It was used extensively throughout this project for depicting experiment results and analysing method behaviour (e.g. plotting the behaviour of template matching similarity scores).
+
+Available as open source under the Python Software Foundation and BSD licenses \cite{matplotlib-lic}.
+
+\textbf{iPython} \cite{ipython} 
+
+Provides an interactive environment for running computational operations where a dedicated graphical user interface may not be appropriate. Provides ability to implement, run and share computational tasks and experiments within a web-based environment (known as an \textit{iPython notebook}\footnote{\url{http://ipython.org/notebook.html}}). 
+
+Provided ability to both run experiment tests and view results within the same testing environment. 
+
+Available as open source under the Revised BSD license \cite{ipython-lic}.

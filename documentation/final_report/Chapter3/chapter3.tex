@@ -244,7 +244,9 @@ Overall a patch size of 100px (fixed height of 100px for experiments two and thr
 
 \subsection{Appearance-Based Similarity Matching Measures}
 
-When evaluating the four appearance-based similarity measures, the results indicate that the performance of a specific measure can vary significantly in relation to both \textit{itself}, and the relative performance of alternative measures, across the various tests conducted within all three experiments. 
+When evaluating the four appearance-based similarity measures, the results indicate that the performance of a specific measure can vary significantly in relation to both \textit{itself}, and the relative performance of alternative measures, across the various tests conducted within all experiments. 
+
+A common observation seen throughout all of the results, was the noticeable decline in vertical displacement recorded towards the maximum row height along the X axis. This was expected, and caused by the relationship between search focus on rows towards the bottom of the image, and the decreasing height of the available search window. As a result, the maximum potential displacement that could be recorded also decreases, with the likelihood that patches towards the very bottom of the image will never find a true match as the corresponding features will have since moved below the vertical field of view of the camera. 
 
 In an example from the experiment one results, it can be seen that while the Euclidean Distance (distance-based) measure appears to perform very well across the brightly coloured `spot' carpet within the first dataset (Figure \ref{fig:ex1_1_1} Graph 2), it then suffers a clear decline in performance across the next two datasets, both of which feature \textit{heavily textured terrain} (brick-paved road (dataset two) and asian rug (dataset three)) (Figures \ref{fig:ex1_1_2} and \ref{fig:ex1_1_4}). 
 
@@ -252,7 +254,7 @@ This observation of the poor performance of Euclidean Distance in relation to th
 
 As a consequence, all of the image `noise' that may have existed originally (\textit{including examples of detailed textures}), subsequently becomes lost. Therefore, when comparing the similarity between two colour histograms, all of the finite detail contained within the original image is in effect ignored, thus leading to an increased chance of finding at least some kind of match, even if this subsequently this match is not accurate. 
 
-In contrast to this, distance-based measures such as the Euclidean Distance retain the finite detail when comparing the similarity between two images. While this allows for a greater level of sensitivity and thus potentially better accuracy, it can also result in a failure to identify a correct match due to an acute misalignment of features within the two patches.
+In contrast to this, distance-based measures such as the Euclidean Distance retain the finite detail when comparing the similarity between two images. This allows for a greater level of sensitivity and thus potentially better accuracy, but can also result in a failure to identify a correct match due to an acute misalignment of features within the two patches.
 
 While Normalised Cross-Correlation is a distance-based metric, it appears to perform remarkably similar to the Histogram Correlation metric when tested under the same ``heavy texture" terrain conditions as the Euclidean distance (Figures \ref{fig:ex1_1_2} and \ref{fig:ex1_1_4}). The most likely cause for this is due to the normalisation step, whereby a considerable proportion of the finer detail within the original image is potentially lost as a consequence of equalising the range in pixel values can lie. 
 

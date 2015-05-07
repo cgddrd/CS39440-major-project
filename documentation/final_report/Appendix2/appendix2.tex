@@ -1,5 +1,79 @@
 \chapter{Code samples}
 
+\begin{algorithm}
+\caption{Generalised approach to performing template matching as implemented within the experiments for this investigation.}
+\label{appen:code1}
+\begin{algorithmic}[1]
+
+\Procedure{Template\_Matching}{\textit{template\_image}, \textit{search\_image}}
+
+\State let \textit{high\_score} = $-1$
+\State let \textit{high\_score\_position} = $(-1, -1)$ \Comment{Initialise high score and position.}
+\State let \textit{template\_image\_height} = len(\textit{template\_image})
+\State let \textit{template\_image\_width} = len(\textit{template\_image}[0])\\\\
+
+\Comment{Convolve the template image through the image we are searching.}
+\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_image}) - 1) - \textit{template\_image\_height} \textbf{step} $1$}
+\For{$j \coloneqq 0$ \textbf{to} (len(\textit{search\_image[0]}) - 1) - \textit{template\_image\_width} \textbf{step} $1$} \\
+
+\State let current\_window = search\_image[$i$][$j$]
+\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_image}, \textit{current\_window}) \\
+
+\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})}
+
+\State \textit{high\_score} = \textit{current\_match\_score}
+\State \textit{high\_score\_position} = $(i, j)$
+
+\EndIf \\
+
+\EndFor
+\EndFor \\
+
+\\ \Return \textit{high\_score\_position} \\
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Non-Exhaustive Search of Localised Search Window}
+\label{appen:code2}
+\begin{algorithmic}[1]
+
+\Procedure{Localised\_Search\_NonExhaustive}{\textit{template\_patch}, \textit{search\_column}}
+
+\State let \textit{high\_score} = $-1$
+\State let \textit{vertical\_displacement} = $0$
+\State let \textit{template\_patch\_height} = len(\textit{template\_patch})\\
+
+ \LineComment{Localised search window originates relative to the top of the extracted template patch within the image.}\\
+\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_column}) - 1) - \textit{template\_patch\_height} \textbf{step} $1$} \\
+
+\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_patch}, \textit{search\_column}) \\
+
+\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})} \\
+
+\LineComment{If no high score has been set (i.e. the search has just begun) or the new score is deemed ``better" than the previous high score, then we have found the new best match.} \\
+\State \textit{high\_score} = \textit{current\_match\_score}
+\State \textit{vertical\_displacement} = $i$
+
+
+\Else
+
+\LineComment{Otherwise, if the new score is \textit{worse}, then stop the search at this point.}
+
+\State \Return \textit{vertical\_displacement}
+
+\EndIf
+
+\EndFor
+
+\\ \Return \textit{vertical\_displacement} \\
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
 %\section{Random Number Generator}
 %
 %The Bayes Durham Shuffle ensures that the psuedo random numbers used in the simulation are further shuffled, ensuring minimal correlation between subsequent random outputs \cite{NumericalRecipes}.
