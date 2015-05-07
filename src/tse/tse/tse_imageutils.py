@@ -1,3 +1,10 @@
+"""
+
+Module Name: TSEImageUtils
+
+Description: Provides functionality relating to image processing and template matching.
+
+"""
 from __future__ import division
 
 import math
