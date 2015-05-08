@@ -1,8 +1,22 @@
-__author__ = 'connorgoddard'
+"""
+
+Module Name: TSEResult
+
+Description: Provides a class representation for a single 'result' recorded within an experiment for the investigation.
+
+"""
+
+__author__ = 'Connor Luke Goddard (clg11@aber.ac.uk)'
 
 
 class TSEResult:
     def __init__(self, row, displacement, match_scores):
+        """
+        :param row: The image row upon which this result is recorded.
+        :param displacement: The level of vertical displacement measured.
+        :param match_scores: A collection of all the match scores calculated as part of the search.
+        """
+
         self._row = row
         self._displacement = displacement
         self._match_scores = match_scores
@@ -17,21 +31,17 @@ class TSEResult:
 
     @property
     def row(self):
-        """I'm the 'row' property."""
         return self._row
 
     @property
     def displacement(self):
-        """I'm the 'displacement' property."""
         return self._displacement
 
     @property
     def match_scores(self):
-        """
-        'match_scores' property.
-        :return:
-        """
         return self._match_scores
 
     def to_tuple(self):
+
+        # Notice here that a tuple does not have to limited to two values only.
         return self.row, self.displacement, self.match_scores

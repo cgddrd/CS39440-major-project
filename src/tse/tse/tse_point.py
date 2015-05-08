@@ -1,4 +1,13 @@
-__author__ = 'connorgoddard'
+"""
+
+Module Name: TSEPoint
+
+Description: Provides a class representation for a single 2D-coordinate point within an image used when performing
+geometric transformations of pixel coordinates.
+
+"""
+
+__author__ = 'Connor Luke Goddard (clg11@aber.ac.uk)'
 
 
 class TSEPoint:
@@ -18,6 +27,7 @@ class TSEPoint:
         """I'm the 'y' property."""
         return self._y
 
+    # Return a tuple representation of the coordinate.
     def to_tuple(self):
         return self.x, self.y
 
