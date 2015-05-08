@@ -174,15 +174,15 @@ The general theory behind motion parallax is simple, stating how as the visual f
 
 One of the key advantages to using motion parallax within the context of computer vision is that the perceived effects continue to be visible even if captured through only a single camera. Therefore strictly speaking, motion parallax is best defined as providing a \textit{monocular} visual cue for depth, theoretically open to exploitation by any visual-based system making use of at least one camera for supplying input.
 
-\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{wrapfigure}{r}{0.6\textwidth}
 \vspace{-20pt}
   \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/motion_parallax.png}
+    \includegraphics[width=0.5\textwidth]{images/motion_parallax.png}
   \end{center}
   \vspace{-10pt}
   \caption{Visualisation of the changes in perceived displacement of objects within the visual scene as a result of the effects caused by motion parallax. Courtesy \cite{akshay}.}
      \label{fig:parallax}
-  \vspace{-30pt}
+  \vspace{-20pt}
 \end{wrapfigure}
  
  By measuring the level of displacement that an object demonstrates, it then becomes possible to infer the relative distance between that object and the current view position. Typical approaches within computer vision accomplish this task through the use of feature detection and tracking to subsequently calculate the displacement of static objects between consecutive images. 
@@ -252,9 +252,9 @@ The use of the model relies upon the completion of an initial calibration stage,
   \begin{center}
     \includegraphics[width=0.5\textwidth]{images/model.pdf}
   \end{center}
-  \vspace{-30pt}
   \caption{Example of a ``perfect" vertical displacement model, showing the expected positive correlation between vertical position of a patch within an image, the the level of vertical displacement demonstrated.}
   \label{fig:model}
+    \vspace{-30pt}
 \end{wrapfigure}
 	
 Within the scope of the proposed final system, subsequent comparison of displacement magnitude and direction recorded for a given row is performed against the general trend of this ``baseline" model as a means of identifying cases of ``unusual" displacement behaviour. This comparison is re-evaluated upon every system cycle, following the generation of a new model to represent the changes in the scene captured by the latest images from the camera. 
@@ -317,12 +317,12 @@ Through the understanding of a concept known as \textit{Focus of Expansion} (FOE
 \begin{wrapfigure}{l}{0.5\textwidth}
 \vspace{-20pt}
   \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/foe.png}
+    \includegraphics[width=0.45\textwidth]{images/foe.png}
   \end{center}
   \vspace{-10pt}
   \caption{Visualisation of the perceived effects caused by Focus of Expansion. Courtesy \cite{texas-cs}}
   \label{fig:foe}
-  \vspace{-30pt}
+  \vspace{-20pt}
 \end{wrapfigure}
 
 When a camera is moved forward and an image is subsequently taken, all of the motion vectors observed in the resulting perspective image appear to begin from a single point centred along the horizon \cite{stanford-cs}. This `single point' is known as the Focus of Expansion, and acts as the primary metric for an observer wishing to identify the direction in which they are currently headed \cite{texas-cs} (Figure \ref{fig:foe}). 
@@ -481,29 +481,24 @@ Instead, the decision was taken to adopt a SCRUM-based methodology for the plann
 
 As the SCRUM methodology is founded upon empiricism \cite{scrum}, this allows it to appreciate that unpredicted changes cannot effectively be addressed using a plan-driven approach. The work conducted for each iteration was prioritised based upon discussions with the project supervisor. New work items were added to a list of outstanding tasks (product backlog), before being organised into a specific collection of tasks (sprint backlog) scheduled for completion within a particular sprint.
 
-\begin{wrapfigure}{l}{0.5\textwidth}
-\vspace{-20pt}
-  \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/kanban.png}
-  \end{center}
-  \vspace{-10pt}
-  \caption{Day-to-day tasks were managed via the use of web-based Kanban-style interface (Waffle.io\footnote{\url{https://waffle.io/cgddrd/cs39440-major-project}}), that connected directly to the project Github account where all of the SCRUM backlogs were stored.}
-     \label{fig:kanban}
-  \vspace{-10pt}
-\end{wrapfigure}
- 
-
 Each sprint followed a ``five-day on, two-day off" development cycle, which provided a buffer to help in situations where work took significantly longer than expected. Sprint planning meetings were arranged for the same time as the weekly group project meeting, allowing for planning of work for the coming week, along with the opportunity to discuss changes that either party felt were required in light of new experiment results.
 
 In terms of tracking project progress, feedback for sprints and releases was provided via a combination of burn-down and throughput charts (see Appendix C - Figures \ref{fig:burndown} and \ref{fig:throughput}), that were created using the \textit{Burndown.io}\footnote{\url{http://burndown.io/#cgddrd/cs39440-major-project}} and \textit{Waffle.io}\footnote{\url{https://waffle.io/cgddrd/cs39440-major-project}} web services. 
 
 While both provided graphical representation of work completed, throughput charts focussed on comparing the frequency of completed tasks over a fixed range of weeks, whereas burn-down charts plotted the amount of outstanding work within an individual sprint or release, in relation to the time that was left before it closed.
 
-\subsection{Testing \& Evaluation of Experiments}
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.3]{images/kanban.png}
+  \caption{Day-to-day tasks were managed via the use of web-based KANBAN-style interface (Waffle.io\footnote{\url{https://waffle.io/cgddrd/cs39440-major-project}}), that connected directly to the project Github account where all of the SCRUM backlogs were stored.}
+\label{fig:kanban}
+\end{figure}
 
-In evaluating the performance of experiments, it was not simply the case that results would equate to a clearcut pass or fail. Instead, testing was a ``subjective" task, involving the use of previously established ground truth data that an experiment would subsequently be expected to replicate as closely as possible. 
-
-The performance of each method tested within an individual experiment would be assessed by comparing how closely each of the recorded results matched the results predicted. 
+%\subsection{Testing \& Evaluation of Experiments}
+%
+%In evaluating the performance of experiments, it was not simply the case that results would equate to a clearcut pass or fail. Instead, testing was a ``subjective" task, involving the use of previously established ground truth data that an experiment would subsequently be expected to replicate as closely as possible. 
+%
+%The performance of each method tested within an individual experiment would be assessed by comparing how closely each of the recorded results matched the results predicted. 
 
 
 

@@ -70,19 +70,10 @@ However, as well as being quick to initially build, this setup would go on to pr
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.1]{images/rig_setup}
+\includegraphics[scale=0.08]{images/rig_setup}
   \caption{The camera-rig setup used to capture the experiment datasets from the front and back profiles.}
 \label{fig:rig}
 \end{figure} 
-
-
-\subsubsection{Capturing Process}
-
-The method behind the use of the `homemade' camera rig to capture the image datasets also proved simple in design. This was regarded as favourable, given that it relied on manual involvement where human error subsequently becomes a potentially big issue. 
-
-Figure \ref{fig:flow} below details the outline of the method used to capture an individual image dataset.
-
-While the method for capturing images followed a ``fixed" procedure, it did allow for changes in the type of terrain captured, and the level of set displacement by which the camera was moved between subsequent images.
 
 \subsubsection{Capture Locations}
 
@@ -99,19 +90,28 @@ Datasets were captured at four separate locations (Figure \ref{fig:location}), s
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.4]{images/locations.png}
+\includegraphics[scale=0.35]{images/locations.png}
   \caption{Examples of the first frame captured from each of the four location datasets.}
 \label{fig:location}
 \end{figure}
 
 \clearpage
+\subsubsection{Capturing Process}
+
+The method behind the use of the `homemade' camera rig to capture the image datasets also proved simple in design. This was regarded as favourable, given that it relied on manual involvement where human error subsequently becomes a potentially big issue. 
+
+Figure \ref{fig:flow} below details the outline of the method used to capture an individual image dataset.
+
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.8]{images/camera_flow.pdf}
+\includegraphics[scale=0.6]{images/camera_flow.pdf}
   \caption{General method process employed for capturing dataset images.}
 \label{fig:flow}
 \end{figure}
-\clearpage
+
+While the method for capturing images followed a ``fixed" procedure, it did allow for changes in the type of terrain captured, and the level of set displacement by which the camera was moved between subsequent images.
+
+
 
 \subsubsection{Calibration of Physical Setup}
 
@@ -125,19 +125,10 @@ Although one of the aims of the hypothesis was to avoid the need for calibration
   \vspace{-10pt}
   \caption{Diagram originally produced by Campbell \textit{et al.} \cite{campbell} depicting the physical setup of the camera rig used within their work. The camera rig built for this project followed a very similar setup.}
   \label{fig:setup}
+  \vspace{2pt}
 \end{wrapfigure}
 
 Following the process outlined in the work of Campbell \textit{et al.} \cite{campbell}, the calibration would provide a future opportunity, should the need arise, to calculate the mapping between coordinates in the image plane and the ground plane.
-
-\begin{wrapfigure}{l}{0.5\textwidth}
-  \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/cam_target.png}
-  \end{center}
-  \vspace{-10pt}
-  \caption{Image indication the visual target used as part of the manual calibration of the camera rig setup.}
-  \label{fig:target}
-  \vspace{-10pt}
-\end{wrapfigure}
 
 The physical setup of the camera rig matched the same general setup as described by Campbell \textit{et al.} \cite{campbell} (Figure \ref{fig:setup}), where $h$ refers to the height of the camera from the ground, and $d$ refers to the distance between the front edge of the rig base and the position at which the principle ray from the camera lens intersects with the ground plane \cite{campbell}.
 
@@ -203,9 +194,19 @@ A key advantage of creating artificial image datasets stems from the level of co
  
 Other potentially very useful consequences of using computer-generated datasets include control over the amount of noise an image may contain (e.g. choice to include or remove specular reflections), and the high degree of speed at which new datasets adopting different condition configurations could be created almost ``on the fly" in order to test new ideas and approaches within an experiment. 
 
-The creation of artificial datasets would have provided an opportunity to test the robustness of the experiment methods against a much broader range of conditions than what was feasibly possible using only real-world imagery. However the use of datasets captured from real-world environments was still arguably the most crucial in terms of evaluating the performance of experiment methods, given that these would ultimately provide the closest representation to the input expected within a live deployment. 
+\begin{wrapfigure}{l}{0.5\textwidth}
+  \begin{center}
+    \includegraphics[width=0.45\textwidth]{images/cam_target.png}
+  \end{center}
+  \vspace{-10pt}
+  \caption{Image indication the visual target used as part of the manual calibration of the camera rig setup.}
+  \label{fig:target}
+  \vspace{-20pt}
+\end{wrapfigure}
 
-While there was no time available for the author to learn how to build 3D environments for use in artificial datasets, some simple 2D-shape image datasets were created as part of evaluating the correct functioning of the template-matching approach adopting geometric scaling (discussed further in Section \ref{tm-scaled}).
+The creation of artificial datasets would have provided an opportunity to test the robustness of the experiment methods against a much broader range of conditions than what was feasibly possible using only real-world imagery. However the use of datasets captured from real-world environments was still arguably the most crucial in terms of evaluating the performance of experiment methods, given that these would ultimately provide the closest representation to the input expected within a live deployment. 
+%
+%While there was no time available for the author to learn how to build 3D environments for use in artificial datasets, some simple 2D-shape image datasets were created as part of evaluating the correct functioning of the template-matching approach adopting geometric scaling (discussed further in Section \ref{tm-scaled}).
 
 \section{Establishment of Ground Truth}
 
@@ -213,32 +214,34 @@ With respect to scientific investigation, the term ``\textit{ground truth}" refe
 
 In the context of computer vision, ground truth data will represent observations within image datasets that are known to exist in the real-world, and be accurate.
 
-Due to the very nature of what ground truth data represents, generating such data can still typically only be accomplished through means of manual verification, where human observation continues to be deemed as the `state of art' in terms of providing the best possible accuracy available as to the \textit{fundamental} truth of a condition or observation \cite{kondermann}. A fundamental issue with this approach to the collection and verification of ground truth data, is it tends to be costly in terms of both time and resources. Kondermann \cite{kondermann} states that this large requirement in effort to generate ground truth data in combination with its relatively limited applicability in terms of evaluation, consequently results in many vision-based projects failing to provide reference data that is either comprehensive or accurate.
+Due to the very nature of what ground truth data represents, generating such data can still typically only be accomplished through means of manual verification, where human observation continues to be deemed as the `state of art' in terms of providing the best possible accuracy available as to the \textit{fundamental} truth of a condition or observation \cite{kondermann}. 
+
+A fundamental issue with this approach to the collection and verification of ground truth data, is it tends to be costly in terms of both time and resources. Kondermann \cite{kondermann} states that this large requirement in effort to generate ground truth data in combination with its relatively limited applicability in terms of evaluation, consequently results in many vision-based projects failing to provide reference data that is either comprehensive or accurate.
 
 For particular types of reference data, some semi-automated methods do exist for gathering high-accuracy measurement results (e.g. extracting depth information about a 3D environment using laser scanning techniques) \cite{haltakov}. However, these approaches still require at least some manual verification in ensuring that this accuracy is at a level sufficient enough for it to be trusted as ground truth.
 
 In terms of generating ground truth, one of the most challenging types of visual behaviour to document is optical flow \cite{kondermann}. This is because no sensor currently exists that is capable of detecting the effects of optical flow directly, and in most situations (except perhaps within very simple artificial datasets) attempting to perform manual annotation also proves to be an extremely difficult task to achieve with the kind of accuracy that is expected for use as ground truth data \cite{haltakov}. 
 
-As this was a problem that had potential implications for this project, thoughts began to turn to ways of developing a utility application that could assist a human in manually generating ground truth data for the observed displacement of features across a series of images. 
+%As this was a problem that had potential implications for this project, thoughts began to turn to ways of developing a utility application that could assist a human in manually generating ground truth data for the observed displacement of features across a series of images. 
 
-\subsection{Ground Truth Utility Tool}
-
-Following discussions with the project supervisor a simple, yet effective solution was devised for determining the vertical displacement between a series of images. 
-
-For each image dataset, it was proposed that an additional pair of images would also be captured for the exclusive purpose of establishing ground truth. While obtained using the exact same method as the rest of the dataset, these two images would differ from the main collection by the addition of a ruler positioned within the centre of each image. The choice to capture the ruler would be important, as the measurement increments it possessed would allow a user to clearly identify the same `feature' within both images (e.g. find the 10cm mark in both images).
-
-The next stage involved the design and implementation of a, GUI-based utility tool that would allow a user to perform the following actions:
-
-\begin{enumerate}
-	\item Load in the pair of dedicated ground truth source images;
-	\item Using the mouse, click to select a number of `feature points' that the user deemed easily-identifiable within the first image (e.g. a particular measure mark along the length of the ruler);
-	\item Cycle through each `feature point' identified in the first image, and click on the location corresponding to the new position of that same `feature point' within the second image;
-	\item Export the calculated ground truth measurements for use in future experiments. 
-\end{enumerate}
-
-Following this process, a collection of sparse measurements would be obtained detailing the calculated number of pixels between the Y-coordinate of a `feature point' located in the first image, and the Y-coordinate of the corresponding `feature point' subsequently located within the second image. As it would not be possible for a user to manually identify and select features at an individual pixel level, interpolation would be required to estimate the intermediate values in order to arrive at a recorded displacement for every row in the image.
-
-Naturally, as with any means of human verification this approach was susceptible to human error in terms how accurately a user could position their mouse upon a feature, and also ensuring that they matched the correct features to each other. However, following the conclusions of a number papers within this topic area \cite{kondermann} \cite{haltakov}, human verification was deemed to still provide the best possible level of accuracy for generating ground truth data relating to optical flow.
+%\subsection{Ground Truth Utility Tool}
+%
+%Following discussions with the project supervisor a simple, yet effective solution was devised for determining the vertical displacement between a series of images. 
+%
+%For each image dataset, it was proposed that an additional pair of images would also be captured for the exclusive purpose of establishing ground truth. While obtained using the exact same method as the rest of the dataset, these two images would differ from the main collection by the addition of a ruler positioned within the centre of each image. The choice to capture the ruler would be important, as the measurement increments it possessed would allow a user to clearly identify the same `feature' within both images (e.g. find the 10cm mark in both images).
+%
+%The next stage involved the design and implementation of a, GUI-based utility tool that would allow a user to perform the following actions:
+%
+%\begin{enumerate}
+%	\item Load in the pair of dedicated ground truth source images;
+%	\item Using the mouse, click to select a number of `feature points' that the user deemed easily-identifiable within the first image (e.g. a particular measure mark along the length of the ruler);
+%	\item Cycle through each `feature point' identified in the first image, and click on the location corresponding to the new position of that same `feature point' within the second image;
+%	\item Export the calculated ground truth measurements for use in future experiments. 
+%\end{enumerate}
+%
+%Following this process, a collection of sparse measurements would be obtained detailing the calculated number of pixels between the Y-coordinate of a `feature point' located in the first image, and the Y-coordinate of the corresponding `feature point' subsequently located within the second image. As it would not be possible for a user to manually identify and select features at an individual pixel level, interpolation would be required to estimate the intermediate values in order to arrive at a recorded displacement for every row in the image.
+%
+%Naturally, as with any means of human verification this approach was susceptible to human error in terms how accurately a user could position their mouse upon a feature, and also ensuring that they matched the correct features to each other. However, following the conclusions of a number papers within this topic area \cite{kondermann} \cite{haltakov}, human verification was deemed to still provide the best possible level of accuracy for generating ground truth data relating to optical flow.
 
 \textbf{Note to the reader:}
 
@@ -281,6 +284,17 @@ One of the most commonly noted disadvantages of using Python describes the fact 
 Given the author's lack of prior knowledge in C++ or Python, it was decided that the use of an IDE for development would be most suitable for development, as they would be able to provide support facilities including code completion, automatic refactoring and powerful debugging facilities. 
 
 For C++ development, the Xcode IDE\footnote{\url{https://developer.apple.com/xcode/}} was chosen. While this was primarily a decision based on ease of having the IDE already installed, Xcode did provide a high level of support for managing the deployment of C++ applications, including a facility to automatically generate the `Makefiles' used to install the released version on another computer. 
+
+\begin{wrapfigure}{l}{0.6\textwidth}
+	\vspace{-10pt}
+  \begin{center}
+    \includegraphics[width=0.55\textwidth]{images/travisci.png}
+  \end{center}
+  \vspace{-10pt}
+  \caption{Travis CI provided automated builds and test suite execution upon each commit to the Github repository}
+  \label{fig:target}
+  \vspace{-10pt}
+\end{wrapfigure}
 
 Python development was conducted within the PyCharm IDE\footnote{\url{https://www.jetbrains.com/pycharm}} making use of the educational license provided by JetBrains. Of particular benefit was the support provided for the automatic management of external dependencies and libraries, which included the ability to export a complete list of a project's dependencies and their precise version numbers.
 
@@ -461,14 +475,7 @@ Following the decision at that same point to switch from C++ to Python (discusse
 
 \subsubsection{Structure}
 
-The design of the \textit{`Terrain Shape Estimation'} (TSE) library saw the creation of nine key components, each focussing on providing functions for a specific set of tasks:
-
-\begin{figure}[ht!]
-\centering
-\includegraphics[scale=0.25]{images/tse_class_diagram}
-  \caption{UML class diagram describing the structure of the `Terrain Shape Estimation'  Python-based library utilised extensively throughout the investigation for providing common functionality shared across experiments.}
-\label{fig:rig}
-\end{figure} 
+The design of the \textit{`Terrain Shape Estimation'} (TSE) library saw the creation of nine key component Python modules, each focussing on providing specific functionality for a given catagory of tasks:
 
 \begin{itemize}
 	\item \textbf{TSEImageUtils:} Provides functionality relating to image processing and template matching.
@@ -483,7 +490,7 @@ The design of the \textit{`Terrain Shape Estimation'} (TSE) library saw the crea
 	\item \textbf{TSEResult:} Provides a class representation for a single `result unit' recorded within an experiment.
 \end{itemize}
 
-% ADD UML CLASS DIAG OF TSE LIBRARY.
+	Due to the page restrictions in this report, the UML class diagram produced as part of the design effort for this library is available within Appendix C - Figure \ref{fig:class}.
 
 \subsubsection{Deployment}
 
@@ -506,10 +513,10 @@ Within Veusz, it was possible to extract specific result sets from an imported r
 
 For experiments implemented in Python (i.e. all experiments except the first) the project instead made extensive use of the \textit{iPython} framework \cite{ipython} discussed previously in Section \ref{lang}. This library proved to be an invaluable asset to the project investigation, providing not only support for extracting and viewing result data, but an entire ecosystem tailored towards the setup, running and analysis of computational experiments from within a single web-based environment. 
 
-\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{wrapfigure}{r}{0.6\textwidth}
 \vspace{-20pt}
   \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/ipython.png}
+    \includegraphics[width=0.55\textwidth]{images/ipython.png}
   \end{center}
   \vspace{-10pt}
   \caption{Example screenshot of the iPython web-based interface running the Python testing rig and displaying the subsequent results all from within a single `notebook'.}
@@ -526,18 +533,14 @@ Through the use of the \textit{Matplotlib} library \cite{matplotlib}, the result
 
 For testing aspects of the software (predominantly the testing rig and implementations of template matching methods), standard software-based testing practices were adopted. This constituted mainly of unit tests written to test for each specific function written in code, and regression tests for confirming that software continued to work as expected following the correction of a bug.
 
-\begin{wrapfigure}{l}{0.5\textwidth}
-\vspace{-20pt}
-  \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/coveralls.png}
-  \end{center}
-  \vspace{-10pt}
+For unit tests written in Python, the \textit{Nose}\footnote{\url{https://nose.readthedocs.org/en/latest/}} third-party testing framework was selected in favour of the default testing framework (\textit{unittest}), due to its ability to generate code coverage reports in partnership with the \textit{Coverage.py}\footnote{\url{http://nedbatchelder.com/code/coverage/}} library. This was later enhanced by integrating with the \textit{Coveralls.io}\footnote{\url{https://coveralls.io/r/cgddrd/CS39440-major-project}} web service (Figure \ref{fig:coveralls}), which provided automatic analysis and notification of changes in the level of code coverage following each new commit to the remote project git repository hosted at Github.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.28]{images/coveralls.png}
   \caption{Example screenshot of the Coveralls.io\footnote{\url{https://coveralls.io/r/cgddrd/CS39440-major-project}} web interface providing a breakdown of unit test code coverage.}
      \label{fig:coveralls}
-  \vspace{-10pt}
-\end{wrapfigure}
-
-For unit tests written in Python, the \textit{Nose}\footnote{\url{https://nose.readthedocs.org/en/latest/}} third-party testing framework was selected in favour of the default testing framework (\textit{unittest}), due to its ability to generate code coverage reports in partnership with the \textit{Coverage.py}\footnote{\url{http://nedbatchelder.com/code/coverage/}} library. This was later enhanced by integrating with the \textit{Coveralls.io}\footnote{\url{https://coveralls.io/r/cgddrd/CS39440-major-project}} web service (Figure \ref{fig:coveralls}), which provided automatic analysis and notification of changes in the level of code coverage following each new commit to the remote project git repository hosted at Github.
+\end{figure} 
 
 \section{Experiment Methods}
 
@@ -546,7 +549,7 @@ This section provides an overview the three main experiment methods conducted wi
 While not specifically intended, as the investigation progressed the focus began to change from  exploring a series of reasonably ``generalised" research aims, to instead concentrating almost exclusively on one small, but very important aspect; \textit{ensuring that accurate results for appearance-based motion displacement could continue to be achieved, across terrain lacking any significant features and/or demonstrating highly repetitive patterns}.
 
   As a result, each of the three primary experiments detailed in this section, focussed on testing and evaluating subsequent evolutions of the same fundamental approach, with the hope of eventually identifying a method that could provide sufficient accuracy across all types of potential terrain. 
-  
+ 
 \subsection{Experiment 1: Template Matching (Multiple Small Patches)}
 \label{ex1}
 
@@ -563,14 +566,15 @@ The method followed a \textit{six-stage} process (Figure \ref{fig:ex1process})to
 \item Average all measured vertical displacement values for each pixel along a given row, removing outliers by ignoring any displacements that lie outside of (2 x standard deviation) of the mean, before appending to the vertical displacement model.
 \end{enumerate}
 
+\clearpage
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.2]{images/ex1stages.pdf}
+\includegraphics[scale=0.25]{images/ex1stages.pdf}
   \caption{Process model for the method undertaken within Experiment 1 to evaluate the use of multiple small-sizes template patches in order to infer the vertical displacement of corresponding features between two consecutive images.}
 \label{fig:ex1process}
 \end{figure} 
 
-
+\clearpage
 \subsection{Experiment 2: Template Matching (Full-width Patches - Non-Scaled)}
 
 This second experiment focussed on establishing if adopting \textit{larger patches} in fewer numbers provided better appearance-based matching accuracy than the method attempted in the first experiment of using many more, but critically \textit{much smaller} overlapping patches 
@@ -589,10 +593,10 @@ As part of the localised search detailed in stage five of the method from experi
 
 The motivation behind non-exhaustive searching prevented the need to continue searching down the entire localised search window column, if it was believed that the best match for that search window had \textit{already been located}. 
 
-\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{wrapfigure}{r}{0.6\textwidth}
 \vspace{-20pt}
   \begin{center}
-    \includegraphics[width=0.5\textwidth]{images/ed.pdf}
+    \includegraphics[width=0.55\textwidth]{images/ed.pdf}
   \end{center}
   \vspace{-10pt}
   \caption{Example of potential early termination of non-exhaustive search due to entering local minima caused by noise, rather than global minima which represents to true best match.}
@@ -614,10 +618,10 @@ As template patches were now expected to span the \textit{full width} of the reg
 
 In order to achieve this, the system required knowledge of what the \textit{corresponding width} should be for every \textit{image row} that represented the ground plane (i.e from the central horizon line to the bottom of the image). 
 
-\begin{wrapfigure}{r}{0.5\textwidth}
+\begin{wrapfigure}{r}{0.6\textwidth}
 \vspace{-20pt}
   \begin{center}
-    \includegraphics[width=0.5\textwidth]{images/calib.jpg}
+    \includegraphics[width=0.55\textwidth]{images/calib.jpg}
   \end{center}
   \vspace{-10pt}
   \caption{Example output from perspective calibration utility tool highlighting the identified region of interest along the ground plane for dataset one.}
@@ -638,11 +642,11 @@ Upon the definition of both long-side edges forming the trapezium-shaped area al
 \subsection{Experiment 3: Template Matching (Full-width Patches - Geometric Scaling)}
 \label{tm-scaled}
 
-The final experiment aimed to investigate if it could be possible to further increase the matching accuracy reported in experiment two, by adding the additional step of \textit{geometrically-scaling} the current template patch as the search progressed down the trapezoidal-shaped region of interest.
+The final experiment aimed to investigate if it could be possible to further increase the matching accuracy reported in experiment two, by adding the additional step of \textit{geometrically scaling} the current template patch as the search progressed down the trapezoidal-shaped region of interest.
 
 \begin{wrapfigure}{l}{0.5\textwidth}
   \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/scaling.png}
+    \includegraphics[width=0.45\textwidth]{images/scaling.png}
   \end{center}
   \vspace{-10pt}
   \caption{Diagram depicting process of geometrically scaling the 2D position coordinates of the pixels from the template patch, in order to subsequently match with the pixels located in the corresponding position within the previously-scaled search window.}
@@ -681,10 +685,30 @@ where $C$ refers to the centre position coordinate within the template patch, $P
 	
 \end{enumerate}
 
-By extracting the value , it remains possible to continue performing template matching between two images of different dimensions, as a result of
-
 Due to the reliance that appearance-based similarity measures hold on the evaluation of \textit{corresponding} pixel values between two images, a key condition of using such an approach is that both of the images to be compared demonstrate an \textit{equal size} (i.e. there are the \textit{same number of pixels in both images}). One of key challenges associated with the proposed method was how to still uphold this condition, while also wanting to potentially compare images of two different sizes (i.e. original template patch and larger search window). 
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.4]{images/scaling_types.pdf}
+  \caption{Comparison between the various approaches of performing scaling of the original template patch image. In the case linear interpolation, additional information has been added to image as a result of ``estimating" the colour that lies between two original pixels. }
+\label{fig:scaletypes}
+\end{figure} 
 
 The solution to this issue lay in the \textit{extraction} of pixels from the larger search window, whose 2D position corresponded to the \textit{scaled} position of each pixel in the original template patch. By subsequently comparing the original template patch, with the collection of newly-extracted corresponding pixels from the search window, it was possible to continue to use all of the appearance-based similarity measures as had previously been utilised in experiments one and two. 
 
-Another important point to realise, was that no additional information regarding the scene represented by the two images was being either \textit{lost} or \textit{gained} as a result of utilising pixel 2D position scaling and subsequent extraction. This however, would not have been the case had the method naively attempted to ``resize" the template patch in order to have the same dimensions as the larger search window. This is because to enlarge the entire template patch image, it would be necessary to linearly interpolate between each of the original pixels, causing new, and most likely incorrect information to be added prior to perform appearance-based matching, which subsequently may have caused the results to be very different to the actual true similarity between the current template patch and search window.
+Another important realisation, was that no additional information regarding the scene represented by the two images was being either \textit{lost} or \textit{gained} as a result of utilising pixel 2D position scaling and subsequent extraction. This however, would not have been the case had the method naively attempted to ``resize" the template patch in order to have the same dimensions as the larger search window (Figure \ref{fig:scaletypes}). 
+
+This is because to enlarge the entire template patch image, it would be necessary to linearly interpolate between each of the original pixels, causing new, and most likely incorrect information to be added prior to perform appearance-based matching, which subsequently may have caused the results to be very different to the actual true similarity between the current template patch and search window.
+
+\subsubsection{Verification of Geometric Scaling Approach}
+
+In order to test that the implemented approach to geometrically scaling template patch pixels could was working as expected, a simple test was devised making use of an artificially generated test image (Figure \ref{fig:graphpic}) to confirm that the approach could successfully match two identical objects within an image, whereby the only theoretical difference between them was a scale transformation.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.3]{images/3d_graph.pdf}
+  \caption{Results of the verification test for the approach towards geometric scaling of template patch pixel coordinates. On the left is the calibrated test image (grid applied only for result analysis) where the two rectangles are identical apart from a single scaling transformation. On the right is the plotted Euclidean Distance scores for the geometric search.}
+\label{fig:graphpic}
+\end{figure} 
+
+The results of this test (Figure \ref{fig:graphpic}) indicated that the approach was working successfully, given by the clear improvement (i.e. sharp decline) in the Euclidean Distance score as soon as the scaled template patch search arrives at the top of the scaled template patch (Row 250) whereby there is a complete alignment between the scaled version of the top green rectangle, and the bottom rectangle. As the search continues, this alignment moves and the score becomes progressively worse.
