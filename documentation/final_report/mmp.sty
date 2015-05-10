@@ -267,7 +267,7 @@
 %----------------------------------------------------------------------------------------
 
 \HRule \\[0.4cm]
-{ \huge \fontsize{18}{21}\selectfont \@title}\\%[0.4cm] % Title of your document
+{\fontsize{18}{20}\selectfont \@title \par}\\%[0.4cm] % Title of your document
 \HRule \\[1.5cm]
 
 \textsc{\Large Final Report}\\[0.5cm] % Major heading such as course name
@@ -290,7 +290,9 @@
 \emph{Supervisor:} \\
 \@supervisor \hspace*{0.05in}(\@supervisoremail) % Supervisor's Name
 \end{flushright}
-\end{minipage}\\[4cm]
+\end{minipage}\\[2cm]
+
+This report was submitted as partial fulfilment of an MEng degree in Software Engineering (G601) \\ [1cm]
 
 %----------------------------------------------------------------------------------------
 %	DATE SECTION
@@ -324,15 +326,14 @@ Status: \@status\\ [3cm]}
 %%%%% Added to redefine the page style %%%%%%%%%%%%%%
 \fancypagestyle{plain}{
 
-\fancyfoot{}
-\fancyhead[LO,RE]{\textsl{Chapter\ \thechapter}}
-\fancyhead[RO,LE]{\textsl{\leftmark}}
-\fancyfoot{}
-\fancyfoot[RO,LE]{{\thepage} of \pageref{LastPage}}
-\fancyfoot[LO,RE]{\@title}
-\renewcommand{\headrulewidth}{0.5pt}
-\renewcommand{\footrulewidth}{0.5pt}
-
+%\fancyfoot{}
+%\fancyhead[LO,RE]{\textsl{Chapter\ \thechapter}}
+%\fancyhead[RO,LE]{\textsl{\leftmark}}
+%\fancyfoot{}
+%\fancyfoot[RO,LE]{{\thepage} of \pageref{LastPage}}
+%\fancyfoot[LO,RE]{\@title}
+%\renewcommand{\headrulewidth}{0.5pt}
+%\renewcommand{\footrulewidth}{0.5pt}
 }
 
 \fancyfoot{}
@@ -340,7 +341,7 @@ Status: \@status\\ [3cm]}
 \fancyhead[RO,LE]{\textsl{\leftmark}}
 \fancyfoot{}
 \fancyfoot[RO,LE]{{\thepage} of \pageref{LastPage}}
-\fancyfoot[LO,RE]{\@title}
+\fancyfoot[LO,RE]{Estimation of Terrain Shape Using a Monocular Vision-based System}
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.5pt}
 

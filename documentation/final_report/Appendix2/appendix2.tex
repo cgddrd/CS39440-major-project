@@ -1,94 +1,168 @@
 \chapter{Code samples}
 
-\section{Random Number Generator}
+\begin{algorithm}
+\caption{Generalised approach to performing template matching as implemented within the experiments for this investigation.}
+\label{appen:code1}
+\begin{algorithmic}[1]
 
-The Bayes Durham Shuffle ensures that the psuedo random numbers used in the simulation are further shuffled, ensuring minimal correlation between subsequent random outputs \cite{NumericalRecipes}.
+\Procedure{Template\_Matching}{\textit{template\_image}, \textit{search\_image}}
 
-\begin{verbatim}
- #define IM1 2147483563
- #define IM2 2147483399
- #define AM (1.0/IM1)
- #define IMM1 (IM1-1)
- #define IA1 40014
- #define IA2 40692 
- #define IQ1 53668
- #define IQ2 52774
- #define IR1 12211
- #define IR2 3791
- #define NTAB 32
- #define NDIV (1+IMM1/NTAB)
- #define EPS 1.2e-7
- #define RNMX (1.0 - EPS)
- 
- double ran2(long *idum)
- {
-   /*---------------------------------------------------*/
-   /* Minimum Standard Random Number Generator          */
-   /* Taken from Numerical recipies in C                */
-   /* Based on Park and Miller with Bays Durham Shuffle */
-   /* Coupled Schrage methods for extra periodicity     */
-   /* Always call with negative number to initialise    */
-   /*---------------------------------------------------*/	
- 
-   int j;
-   long k;
-   static long idum2=123456789;
-   static long iy=0;
-   static long iv[NTAB];
-   double temp;
- 
-   if (*idum <=0)
-   {
-     if (-(*idum) < 1)
-     {
-       *idum = 1;
-     }else
-     {
-       *idum = -(*idum);
-     }
-     idum2=(*idum);
-     for (j=NTAB+7;j>=0;j--)
-     {
-       k = (*idum)/IQ1;
-       *idum = IA1 *(*idum-k*IQ1) - IR1*k;
-       if (*idum < 0)
-       {
-         *idum += IM1;
-       }
-       if (j < NTAB)
-       {
-         iv[j] = *idum;
-       }
-     }
-     iy = iv[0];	
-   }
-   k = (*idum)/IQ1;
-   *idum = IA1*(*idum-k*IQ1) - IR1*k;
-   if (*idum < 0)
-   {
-     *idum += IM1;
-   }
-   k = (idum2)/IQ2;
-   idum2 = IA2*(idum2-k*IQ2) - IR2*k;
-   if (idum2 < 0)
-   {
-     idum2 += IM2;
-   }
-   j = iy/NDIV;
-   iy=iv[j] - idum2;
-   iv[j] = *idum;
-   if (iy < 1)
-   {
-     iy += IMM1;
-   }
-   if ((temp=AM*iy) > RNMX)
-   {
-     return RNMX;
-   }else
-   {
-     return temp;	
-   }
- }
- 
-\end{verbatim}
+\State let \textit{high\_score} = $-1$
+\State let \textit{high\_score\_position} = $(-1, -1)$ \Comment{Initialise high score and position.}
+\State let \textit{template\_image\_height} = len(\textit{template\_image})
+\State let \textit{template\_image\_width} = len(\textit{template\_image}[0])\\\\
 
+\Comment{Convolve the template image through the image we are searching.}
+\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_image}) - 1) - \textit{template\_image\_height} \textbf{step} $1$}
+\For{$j \coloneqq 0$ \textbf{to} (len(\textit{search\_image[0]}) - 1) - \textit{template\_image\_width} \textbf{step} $1$} \\
+
+\State let current\_window = search\_image[$i$][$j$]
+\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_image}, \textit{current\_window}) \\
+
+\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})}
+
+\State \textit{high\_score} = \textit{current\_match\_score}
+\State \textit{high\_score\_position} = $(i, j)$
+
+\EndIf \\
+
+\EndFor
+\EndFor \\
+
+\\ \Return \textit{high\_score\_position} \\
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Non-Exhaustive Search of Localised Search Window}
+\label{appen:code2}
+\begin{algorithmic}[1]
+
+\Procedure{Localised\_Search\_NonExhaustive}{\textit{template\_patch}, \textit{search\_column}}
+
+\State let \textit{high\_score} = $-1$
+\State let \textit{vertical\_displacement} = $0$
+\State let \textit{template\_patch\_height} = len(\textit{template\_patch})\\
+
+ \LineComment{Localised search window originates relative to the top of the extracted template patch within the image.}\\
+\For{$i \coloneqq 0$ \textbf{to} (len(\textit{search\_column}) - 1) - \textit{template\_patch\_height} \textbf{step} $1$} \\
+
+\State let current\_match\_score = CHECK\_SIMILARITY(\textit{template\_patch}, \textit{search\_column}) \\
+
+\If{(\textit{high\_score} == $-1$) \textbf{or} (\textit{current\_match\_score} \textbf{is} better than \textit{high\_score})} \\
+
+\LineComment{If no high score has been set (i.e. the search has just begun) or the new score is deemed ``better" than the previous high score, then we have found the new best match.} \\
+\State \textit{high\_score} = \textit{current\_match\_score}
+\State \textit{vertical\_displacement} = $i$
+
+
+\Else
+
+\LineComment{Otherwise, if the new score is \textit{worse}, then stop the search at this point.}
+
+\State \Return \textit{vertical\_displacement}
+
+\EndIf
+
+\EndFor
+
+\\ \Return \textit{vertical\_displacement} \\
+\EndProcedure
+
+\end{algorithmic}
+\end{algorithm}
+
+%\section{Random Number Generator}
+%
+%The Bayes Durham Shuffle ensures that the psuedo random numbers used in the simulation are further shuffled, ensuring minimal correlation between subsequent random outputs \cite{NumericalRecipes}.
+%
+%\begin{verbatim}
+% #define IM1 2147483563
+% #define IM2 2147483399
+% #define AM (1.0/IM1)
+% #define IMM1 (IM1-1)
+% #define IA1 40014
+% #define IA2 40692 
+% #define IQ1 53668
+% #define IQ2 52774
+% #define IR1 12211
+% #define IR2 3791
+% #define NTAB 32
+% #define NDIV (1+IMM1/NTAB)
+% #define EPS 1.2e-7
+% #define RNMX (1.0 - EPS)
+% 
+% double ran2(long *idum)
+% {
+%   /*---------------------------------------------------*/
+%   /* Minimum Standard Random Number Generator          */
+%   /* Taken from Numerical recipies in C                */
+%   /* Based on Park and Miller with Bays Durham Shuffle */
+%   /* Coupled Schrage methods for extra periodicity     */
+%   /* Always call with negative number to initialise    */
+%   /*---------------------------------------------------*/	
+% 
+%   int j;
+%   long k;
+%   static long idum2=123456789;
+%   static long iy=0;
+%   static long iv[NTAB];
+%   double temp;
+% 
+%   if (*idum <=0)
+%   {
+%     if (-(*idum) < 1)
+%     {
+%       *idum = 1;
+%     }else
+%     {
+%       *idum = -(*idum);
+%     }
+%     idum2=(*idum);
+%     for (j=NTAB+7;j>=0;j--)
+%     {
+%       k = (*idum)/IQ1;
+%       *idum = IA1 *(*idum-k*IQ1) - IR1*k;
+%       if (*idum < 0)
+%       {
+%         *idum += IM1;
+%       }
+%       if (j < NTAB)
+%       {
+%         iv[j] = *idum;
+%       }
+%     }
+%     iy = iv[0];	
+%   }
+%   k = (*idum)/IQ1;
+%   *idum = IA1*(*idum-k*IQ1) - IR1*k;
+%   if (*idum < 0)
+%   {
+%     *idum += IM1;
+%   }
+%   k = (idum2)/IQ2;
+%   idum2 = IA2*(idum2-k*IQ2) - IR2*k;
+%   if (idum2 < 0)
+%   {
+%     idum2 += IM2;
+%   }
+%   j = iy/NDIV;
+%   iy=iv[j] - idum2;
+%   iv[j] = *idum;
+%   if (iy < 1)
+%   {
+%     iy += IMM1;
+%   }
+%   if ((temp=AM*iy) > RNMX)
+%   {
+%     return RNMX;
+%   }else
+%   {
+%     return temp;	
+%   }
+% }
+% 
+%\end{verbatim}
+%
