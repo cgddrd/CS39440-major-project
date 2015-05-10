@@ -4,3 +4,5 @@ matplotlib
 nose
 coverage
 python-coveralls
+ipython
+ipycache

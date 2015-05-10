@@ -9,12 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
+<<<<<<< HEAD
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "448190084.607861"
+            timestampString = "452270572.595154"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
+            startingLineNumber = "365"
+            endingLineNumber = "365"
             landmarkName = "runTestPatch(Mat image2ROI, int patchSize, int match_method, vector&lt;Mat&gt; patch_templates, vector&lt;Point2f&gt; patch_template_coords, string histFileName)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +27,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "448190084.607861"
+            timestampString = "452270572.595154"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "289"
-            endingLineNumber = "289"
+            startingLineNumber = "322"
+            endingLineNumber = "322"
             landmarkName = "exportTimeResults(vector&lt;double&gt; timeTaken, vector&lt;int&gt; methods, int roiSize, int patchSize, string fileNamePrefix)"
             landmarkType = "7">
          </BreakpointContent>
@@ -41,6 +42,8 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
+=======
+>>>>>>> develop
             filePath = "optical_flow_lk_image_template_match/TemplateMatching.cpp"
             timestampString = "447850177.443307"
             startingColumnNumber = "9223372036854775807"
@@ -99,6 +102,7 @@
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
+<<<<<<< HEAD
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
@@ -106,12 +110,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "448190084.607861"
+            timestampString = "452270572.595154"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "476"
-            endingLineNumber = "476"
-            landmarkName = "calcPatchMatchScore2(Mat localisedSearchWindow, Mat templatePatch, int match_method, double&amp; highScore, double&amp; highScoreIndexY)"
+            startingLineNumber = "513"
+            endingLineNumber = "513"
+            landmarkName = "calcPatchMatchScoreExhaustive(Mat localisedSearchWindow, Mat templatePatch, int match_method, double&amp; highScore, double&amp; highScoreIndexY)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -122,11 +126,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "448190084.607861"
+            timestampString = "452270572.595154"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "638"
-            endingLineNumber = "638"
+            startingLineNumber = "764"
+            endingLineNumber = "764"
             landmarkName = "calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double&amp; highScore, double&amp; highScoreIndexY)"
             landmarkType = "7">
          </BreakpointContent>
@@ -138,14 +142,16 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "optical_flow_lk_image_template_match/main.cpp"
-            timestampString = "448190084.607861"
+            timestampString = "452270572.595154"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "211"
-            endingLineNumber = "211"
+            startingLineNumber = "244"
+            endingLineNumber = "244"
             landmarkName = "startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector&lt;int&gt; roiDimensions, vector&lt;int&gt; patchDimensions, vector&lt;int&gt; match_type, int pairNo)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
+=======
+>>>>>>> develop
    </Breakpoints>
 </Bucket>

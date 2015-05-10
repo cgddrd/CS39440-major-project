@@ -1,0 +1,105 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1347\cocoasubrtf570
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red38\green38\blue38;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs24 \cf0 \ul \ulc0 README for Connor Luke Goddard (clg11) CS39440 Major Project Submission.\ulnone \
+\
+This folder contains all aspects of the technical work undertaken for the CS39440 Major Project. \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\b \cf0 \ul Structure
+\b0 \ulnone \
+\
+1. \'91
+\i primary_experiments
+\i0 \'92 - Contains software associated with the three primary experiments conducted for the investigation as detailed in the attached report. Software is contained within language-specific folders, where the \'91c++\'92 folder contains the code for EXPERIMENT 1, and \'91python\'92 contains the code for EXPERIMENTS 2 and 3. \
+	\
+
+\i\b Python:
+\i0\b0 \
+	- \'91
+\i tse
+\i0 \'92: Contains all code for the \'91Template Shape Estimation\'92 library.\
+\
+	- \'91
+\i template_matching_scaling
+\i0 \'92: Contains all code for the test rig and implemented methods for EXPERIMENTS TWO AND THREE.\
+\
+	- \'91
+\i perspective_calibration
+\i0 \'92: Contains all code for the calibration tool written to account for perspective distortion within images.\
+\
+
+\i\b C++:
+\i0\b0 \
+	- \'91
+\i optical_flow_lk_image_template_match
+\i0 \'92: Contains all code for the implemented method within EXPERIMENT ONE.\
+\
+2. \'91
+\i additional_work
+\i0 \'92 - Contains all software that was built as part of the investigation, but did not contribute to the final report. As with \'91primary_experiments\'92, this code is organised by programming language.\
+\
+
+\i\b Python:
+\i0\b0 \
+	- \'91
+\i geometric_scaling_python
+\i0 \'92: Project to explore geometric scaling of pixel coordinates.\
+\
+	- \'91feature_tracking_motion_displacement\'92: Project exploring the approach to feature based optical flow tracking as proposed by Campbell et al. in their paper \'93
+\i A Robust Visual Odometry and Precipice Detection System Using Consumer-grade Monocular Vision
+\i0 \'94.  \
+\
+	
+\b Note
+\b0 : This project was heavily based upon the C# implementation developed by Dr Rainer Hessmer ({\field{\*\fldinst{HYPERLINK "http://www.hessmer.org/blog/2010/08/17/monocular-visual-odometry/comment-page-1/"}}{\fldrslt http://www.hessmer.org/blog/2010/08/17/monocular-visual-odometry/comment-page-1/}})\
+\
+	- \'91
+\i eval_image_gen
+\i0 \'92: Small utility application designed to generate simple artificial evaluation images to test the geometric scaling of pixel values. \
+\
+3. \'91
+\i datasets
+\i0 \'92 - Contains all calibration data and evaluation datasets created for the purposes of the project investigation.\
+\
+4. \'91
+\i licenses
+\i0 \'92 - Contains license files for third-party libraries utilised within the project.\
+\
+
+\b \ul Installation\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\b0 \cf0 \ulnone 1. Install OpenCV (v2.4.10) - {\field{\*\fldinst{HYPERLINK "http://opencv.org/downloads.html"}}{\fldrslt http://opencv.org/downloads.html}}\
+\
+2. Install Python (v2.7) - {\field{\*\fldinst{HYPERLINK "https://www.python.org/download/releases/2.7/"}}{\fldrslt https://www.python.org/download/releases/2.7/}}\
+\
+3. Install required libraries - Run: 
+\i $ pip install -r ./requirements.txt
+\i0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\b \cf0 \ul \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 \ulnone Any projects requiring additional installation steps contain an \'91INSTALL.rtf\'92 file. Please read this file for further information.
+\b0 \
+\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\b \cf0 \expnd0\expndtw0\kerning0
+*** IMPORTANT NOTE ***
+\i\b0 \expnd0\expndtw0\kerning0
+\
+\
+To view the original results of each experiment published in the report, please visit:\
+\
+{\field{\*\fldinst{HYPERLINK "http://nbviewer.ipython.org/github/cgddrd/CS39440-major-project/tree/develop/src/template_matching_scaling/notebooks/"}}{\fldrslt \expnd0\expndtw0\kerning0
+http://nbviewer.ipython.org/github/cgddrd/CS39440-major-project/tree/develop/src/template_matching_scaling/notebooks/}}
+\i0 \kerning1\expnd0\expndtw0 \
+}
