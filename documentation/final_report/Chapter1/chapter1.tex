@@ -271,12 +271,12 @@ Observing a significant extension or reduction in the length of displacement rec
 \begin{wrapfigure}{l}{0.5\textwidth}
 \vspace{-20pt}
   \begin{center}
-    \includegraphics[width=0.49\textwidth]{images/obstacle_graph.pdf}
+    \includegraphics[width=0.45\textwidth]{images/obstacle_graph.pdf}
   \end{center}
   \vspace{-10pt}
   \caption{Example of vertical displacement model indicating the potential presence obstacle of a positive obstacle.}
   \label{fig:obstacle}
-  \vspace{20pt}
+  \vspace{21pt}
 \end{wrapfigure}
 
 However importantly, this change would typically not be representative of the general trend in displacement that is observed across the entire height of image (indicated as a `spike' in a 2D scatter plot (Figure \ref{fig:multi_obstacle}). 
@@ -293,7 +293,7 @@ However importantly, this change would typically not be representative of the ge
 \hspace{0.5cm}
 \begin{minipage}[b]{0.5\linewidth}
 \centering
-\includegraphics[width=0.9\linewidth]{images/gradient_graph.pdf}
+\includegraphics[width=\linewidth]{images/gradient_graph.pdf}
 \caption{Simplified example of recorded change in terrain gradient indicating a downwards slope (general reduction in recorded displacement).}
 \label{fig:gradient}
 \end{minipage}
@@ -312,9 +312,9 @@ Failure to correct such distortion can result in significant inaccuracies being 
 
 In the case of many robotic software projects engaging in tasks involving visual navigation or obstacle detection, the calibration of both the camera lens and physical setup allows for future conversion between native camera units (e.g. pixels) and their real world equivalents (e.g. centimetres) \cite{campbell}, \cite{wyeth}. While many computerised solutions to camera calibration do now exist \cite{camera-calib}, all continue to rely upon some form of manual involvement (normally surrounding calibration of the camera lens). 
 
-Through the understanding of a concept known as \textit{Focus of Expansion} (FOE) it was identified that this additional level of complexity associated with camera calibration could instead be replaced with a much simpler approach that focussed exclusively on the analysis of optical flow of features that were contained within a confined ``region-of-interest" located around the horizontal centre of the image.
+Through the understanding of a concept known as \textit{Focus of Expansion} (FOE), it was identified that this additional level of complexity associated with camera calibration could instead be replaced with a much simpler approach, focussing exclusively on the analysis of optical flow of features that were contained within a confined ``region-of-interest" located around the horizontal centre of the image.
 
-\begin{wrapfigure}{l}{0.5\textwidth}
+\begin{wrapfigure}{r}{0.5\textwidth}
 \vspace{-20pt}
   \begin{center}
     \includegraphics[width=0.45\textwidth]{images/foe.png}
@@ -345,7 +345,7 @@ The other type of motion that can be demonstrated by a robot is of course, rotat
   \vspace{-10pt}
   \caption{Diagram demonstrating the expected difference in behaviour between the separated vertical and horizontal components of observed optical flow vectors calculated from \textit{forward-turning motion}. Notice that the horizontal-component vectors (i.e. rotation) all share the same magnitude, whereas the vertical-component vectors (i.e. translation) show an increase in displacement travelling towards the bottom of the image.}
   \label{fig:rotation}
-  \vspace{-10pt}
+  \vspace{10pt}
 \end{wrapfigure}
 
 However, a crucial distinction to be made between these two modes of motion, is the difference observed towards the level of respective displacement that features within an image can demonstrate. In the case of translational motion, features detected towards the top of the image will show a much smaller level of vertical displacement than features located towards the bottom. This is a consequence of the effects caused by motion-parallax, and forms the foundation of the proposal made in Section \ref{hypo-model} for supporting the inference of terrain gradient and obstacle detection. 
