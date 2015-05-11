@@ -146,9 +146,9 @@ System Using Consumer-grade Monocular Vision}}, J. Campbell \textit{et al.}, IEE
  \vspace{10pt}
  
        \begin{wrapfigure}{r}{0.4\textwidth}
-   \vspace{-20pt}
+   \vspace{-30pt}
   \begin{center}
-    \includegraphics[width=0.4\textwidth]{model.pdf}
+    \includegraphics[width=0.42\textwidth]{model.pdf}
   \end{center}
   \vspace{-15pt}
   \caption{\small Tracked features from MER \cite{mars}.}
@@ -157,8 +157,33 @@ System Using Consumer-grade Monocular Vision}}, J. Campbell \textit{et al.}, IEE
 %   \hspace*{20pt} 
    
   \textit{``Features captured towards the \textbf{bottom} of an image will show \textbf{greater displacement} between subsequent frames, than those features captured towards the \textbf{top} of the image."}
-
    
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Vertical Displacement Model}
+
+From observing discrepancies between the current model and ``baseline" model, it should be possible to infer the presence of potential obstacles: 
+
+  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.4]{obstacle_graph}
+  \end{figure}
+  
+  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Vertical Displacement Model}
+
+Differences in model discrepancy behaviour should provide enough information to establish between a potential obstacle and a change in terrain slope: 
+
+  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.32]{slope_vs_obstacle}
+  \end{figure}
+  
+  
 \end{frame}
 
 \begin{frame}[fragile]
