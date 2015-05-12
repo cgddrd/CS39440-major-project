@@ -26,6 +26,8 @@
 
 \begin{frame}[fragile]
   \frametitle{Background}
+  
+  \vspace{-10pt}
 	
      \begin{block}{}  
 
@@ -34,8 +36,7 @@
   \begin{center}
     \includegraphics[width=0.25\textwidth]{mars.jpg}
   \end{center}
-  \vspace{-15pt}
-  \caption{\small Tracked features from MER \cite{mars}.}
+  \vspace{-15pt}  \caption{\small Tracked features from MER \cite{mars}.}
   \end{wrapfigure}
   
   The ability for an autonomous robot to navigate from one location to another in a manner that is both \textbf{safe}, yet \textbf{objective} is vital to the \textbf{survivability} of the machine, and the \textbf{success of the mission} it is undertaking.    
@@ -151,7 +152,7 @@ System Using Consumer-grade Monocular Vision}}, J. Campbell \textit{et al.}, IEE
     \includegraphics[width=0.42\textwidth]{model.pdf}
   \end{center}
   \vspace{-15pt}
-  \caption{\small Tracked features from MER \cite{mars}.}
+  \caption{\small Example of ``perfect" vertical displacement model.}
   \end{wrapfigure}
    
 %   \hspace*{20pt} 
@@ -161,26 +162,65 @@ System Using Consumer-grade Monocular Vision}}, J. Campbell \textit{et al.}, IEE
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Vertical Displacement Model}
+  \frametitle{Inference of Terrain Slope \& Potential Obstacles}
 
 From observing discrepancies between the current model and ``baseline" model, it should be possible to infer the presence of potential obstacles: 
 
   \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.4]{obstacle_graph}
+\includegraphics[scale=0.3]{obstacle_graph}
+\caption{Vertical displacement model indicating the potential presence of a positive obstacle.}
   \end{figure}
   
   
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Vertical Displacement Model}
+  \frametitle{Inference of Terrain Slope \& Potential Obstacles}
 
 Differences in model discrepancy behaviour should provide enough information to establish between a potential obstacle and a change in terrain slope: 
 
   \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.32]{slope_vs_obstacle}
+\includegraphics[scale=0.28]{slope_vs_obstacle}
+\caption{Example of observed differences between detection of obstacles and change in terrain slope.}
+  \end{figure}
+  
+  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Robot Rotation}
+  
+\vspace{-10pt}
+
+Two types of observed motion:
+
+\begin{itemize}[label={\textbullet}]
+  	\item \textbf{Translation} (\textit{Vertical} component of optical flow vectors)
+  	\item \textbf{Rotation} (\textit{Horizontal} component of optical flow vectors)
+  \end{itemize}
+
+  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.3]{rotation_diag}
+\caption{Diagram demonstrating the expected difference in behaviour between the separated vertical and horizontal components of observed optical flow vectors calculated from \textbf{\textit{forward-turning motion}}.}
+  \end{figure}
+  
+  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Robot Speed}
+  
+\vspace{-10pt}
+
+By recording multiple ``calibration" models at different speeds, it should be possible to later infer the current speed using the standard \textit{speed-distance-time} equation.
+
+  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.3]{speed_graph}
+\caption{Diagram indicating examples of alternative vertical displacement models calculated while travelling at different constant speeds.}
   \end{figure}
   
   
@@ -189,32 +229,100 @@ Differences in model discrepancy behaviour should provide enough information to 
 \begin{frame}[fragile]
   \frametitle{Investigation Aims}
 
+  \begin{block}{Primary Aims}
   
+  	  \begin{enumerate}[label={\arabic*.}]
+  \item Establish which out the following appearance-based template matching similarity measures:
+ {\small \begin{itemize}[label={\textbullet}]
+  	\item Euclidean Distance
+  	\item Correlation Coefficient
+  	\item Histogram Correlation
+  	\item Histogram Chi-Square
+  \end{itemize} }
+  
+  best supports the predicted positive correlation between the vertical position of features within an image, and the level of vertical displacement demonstrated.
+ 
+  \item Use the generated model of vertical displacement to identify potential obstacles and changes in terrain gradient based upon the predicted ‘comparative trend’ behaviour.
+\end{enumerate}
+
+  \end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Investigation Aims}
+
+  \begin{block}{Secondary Aims}
+  
+  	  \begin{enumerate}[label={\arabic*.}]
+  	  
+  \item Further extend the capabilities of the vertical displacement model to provide estimates into the current speed of travel demonstrated by the robot.
+
+  \item Add support for providing an estimation into the change in orientation.
+ 
+\end{enumerate}
+
+  \end{block}
+
 \end{frame}
 
 \plain{Experiment Methods}
 
 \begin{frame}[fragile]
+  \frametitle{Gathering Datasets}
+  
+  No existing imagery datasets were found to be suitable, therefore new sets had to be collected.
+  
+  \vspace{5pt}
+  
+    \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.05]{rig_setup}
+\caption{Camera-rig setup used to capture the experiment datasets from front and back profiles.}
+  \end{figure}
+  
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Gathering Datasets}
+  
+  Images taken at a number of locations, but \textbf{four} were eventually selected based upon their variety in terms of \textbf{terrain texture} and \textbf{lighting conditions}.
+  
+  \vspace{15pt}
+  
+    \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.27]{locations}
+\caption{Examples of the first frame captured from each of the four location datasets.}
+  \end{figure}
+  
+\end{frame}
+
+\begin{frame}[fragile]
   \frametitle{Experiment Methods}
   
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Experiment 1}
+  {\normalsize Over time, \textbf{investigation focus changed} from exploring a series of reasonably ``generalised" research aims, to instead concentrating almost exclusively on one small, but very important aspect; 
+  \vspace{-10pt}
   
-\end{frame}
+  \begin{block}{}
+  \textit{Ensuring that accurate results for appearance-based motion displacement could continue to be achieved, across terrain lacking any significant features and/or demonstrating highly repetitive patterns}.
+  \end{block}}
+		
+  \begin{block}{Three Experiments}
+  \begin{enumerate}[label={\arabic*.}]
+  	  
+  \item Template Matching - \textbf{Multiple Small Patches}
 
-\begin{frame}[fragile]
-  \frametitle{Experiment 2}
+  \item Template Matching - \textbf{Full-width Patches | Non-Scaled}
   
+  \item Template Matching - \textbf{Full-width Patches | Geometrically Scaled}
+ 
+\end{enumerate}
+\end{block}
+
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Experiment 3}
-  
-\end{frame}
-
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 %Input: Two images with a set displacement between them (e.g. 10cm). \\
 
@@ -230,7 +338,7 @@ Import two consecutive images, and convert from RGB (BGR in OpenCV) colour space
 The 'V' channel is then removed in order to improve robustness to lighting changes between frames. 
 \end{frame}
 
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 \textbf{Stage Two} \\ \vspace{0.2cm}
 
@@ -259,7 +367,7 @@ This effect is minimised towards the centre of the image.
   
 \end{frame}
 
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 \textbf{Stage Three} \\ \vspace{0.2cm}
 
@@ -273,7 +381,7 @@ Extract patches of a fixed size around each pixel within the extracted ROI.
   
 \end{frame}
 
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 \textbf{Stage Four} \\ \vspace{0.2cm}
 
@@ -287,7 +395,7 @@ For each patch extracted from \emph{image one}, move down through a localised se
   
 \end{frame}
 
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 \textbf{Stage Five} \\ \vspace{0.2cm}
 
@@ -300,7 +408,7 @@ Identify the patch within the localised search window that provides the ``best m
 
 \end{frame}
 
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 \textbf{Stage Six} \\ \vspace{0.2cm}
 
@@ -315,7 +423,7 @@ Outliers are removed by ignoring any displacements that lie outside of (2 x Stan
 
 \end{frame}
 
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 \textbf{Repeat Stages 1-6} \\ \vspace{0.2cm}
 
@@ -328,7 +436,7 @@ Repeat stages 1-6 for an entire collection of ``calibration" images taken of \em
 
 \end{frame}
 
-\begin{frame}{Current Approach}
+\begin{frame}{Experiment One - Multiple Small Patches}
 
 \textbf{Stage Seven} \\ \vspace{0.2cm}
 
@@ -341,12 +449,113 @@ Plot the \emph{average displacement} for each ROI row, calculated from the displ
 
 \end{frame}
 
+\begin{frame}{Experiment Two - Full-width Patches (Non-Scaled)}
+
+\begin{block}{Focus}
+
+Establishing if adopting \textbf{\textit{larger}} patches in fewer numbers provided better appearance-based matching accuracy than using many more, but critically much \textbf{\textit{smaller}} overlapping patches.
+	
+\end{block}
+
+While the underlying method remained the same as in the first experiment, some key changes were made:
+
+ \begin{itemize}[label={\textbullet}]
+  	\item Extracting a central region of interest relative to the \textbf{ground plane}, as opposed to extracting a fixed-width column from the image plane.
+  	\item Moving away from multiple overlapping small patches, in favour of adopting a single, \textbf{full-width} patch to represent a single row in the image.
+  \end{itemize}
+
+\end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Exhaustive vs. Non-Exhaustive}
-
+  \frametitle{Exhaustive vs. Non-Exhaustive Search}
   
+  \vspace{-10pt}
+  
+  Issue discovered regarding the use of \textbf{non-exhaustive} searching causing erroneous results. All tests in experiments two and three were conducted using both exhaustive and non-exhaustive approaches.
+  
+  \vspace{-10pt}
+
+  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.32]{ed}
+ \vspace{-5pt}
+\caption{Example of potential early termination of non-exhaustive search due to entering local minima caused by noise, rather than global minima which represents to true best match.}
+\end{figure}
+
 \end{frame}
+
+\begin{frame}{Perspective Distortion Calibration Tool}
+
+\vspace{-5pt}
+
+To extract a region-of-interest along the \textit{ground plane}, the system would need to take account of \textit{perspective distortion}. Therefore, a simple \textbf{calibration tool} was implemented, enabling users to define the region of interest within an image.
+
+ \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.19]{calib_tool}
+\vspace{-10pt}
+ \caption{{\small Results of the verification test for the approach towards geometric scaling of template patch pixel coordinates.}}
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}{Experiment Three - Full-width Patches (Scaled)}
+
+\begin{block}{Focus}
+
+Add \textbf{geometric scaling} of template patch in order to account for objects appearing larger as they approach the camera. 
+	
+\end{block}
+ \vspace{15pt}
+  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.28]{scaling_types}
+ \caption{{\small Comparison between the various approaches of performing scaling of the original template patch image. In the case of linear interpolation, additional information has been added to image as a result of “estimating” the colour that lies between two original pixels.}}
+\end{figure}
+
+\end{frame}
+
+
+\begin{frame}{Experiment Three - Full-width Patches (Scaled)}
+
+\vspace{-5pt}
+\begin{block}{6 Stage Process}
+  \vspace{-5pt}
+{\small \begin{enumerate}[label={\arabic*.}]
+  \item Obtain the width and height of the current template patch.
+  \item Obtain the calibrated width of the search window with respect to the current image row.
+  \item Calculate the independent scale factor for the width and height between the template patch and the search window.
+  \item Treating each pixel as a 2D coordinate in geometric space, scale the position of each pixel coordinate within the template patch relative to the position of centre coordinate.
+  \item For each scaled pixel coordinate, extract the value of the pixel at the corresponding position with the search window and add to a temporary “image” data structure.
+  \item Perform template matching between the original template patch, and the new ``extracted" temporary image.
+ 
+\end{enumerate}}
+	
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}{Experiment Three - Full-width Patches (Scaled)}
+	
+	\vspace{-5pt}
+  \begin{block}{Testing of Scaling Approach}
+  
+ A simple test was devised to confirm geometric scaling worked as expected under ``perfect" conditions.
+ \vspace{-15pt}
+  		  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.23]{scaling_verif}
+ \caption{{\small Results of the verification test for the approach towards geometric scaling of template patch pixel coordinates.}}
+\end{figure}
+  		
+  \end{block}
+
+
+\end{frame}
+
+
 
 \plain{Investigation Results}
 
