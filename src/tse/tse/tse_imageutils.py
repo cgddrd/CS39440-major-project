@@ -210,7 +210,7 @@ class TSEImageUtils:
 
         reshaped_search_window_target_pixels = TSECImageUtils.reshape_match_images(search_window_target_pixels, template_patch)
 
-        return TSEImageUtils.calc_euclidean_distance_cv2_norm(template_patch, reshaped_search_window_target_pixels)
+        return TSEImageUtils.calc_euclidean_distance_cv2_norm(template_patch, reshaped_search_window_target_pixels), reshaped_search_window_target_pixels
 
     @staticmethod
     def calc_ed_template_match_score_scaled_compiled_slow(template_patch, scaled_search_window):

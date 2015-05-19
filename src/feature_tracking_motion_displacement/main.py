@@ -10,6 +10,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import itertools
 import math
+import argparse
+import os
+
+__author__ = 'Connor Luke Goddard (clg11@aber.ac.uk)'
 
 def calc_moving_average_array(values, window, mode='valid'):
 
@@ -289,7 +293,7 @@ def filter_angle(old_points, new_points, vectors):
 
     return bool_result
 
-def run_sim(images, feature_params, lk_params, subpix_params):
+def run_sim(folder_path, images, feature_params, lk_params, subpix_params):
 
     count = 0
 
@@ -303,7 +307,7 @@ def run_sim(images, feature_params, lk_params, subpix_params):
 
     for image in images:
 
-        image_loaded = cv2.imread(image)
+        image_loaded = cv2.imread(os.path.join(folder_path, image))
 
         image_height, image_width = image_loaded.shape[:2]
         image_height_quarter = int(round(int(image_loaded.shape[0]) / 4))
@@ -341,8 +345,6 @@ def run_sim(images, feature_params, lk_params, subpix_params):
             good_new = good_new[angle_filter]
             good_old = good_old[angle_filter]
 
-            # mask = np.zeros_like(image_loaded)
-
             # draw the tracks
             for i, (new, old) in enumerate(zip(good_new, good_old)):
                 a, b = new.ravel()
@@ -369,22 +371,15 @@ def run_sim(images, feature_params, lk_params, subpix_params):
 
         count += 1
 
-
-
-__author__ = 'connorgoddard'
-
 def main():
 
-    image1_wiltshire_outside = cv2.imread("../eval_data/motion_images/wiltshire_outside_10cm/IMG1.JPG")
-    image2_wiltshire_outside = cv2.imread("../eval_data/motion_images/wiltshire_outside_10cm/IMG2.JPG")
+    parser = argparse.ArgumentParser()
 
-    image1_wiltshire_inside = cv2.imread("../eval_data/motion_images/wiltshire_inside_15cm/IMG1.JPG")
-    image2_wiltshire_inside = cv2.imread("../eval_data/motion_images/wiltshire_inside_15cm/IMG2.JPG")
+    # "nargs='+'" tells 'argparse' to allow for a list of values to be accepted within this parameter.
+    parser.add_argument('--source-folder', help='Source folder from which to load images', dest="source_folder", type=str, required=True)
+    parser.add_argument('--images', help='List of image file names to load from inside the source-folder. Please note: The order of image names in this list determine the order of images processed by the application.', nargs='+', dest="images", type=str, required=True)
 
-    image1_flat = cv2.imread("../eval_data/motion_images/flat_10cm/IMG1.JPG")
-    image2_flat = cv2.imread("../eval_data/motion_images/flat_10cm/IMG2.JPG")
-
-    # calc_farneback_flow(image1, image2)
+    args = vars(parser.parse_args())
 
     feature_params = dict(maxCorners=1000, qualityLevel=0.005, minDistance=20)
 
@@ -392,43 +387,46 @@ def main():
 
     subpix_params = dict(winSize=(20, 20), zeroZone=(-1, -1), criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 20, 0.1))
 
-    images = ["../eval_data/motion_images/wiltshire_outside_10cm/IMG1.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG2.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG3.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG4.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG5.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG6.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG7.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG8.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG9.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG10.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG11.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG12.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG13.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG14.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG15.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG16.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG17.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG18.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG19.JPG",
-              "../eval_data/motion_images/wiltshire_outside_10cm/IMG20.JPG"]
+    # images = ["../eval_data/motion_images/wiltshire_outside_10cm/IMG1.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG2.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG3.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG4.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG5.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG6.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG7.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG8.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG9.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG10.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG11.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG12.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG13.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG14.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG15.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG16.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG17.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG18.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG19.JPG",
+    #           "../eval_data/motion_images/wiltshire_outside_10cm/IMG20.JPG"]
+    #
+    # images2 = ["../eval_data/motion_images/flat_10cm/IMG1.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG2.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG3.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG4.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG5.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG6.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG7.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG8.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG9.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG10.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG11.JPG",
+    #           "../eval_data/motion_images/flat_10cm/IMG12.JPG"]
 
-    images2 = ["../eval_data/motion_images/flat_10cm/IMG1.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG2.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG3.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG4.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG5.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG6.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG7.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG8.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG9.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG10.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG11.JPG",
-              "../eval_data/motion_images/flat_10cm/IMG12.JPG"]
+    run_sim(args['source_folder'], args['images'], feature_params, lk_params, subpix_params)
 
-    run_sim(images, feature_params, lk_params, subpix_params)
+    k = cv2.waitKey(0) & 0xFF
 
-    cv2.waitKey()
+    if k == ord('q'):
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()

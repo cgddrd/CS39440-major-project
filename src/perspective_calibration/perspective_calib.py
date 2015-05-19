@@ -178,14 +178,13 @@ class PerspectiveCalibration:
 def main():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--image', dest="input_image", type=str, required=True)
-    parser.add_argument('--output-file-prefix', dest="file_prefix", type=str, default="calibdata")
-    parser.add_argument('--output-folder-path', dest="folder_path", type=str, default="./output/")
+    parser.add_argument('--image', help="File path to calibration image to load in. ", dest="input_image", type=str, required=True)
+    parser.add_argument('--output-file-prefix', help="Optional argument to specify the prefix for output filename. Default: \'calibdata\'", dest="file_prefix", type=str, default="calibdata")
+    parser.add_argument('--output-folder-path', help="Optional path specifying the folder path for the output folder. Default: \'./output/\'", dest="folder_path", type=str, default="./output/")
 
     args = vars(parser.parse_args())
 
     PerspectiveCalibration(args['input_image'], args['file_prefix'], args['folder_path'])
-
 
 if __name__ == '__main__':  # if the function is the main function ...
     main()

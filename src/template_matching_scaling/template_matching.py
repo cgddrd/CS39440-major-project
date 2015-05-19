@@ -22,7 +22,7 @@ from tse.tse_matchmethod import tse_match_methods
 
 
 class TemplateMatching:
-    def __init__(self, image_one_file_path, image_two_file_path, calibration_data_file_path, plot_axis, use_hsv_colour_space=True, strip_luminance=True):
+    def __init__(self, image_one_file_path, image_two_file_path, calibration_data_file_path, plot_axis, use_hsv_colour_space=True, strip_luminance=True, demo_mode=False):
 
         self._image_one_file_path = image_one_file_path
         self._image_two_file_path = image_two_file_path
@@ -33,6 +33,8 @@ class TemplateMatching:
 
         self._img1_raw = cv2.imread(image_one_file_path, cv2.IMREAD_COLOR)
         self._img2_raw = cv2.imread(image_two_file_path, cv2.IMREAD_COLOR)
+
+        self._demo_mode = demo_mode
 
         if use_hsv_colour_space:
 
@@ -274,8 +276,19 @@ class TemplateMatching:
             # Extract pixels from the larger search window that correspond to the SCALED position of each pixel in the smaller template patch.
             scaled_search_window = TSEImageUtils.extract_image_sub_window(self._img2_target_colour_space, current_window_scaled_coords[0], current_window_scaled_coords[1])
 
+
+            if self._demo_mode:
+                scaled_image_demo_template = TSEImageUtils.scale_image_no_interpolation_auto(template_patch, scaled_search_window)
+                cv2.imshow("Search Window", scaled_search_window)
+                cv2.imshow("Geometric Scaling Demo", scaled_image_demo_template)
+                cv2.imshow("Template - IMG 1", template_patch)
+                cv2.waitKey(100)
+
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
-                score = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, scaled_search_window)
+                score, extracted_window = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, scaled_search_window)
+
+                if self._demo_mode:
+                  cv2.imshow("Extracted Patch - IMG 2", extracted_window)
 
             elif match_method.match_type == tse_match_methods.DISTANCE:
                 score = TSEImageUtils.calc_template_match_compare_cv2_score_scaled(template_patch, scaled_search_window, match_method.match_id)
@@ -376,7 +389,10 @@ class TemplateMatching:
             scaled_search_window = TSEImageUtils.extract_image_sub_window(self._img2_target_colour_space, current_window_scaled_coords[0], current_window_scaled_coords[1])
 
             if match_method.match_type == tse_match_methods.DISTANCE_ED:
-                score = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, scaled_search_window)
+                score, extracted_window = TSEImageUtils.calc_ed_template_match_score_scaled_compiled(template_patch, scaled_search_window)
+
+                if self._demo_mode:
+                  cv2.imshow("Extracted Window", extracted_window)
 
             elif match_method.match_type == tse_match_methods.DISTANCE:
                 score = TSEImageUtils.calc_template_match_compare_cv2_score_scaled(template_patch, scaled_search_window, match_method.match_id)

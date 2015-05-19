@@ -257,11 +257,13 @@ class TestTSEImageUtils(TestCase):
 
         non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
 
+
+
         # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(matching_image, original_image), 0)
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(matching_image, original_image)[0], 0)
 
         # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(non_matching_image, original_image) > 0)
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(non_matching_image, original_image)[0] > 0)
 
     def test_calc_ed_template_match_score_scaled_compiled_slow(self):
 
@@ -318,10 +320,10 @@ class TestTSEImageUtils(TestCase):
         non_matching_image = np.full((200, 200, 3), [200, 0, 0],  dtype=np.uint8)
 
         # Check that for perfectly matching images, we get a score of exactly 0.
-        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(matching_image, original_image), 0)
+        assert_equal(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(matching_image, original_image)[0], 0)
 
         # Check that for non-matching images, we get a score > 0.
-        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(non_matching_image, original_image) > 0)
+        assert_true(TSEImageUtils.calc_ed_template_match_score_scaled_compiled(non_matching_image, original_image)[0] > 0)
 
     def test_calc_ed_template_match_score_scaled_compiled_slow(self):
 

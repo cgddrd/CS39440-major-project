@@ -21,7 +21,7 @@ from tse.tse_matchmethod import tse_match_methods
 
 from collections import OrderedDict
 
-def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scaling=False, scale_centre=True, exhaustive_search=False, use_hsv=True, strip_luminance=True, plot_results=False):
+def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scaling=False, scale_centre=True, exhaustive_search=False, use_hsv=True, strip_luminance=True, plot_results=False, demo_mode=False):
     """
     Executes sequential experiment tests for each possible combination of experiment parameters defined via command line arguments.
 
@@ -53,7 +53,7 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
             patch_dict = {}
 
             # Create a new instance of the template matching test runner.
-            match = TemplateMatching(pair[0], pair[1], config_file, None, use_hsv, strip_luminance_sanity)
+            match = TemplateMatching(pair[0], pair[1], config_file, None, use_hsv, strip_luminance_sanity, demo_mode)
 
             for patch_size in patch_sizes:
 
@@ -88,9 +88,9 @@ def start_tests(image_pairs, patch_sizes, match_methods, config_file, use_scalin
 
             # If we have more than one row of tests, then we need to select which row we are currently on.
             if row_max > 1:
-                match = TemplateMatching(pair[0], pair[1], config_file, axes[row_count, column_count])
+                match = TemplateMatching(pair[0], pair[1], config_file, axes[row_count, column_count], use_hsv, strip_luminance_sanity, demo_mode)
             else:
-                match = TemplateMatching(pair[0], pair[1], config_file, axes[column_count])
+                match = TemplateMatching(pair[0], pair[1], config_file, axes[column_count], use_hsv, strip_luminance_sanity, demo_mode)
 
             for patch_size in patch_sizes:
 
@@ -159,20 +159,21 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Specify the properties for all of the accepted command-line parameters.
-    parser.add_argument('--calibfile', help='Datafile containing the calibration data', dest="calib_file", required=True)
+    parser.add_argument('--calibfile', help='Path to a file containing the perspective distortion calibration data.', dest="calib_file", required=True)
 
     # "nargs='+'" tells 'argparse' to allow for a list of values to be accepted within this parameter.
-    parser.add_argument('--images', help="Images", dest="image_pairs", type=InputImagePairArgument, nargs='+', required=True)
-    parser.add_argument('--patches', nargs='+', dest="patch_sizes", type=int, required=True)
-    parser.add_argument('--methods', nargs='+', dest="match_methods", type=str, required=True)
+    parser.add_argument('--images', help="List of file paths to image pairs. \nExpected format: \"<image_1_path>, <image_2_path>\"", dest="image_pairs", type=InputImagePairArgument, nargs='+', required=True)
+    parser.add_argument('--patches', help='List of numerical sizes used to determine fixed patch height.', nargs='+', dest="patch_sizes", type=int, required=True)
+    parser.add_argument('--methods', help='List of appearance-based similarity measures to test under template matching. \nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\'', nargs='+', dest="match_methods", type=str, required=True)
 
     # 'store_true' creates a "default" value set to False, which beomes True upon the existence of the argument within the command-line.
-    parser.add_argument('--use-scaling', dest='scaling', action='store_true')
-    parser.add_argument('--draw-plot', dest='plot_results', action='store_true')
-    parser.add_argument('--exhaustive', dest='exhaustive_search', action='store_true')
-    parser.add_argument('--use-rgb', dest='use_rgb', action='store_false')
-    parser.add_argument('--strip-luminance', dest='hsv_strip_luminance', action='store_true')
-    parser.add_argument('--scale-top', dest='scale_top', action='store_false')
+    parser.add_argument('--use-scaling', help='Specify to perform scaled template matching.', dest='scaling', action='store_true')
+    parser.add_argument('--draw-plot', help='Specify to output graphical representation of results as \'matplotlib\' plots.', dest='plot_results', action='store_true')
+    parser.add_argument('--demo-mode', help='Specify to activate additional \"demo mode\" GUI output.', dest='demo_mode', action='store_true')
+    parser.add_argument('--exhaustive', help='Specify to perform an exhaustive search, otherwise default will perform non-exhaustive search.', dest='exhaustive_search', action='store_true')
+    parser.add_argument('--use-rgb', help='Specify to use RGB colour space for input images, rather than converting to HSV (default).', dest='use_rgb', action='store_false')
+    parser.add_argument('--strip-luminance', help='Specify to deactivate stripping of \'V\' channel from HSV colour space (only available when using HSV colour space).', dest='hsv_strip_luminance', action='store_true')
+    parser.add_argument('--scale-top', help='Specify to set the origin for geometric scaling from the TOP of the template patch, as opposed to the centre.', dest='scale_top', action='store_false')
 
     args = vars(parser.parse_args())
 
@@ -195,10 +196,10 @@ def main():
             match_methods.append(TSEMatchType("HistChiSqr", tse_match_methods.HIST, cv2.cv.CV_COMP_CHISQR, "g", reverse_score=True))
 
         else:
-            parser.error("Error: \"{0}\" is not a valid matching method option.\nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\' ".format(method))
+            parser.error("Error: \"{0}\" is not a valid matching method option.\nSupported Methods: \'DistanceEuclidean\', \'DistanceCorr\', \'HistCorrel\', \'HistChiSqr\'".format(method))
 
     # Start the tests using settings passed in as command-line arguments.
-    start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], scale_centre=args['scale_top'], exhaustive_search=args['exhaustive_search'], use_hsv=args['use_rgb'], strip_luminance=args['hsv_strip_luminance'], plot_results=args['plot_results'])
+    start_tests(args['image_pairs'], list(OrderedDict.fromkeys(args['patch_sizes'])), match_methods, args['calib_file'], use_scaling=args['scaling'], scale_centre=args['scale_top'], exhaustive_search=args['exhaustive_search'], use_hsv=args['use_rgb'], strip_luminance=args['hsv_strip_luminance'], plot_results=args['plot_results'], demo_mode=args['demo_mode'])
 
     # Trigger the GUI window to display the plotted results if required.
     if args['plot_results']:
