@@ -7,6 +7,10 @@
 \usepackage{minted}
 \usepackage{wrapfig}
 \usepackage{enumitem}% http://ctan.org/pkg/enumitem
+\usepackage[font=scriptsize,labelfont=bf]{caption}
+\usepackage{natbib}
+
+\def\bibfont{\footnotesize}
 
 \usepgfplotslibrary{dateplot}
 
@@ -36,7 +40,7 @@
   \begin{center}
     \includegraphics[width=0.25\textwidth]{mars.jpg}
   \end{center}
-  \vspace{-15pt}  \caption{\small Tracked features from MER \cite{mars}.}
+  \vspace{-15pt}  \caption{Tracked features from MER [2].}
   \end{wrapfigure}
   
   The ability for an autonomous robot to navigate from one location to another in a manner that is both \textbf{safe}, yet \textbf{objective} is vital to the \textbf{survivability} of the machine, and the \textbf{success of the mission} it is undertaking.    
@@ -118,7 +122,7 @@ System Using Consumer-grade Monocular Vision}}, J. Campbell \textit{et al.}, IEE
 \begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.2]{motion_parallax.png}
-    \caption{Typical example of motion parallax. \textbf{Courtesy}: \href{http://www.infovis.net}{http://www.infovis.net}.}
+    \caption{Typical example of motion parallax [4].}
   \end{figure}
   
 \end{frame}
@@ -140,19 +144,19 @@ System Using Consumer-grade Monocular Vision}}, J. Campbell \textit{et al.}, IEE
 \begin{frame}[fragile]
   \frametitle{Vertical Displacement Model}
   
-  \vspace{-20pt}
+  \vspace{-35pt}
 
  Provides a mechanism by which to evaluate the prediction:
  
- \vspace{10pt}
+ \vspace{15pt}
  
-       \begin{wrapfigure}{r}{0.4\textwidth}
+       \begin{wrapfigure}{r}{0.5\textwidth}
    \vspace{-30pt}
   \begin{center}
-    \includegraphics[width=0.42\textwidth]{model.pdf}
+    \includegraphics[width=0.52\textwidth]{model.pdf}
   \end{center}
   \vspace{-15pt}
-  \caption{\small Example of ``perfect" vertical displacement model.}
+  \caption{Example of ``perfect" vertical displacement model.}
   \end{wrapfigure}
    
 %   \hspace*{20pt} 
@@ -313,9 +317,9 @@ By recording multiple ``calibration" models at different speeds, it should be po
   	  
   \item Template Matching - \textbf{Multiple Small Patches}
 
-  \item Template Matching - \textbf{Full-width Patches | Non-Scaled}
+  \item Template Matching - \textbf{Full-width Patches (Non-Scaled)}
   
-  \item Template Matching - \textbf{Full-width Patches | Geometrically Scaled}
+  \item Template Matching - \textbf{Full-width Patches (Geometrically Scaled)}
  
 \end{enumerate}
 \end{block}
@@ -362,7 +366,7 @@ This effect is minimised towards the centre of the image.
 \begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.15]{foe.png}
-\caption{\textbf{Courtesy:} J.Pillow, University of Texas}
+\caption{Diagram indicating the perceived effects caused by Focus of Expansion. Courtesy: [5]}
   \end{figure}
   
 \end{frame}
@@ -494,7 +498,7 @@ To extract a region-of-interest along the \textit{ground plane}, the system woul
 \centering
 \includegraphics[scale=0.16]{calib_tool}
 \vspace{-10pt}
- \caption{{\small Results of the verification test for the approach towards geometric scaling of template patch pixel coordinates.}}
+ \caption{Results of the verification test for the approach towards geometric scaling of template patch pixel coordinates.}
 \end{figure}
 
 \end{frame}
@@ -511,7 +515,7 @@ Add \textbf{geometric scaling} of template patch in order to account for objects
   \begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.28]{scaling_types}
- \caption{{\small Comparison between various approaches of performing scaling of the original template patch image. In the case of linear interpolation, additional information has been added to image as a result of “estimating” the colour that lies between two original pixels.}}
+ \caption{Comparison between various approaches of performing scaling of the original template patch image. In the case of linear interpolation, additional information has been added to image as a result of “estimating” the colour that lies between two original pixels.}
 \end{figure}
 
 \end{frame}
@@ -540,14 +544,12 @@ Add \textbf{geometric scaling} of template patch in order to account for objects
 \begin{frame}{Experiment Three - Full-width Patches (Scaled)}
 	
 	\vspace{-5pt}
-  \begin{block}{Testing of Scaling Approach}
-  
- A simple test was devised to confirm geometric scaling worked as expected under ``perfect" conditions.
+  \begin{block}{Testing of Scaling Approach} A simple test was devised to confirm geometric scaling worked as expected under ``perfect" conditions.
  \vspace{-15pt}
   		  \begin{figure}[ht!]
 \centering
 \includegraphics[scale=0.23]{scaling_verif}
- \caption{{\small Results of the verification test for the approach towards geometric scaling of template patch pixel coordinates.}}
+ \caption{Results of the verification test for the approach towards geometric scaling of template patch pixel coordinates.}
 \end{figure}
   		
   \end{block}
@@ -555,94 +557,175 @@ Add \textbf{geometric scaling} of template patch in order to account for objects
 
 \end{frame}
 
+\begin{frame}{Additional Experimental Work}
 
+\vspace{-10pt}
 
-\plain{Investigation Results}
+{\small Some additional experimental work was conducted as part of the larger project investigation, but these did not actively contribute to the final investigation results.
+
+\begin{itemize}[label={\textbullet}]
+  	\item Investigation of Campbell \textit{et al.} [1] approach to feature tracking to provide optical flow field (based heavily upon C\# implementation provided by Dr. Rainer Hessmer (\href{http://www.hessmer.org/blog/2010/08/17/monocular-visual-odometry}{Source}))
+  	\item Investigation of edge-based template matching discussed by Perveen \textit{et al.} [3]
+  \end{itemize} }
+  
+  \vspace{-10pt}
+  
+    		  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.13]{additional_work}
+ \caption{\textbf{Left:} Example of feature tracking to establish optical flow field. \textbf{Right:} Edge-based template matching using Canny edge detector.}
+\end{figure}
+  		
+
+\end{frame}
+
+\plain{Investigation Results\\ \vspace{0.2cm} \footnotesize{\href{http://nbviewer.ipython.org/github/cgddrd/CS39440-major-project/tree/develop/src/template_matching_scaling/notebooks}{View Results (Courtesy: nbviewer)}}}
 
 \begin{frame}{Results}
 
-Generally ``mixed" results at this stage. \\ \vspace{0.5cm}
+Results can be described as generally \textbf{inconclusive}. \\ \vspace{0.5cm}
 
-From the results obtained, we have learned:
+However from the results obtained, we have learned:
 
 \begin{enumerate}[label={\arabic*.}]
-  \item It is possible to potentially establish a relationship between row height in an image, and average downwards pixel displacement.
-  \item The current approach to appearance-based tracking using multiple ``small" patches\textbf{does not work well} for many typical terrain conditions (i.e. outside). 
+  \item Under certain terrain conditions, it is possible to potentially establish a relationship between row height in an image, and average downwards pixel displacement. \vspace{0.5cm} 
+  \item The performance of each appearance-based similarity measure can vary widely, based upon factors including:
+ \vspace{0.2cm} 
+  \begin{itemize}[label={\textbullet}]
+  	\item \textbf{Terrain texture} (e.g. highly patterned, isotropic or homogenous)
+  	\item \textbf{Patch size} (Balance between reducing ``noise" and representing true displacement behaviour)
+  	\item \textbf{Exhaustive vs. Non-exhaustive search}
+  	\item \textbf{Scaling vs. Non-scaling}
+  \end{itemize}
 \end{enumerate}
 
 \end{frame}
 
-\begin{frame}{Results: Example 1}
+\begin{frame}{Results: Approach Comparison - `Living Room Rug' Dataset}
+
+\begin{figure}[ht!]
+\centering
+\vspace{-0.5cm}
+\includegraphics[scale=0.12]{flat_pres_results.png}
+\caption{Comparison of results for the `Living room rug' dataset using an exhaustive search and 100px patch size. Small patches (Graph 1), full-width patches (Graph 2) and geometrically scaled full-width patches (Graph 3).}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Results: Approach Comparison - `Brick-paved Road' Dataset}
+
+\begin{figure}[ht!]
+\centering
+\vspace{-0.5cm}
+\includegraphics[scale=0.12]{outside_pres_results.png}
+\caption{Comparison of results for the `Brick-paved road' dataset using an exhaustive search and 100px patch size. Small patches (Graph 1), full-width patches (Graph 2) and geometrically scaled full-width patches (Graph 3).}
+\end{figure}
+
+
+%\begin{columns}[T] % align columns
+%\begin{column}{.48\textwidth}
+%
+%\textbf{Input Collection:}
+%
+%\begin{figure}[ht!]
+%\centering
+%\vspace{0.3cm}
+%\includegraphics[scale=0.18]{calibimages.png}
+%\end{figure}
+%
+%\end{column}%
+%\hfill%
+%\begin{column}{.48\textwidth}
+%
+%\textbf{Result:}
+%\begin{figure}[ht!]
+%\centering
+%\includegraphics[scale=0.22]{wiltshire_outside_10cm.png}
+%\end{figure}
+%
+%\end{column}%
+%\end{columns}
+
+\end{frame}
+
+\begin{frame}{Results: Exhaustive vs. Non-Exhaustive Search}
+
+%\begin{figure}[ht!]
+%\centering
+%\vspace{-0.5cm}
+%\includegraphics[scale=0.12]{ }
+%\caption{Comparison of results for the `Brick-paved road' dataset using an exhaustive search and 100px patch size. Small patches (Graph 1), full-width patches (Graph 2) and geometrically scaled full-width patches (Graph 3).}
+%\end{figure}
+
+\vspace{-0.4cm}
 
 \begin{columns}[T] % align columns
 \begin{column}{.48\textwidth}
 
-\textbf{Input Collection:}
+\textbf{Non-Exhaustive}
 
 \begin{figure}[ht!]
 \centering
-\vspace{0.3cm}
-\includegraphics[scale=0.18]{calibimages_good.png}
+\vspace{0.1cm}
+\includegraphics[scale=0.11]{flat_10cm_scaled}
 \end{figure}
 
 \end{column}%
 \hfill%
 \begin{column}{.48\textwidth}
 
-\textbf{Result:}
-
+\textbf{Exhaustive}
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.22]{flat_10cm_results.png}
+\vspace{0.1cm}
+\includegraphics[scale=0.11]{flat_10cm_scaled_exhaustive}
 \end{figure}
 
 \end{column}%
 \end{columns}
 
-\end{frame}
-
-\begin{frame}{Results: Example 2}
-
-\begin{columns}[T] % align columns
-\begin{column}{.48\textwidth}
-
-\textbf{Input Collection:}
-
 \begin{figure}[ht!]
-\centering
-\vspace{0.3cm}
-\includegraphics[scale=0.18]{calibimages.png}
+\caption{Comparison between non-exhaustive and exhaustive search performance using geometrically scaled template patches and the `Living room rug' dataset.}
 \end{figure}
-
-\end{column}%
-\hfill%
-\begin{column}{.48\textwidth}
-
-\textbf{Result:}
-\begin{figure}[ht!]
-\centering
-\includegraphics[scale=0.22]{wiltshire_outside_10cm.png}
-\end{figure}
-
-\end{column}%
-\end{columns}
 
 \end{frame}
 
+\begin{frame}{Results: Patch Size Comparison - `Slate Footpath' Dataset}
 
-\plain{Evaluation \& Conclusion}
+\begin{figure}[ht!]
+\centering
+\vspace{-0.5cm}
+\includegraphics[scale=0.13]{path_outside_10cm_scaled.png}
+\caption{Comparison of results for the `Living room rug' dataset using geometrically-scaled patches of 50px, 100px and 200px heights under an exhaustive search approach.}
+\end{figure}
 
+\end{frame}
+
+\plain{Conclusion}
 
 \begin{frame}[fragile]
   \frametitle{Future Work}
 
-  
+	Great potential for future work, most likely focussing on areas including:
+	
+	\begin{itemize}[label={\textbullet}]
+  	\item Further experimentation to establish most appropriate combination of similarity-measure, search approach and patch size for a \textbf{given terrain type}. 
+  	\item Development of a system to identify ``significant" changes in vertical displacement model that are potentially indicative of a potential obstacle or change in terrain gradient.
+  	\item Development of system to estimate change in robot heading.
+  	\item Development of system to estimate current robot speed.
+  \end{itemize}
+	
 \end{frame}
 
 \begin{frame}[fragile]
-  \frametitle{Summary}
-
+  \frametitle{Conclusion Summary}
   
+	Project has laid the groundwork upon which further development can subsequently be conducted. \\ \vspace{0.2cm}
+	
+	While not all of the original aims were accomplished, research efforts had to be focussed on confirming the underlying hypothesis, which as a general concept, has been proven. \\ \vspace{0.2cm}
+	
+	\textbf{Not one single approach or solution will suffice for all terrain conditions.}
+
 \end{frame}
 
 
@@ -687,9 +770,18 @@ From the results obtained, we have learned:
 %\centering
 %\includegraphics[scale=0.4]{scaling.png}
 %\end{figure}
-%	
+%	  
 %\end{frame}
 
 \plain{Questions? \\ \vspace{0.2cm} \footnotesize{\href{http://mmpblog.connorlukegoddard.com}{Project Blog} \\ \vspace{0.2cm} \footnotesize{Slide Design: Matthias Vogelgesang - (\href{https://github.com/matze/mtheme}{Github})}}}
+
+\begin{frame}[fragile]
+\frametitle{Bibliography}
+\bibliographystyle{plain}
+\nocite{maimone2007two, campbell, akshay, texas-cs, perveen}
+\bibliography{mmp}
+\end{frame}
+
+
 
 \end{document}

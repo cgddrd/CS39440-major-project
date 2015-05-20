@@ -9,6 +9,9 @@
 
 \ProvidesPackage{beamerthemem}
 
+% CG - Use numbered entries and NOT 'Beamer Icons' - http://tex.stackexchange.com/a/124271
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
 %{{{ --- Options ----------------------
 
 \newif\if@useTitleProgressBar
@@ -241,6 +244,7 @@
   \raggedright
   \usebeamercolor{footnote}\hbox to 0.8em{\hfil\insertfootnotemark}\insertfootnotetext\par%
 }
+
 
 %}}}
 %{{{ --- Frametitle -------------------
