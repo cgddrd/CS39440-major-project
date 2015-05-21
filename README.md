@@ -1,10 +1,5 @@
 # *Estimation of Terrain Shape Using a Monocular Vision-based System* (CS39440 Major Project) [![Build Status](https://travis-ci.org/cgddrd/CS39440-major-project.svg)](https://travis-ci.org/cgddrd/CS39440-major-project) [![Stories in Ready](https://badge.waffle.io/cgddrd/cs39440-major-project.png?label=ready&title=Ready)](https://waffle.io/cgddrd/cs39440-major-project) [![Coverage Status](https://coveralls.io/repos/cgddrd/CS39440-major-project/badge.svg?branch=develop)](https://coveralls.io/r/cgddrd/CS39440-major-project?branch=develop) [![Code Climate](https://codeclimate.com/github/cgddrd/CS39440-major-project/badges/gpa.svg)](https://codeclimate.com/github/cgddrd/CS39440-major-project) 
 
-## Project Metrics
-
-### Average Throughput
-[![Throughput Graph](https://graphs.waffle.io/cgddrd/cs39440-major-project/throughput.svg)](https://waffle.io/cgddrd/cs39440-major-project/metrics)
-
 ## Installation
 
 **Please note:** Instructions should be followed at a **project-level** (i.e. not at repo root). Please ```cd``` into the appropiate project folder within the `src` folder.
