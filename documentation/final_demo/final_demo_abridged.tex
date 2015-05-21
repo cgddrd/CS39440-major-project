@@ -233,51 +233,51 @@ By recording multiple ``calibration" models at different speeds, it should be po
   
 \end{frame}
 
-\begin{frame}[fragile]
-  \frametitle{Investigation Aims}
-	
-	 \vspace{-7pt}
-	 
-  \begin{block}{Primary Aims}
-  
-  	  \begin{enumerate}[label={\arabic*.}]
-  \item Establish which out the following appearance-based template matching similarity measures:
-
-  \vspace{2pt}
- {\small \begin{itemize}[label={\textbullet}]
-  	\item Euclidean Distance
-  	\item Correlation Coefficient
-  	\item Histogram Correlation
-  	\item Histogram Chi-Square
-  \end{itemize} }
-  \vspace{2pt}
-  best supports the predicted positive correlation between the vertical position of features within an image, and the level of vertical displacement demonstrated.
- 
- \vspace{10pt}
- 
-  \item Use the generated model of vertical displacement to identify potential obstacles and changes in terrain gradient based upon the predicted ‘comparative trend’ behaviour.
-\end{enumerate}
-
-  \end{block}
-
-\end{frame}
-
-\begin{frame}[fragile]
-  \frametitle{Investigation Aims}
-
-  \begin{block}{Secondary Aims}
-  
-  	  \begin{enumerate}[label={\arabic*.}]
-  	  
-  \item Further extend the capabilities of the vertical displacement model to provide estimates into the current speed of travel demonstrated by the robot.
-
-  \item Add support for providing an estimation into the change in orientation.
- 
-\end{enumerate}
-
-  \end{block}
-
-\end{frame}
+%\begin{frame}[fragile]
+%  \frametitle{Investigation Aims}
+%	
+%	 \vspace{-7pt}
+%	 
+%  \begin{block}{Primary Aims}
+%  
+%  	  \begin{enumerate}[label={\arabic*.}]
+%  \item Establish which out the following appearance-based template matching similarity measures:
+%
+%  \vspace{2pt}
+% {\small \begin{itemize}[label={\textbullet}]
+%  	\item Euclidean Distance
+%  	\item Correlation Coefficient
+%  	\item Histogram Correlation
+%  	\item Histogram Chi-Square
+%  \end{itemize} }
+%  \vspace{2pt}
+%  best supports the predicted positive correlation between the vertical position of features within an image, and the level of vertical displacement demonstrated.
+% 
+% \vspace{10pt}
+% 
+%  \item Use the generated model of vertical displacement to identify potential obstacles and changes in terrain gradient based upon the predicted ‘comparative trend’ behaviour.
+%\end{enumerate}
+%
+%  \end{block}
+%
+%\end{frame}
+%
+%\begin{frame}[fragile]
+%  \frametitle{Investigation Aims}
+%
+%  \begin{block}{Secondary Aims}
+%  
+%  	  \begin{enumerate}[label={\arabic*.}]
+%  	  
+%  \item Further extend the capabilities of the vertical displacement model to provide estimates into the current speed of travel demonstrated by the robot.
+%
+%  \item Add support for providing an estimation into the change in orientation.
+% 
+%\end{enumerate}
+%
+%  \end{block}
+%
+%\end{frame}
 
 \plain{Experiment Methods}
 
@@ -521,10 +521,11 @@ To extract a region-of-interest along the \textit{ground plane}, the system woul
 Add \textbf{geometric scaling} of template patch in order to account for objects appearing \textit{larger} as they approach the camera. 
 	
 \end{block}
- \vspace{15pt}
+ \vspace{5pt}
   \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.28]{scaling_types}
+\includegraphics[scale=0.28]{scaling_types_new}
+\vspace{5pt}
  \caption{Comparison between various approaches of performing scaling of the original template patch image. In the case of linear interpolation, additional information has been added to image as a result of “estimating” the colour that lies between two original pixels.}
 \end{figure}
 
@@ -585,27 +586,27 @@ Add \textbf{geometric scaling} of template patch in order to account for objects
 
 \end{frame}
 
-%\begin{frame}{Additional Experimental Work}
-%
-%\vspace{-10pt}
-%
-%{\small Some additional experimental work was conducted as part of the larger project investigation:
-%
-%\begin{itemize}[label={\textbullet}]
-%  	\item Investigation of Campbell \textit{et al.} [1] approach to feature tracking to provide optical flow field (based heavily upon C\# implementation provided by Dr. Rainer Hessmer (\href{http://www.hessmer.org/blog/2010/08/17/monocular-visual-odometry}{Source}))
-%  	\item Investigation of edge-based template matching discussed by Perveen \textit{et al.} [3]
-%  \end{itemize} }
-%  
-%  \vspace{-10pt}
-%  
-%    		  \begin{figure}[ht!]
-%\centering
-%\includegraphics[scale=0.16]{additional_work}
-% \caption{\textbf{Left:} Example of feature tracking to establish optical flow field. \textbf{Right:} Edge-based template matching using Canny edge detector.}
-%\end{figure}
-%  		
-%
-%\end{frame}
+\begin{frame}{Additional Experimental Work}
+
+\vspace{-10pt}
+
+{\small Some additional experimental work was conducted as part of the larger project investigation:
+
+\begin{itemize}[label={\textbullet}]
+  	\item Investigation of Campbell \textit{et al.} [1] approach to feature tracking to provide optical flow field (based heavily upon C\# implementation provided by Dr. Rainer Hessmer (\href{http://www.hessmer.org/blog/2010/08/17/monocular-visual-odometry}{Source}))
+  	\item Investigation of edge-based template matching discussed by Perveen \textit{et al.} [3]
+  \end{itemize} }
+  
+  \vspace{-10pt}
+  
+    		  \begin{figure}[ht!]
+\centering
+\includegraphics[scale=0.16]{additional_work}
+ \caption{\textbf{Left:} Example of feature tracking to establish optical flow field. \textbf{Right:} Edge-based template matching using Canny edge detector.}
+\end{figure}
+  		
+
+\end{frame}
 
 \plain{Investigation Results\\ \vspace{0.2cm} \footnotesize{\href{http://nbviewer.ipython.org/github/cgddrd/CS39440-major-project/tree/develop/src/template_matching_scaling/notebooks}{View Results (Courtesy: nbviewer)}}}
 
@@ -799,14 +800,14 @@ From the results obtained, we have learned:
 %	  
 %\end{frame}
 
-\plain{Questions? \\ \vspace{0.2cm} \footnotesize{\href{http://mmpblog.connorlukegoddard.com}{Project Blog} \\ \vspace{0.2cm} \footnotesize{Slide Design: Matthias Vogelgesang - (\href{https://github.com/matze/mtheme}{Github})}}}
-
-\begin{frame}[fragile]
-\frametitle{Bibliography}
-\bibliographystyle{plain}
-\nocite{maimone2007two, campbell, akshay, texas-cs, perveen}
-\bibliography{mmp}
-\end{frame}
+%\plain{Questions? \\ \vspace{0.2cm} \footnotesize{\href{http://mmpblog.connorlukegoddard.com}{Project Blog} \\ \vspace{0.2cm} \footnotesize{Slide Design: Matthias Vogelgesang - (\href{https://github.com/matze/mtheme}{Github})}}}
+%
+%\begin{frame}[fragile]
+%\frametitle{Bibliography}
+%\bibliographystyle{plain}
+%\nocite{maimone2007two, campbell, akshay, texas-cs, perveen}
+%\bibliography{mmp}
+%\end{frame}
 
 
 

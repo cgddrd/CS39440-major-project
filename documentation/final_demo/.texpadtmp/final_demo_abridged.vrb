@@ -1,4 +1,8 @@
-\frametitle{Bibliography}
-\bibliographystyle{plain}
-\nocite{maimone2007two, campbell, akshay, texas-cs, perveen}
-\bibliography{mmp}
+\frametitle{Conclusion Summary}
+
+Project has laid the groundwork upon which further development can subsequently be conducted. \\ \vspace{0.2cm}
+
+While not all of the original aims were accomplished, research efforts had to be focussed on confirming the underlying hypothesis, which as a general concept, has been proven. \\ \vspace{0.2cm}
+
+\textbf{Not one single approach or solution will suffice for all terrain conditions.}
+
