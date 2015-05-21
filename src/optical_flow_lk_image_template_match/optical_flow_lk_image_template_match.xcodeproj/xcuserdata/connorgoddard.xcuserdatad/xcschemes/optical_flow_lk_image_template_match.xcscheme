@@ -48,7 +48,8 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "99DD734B1A9A3F54006E73B7"
@@ -59,11 +60,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "../../../eval_data/motion_images/1.JPG"
+            argument = "../../../eval_data/motion_images/flat_10cm/IMG1.JPG"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "../../../eval_data/motion_images/2.JPG"
+            argument = "../../../eval_data/motion_images/flat_10cm/IMG2.JPG"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
@@ -76,7 +77,8 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
-      <BuildableProductRunnable>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "99DD734B1A9A3F54006E73B7"

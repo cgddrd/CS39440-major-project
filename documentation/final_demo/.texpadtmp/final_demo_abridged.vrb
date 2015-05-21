@@ -1,0 +1,4 @@
+\frametitle{Bibliography}
+\bibliographystyle{plain}
+\nocite{maimone2007two, campbell, akshay, texas-cs, perveen}
+\bibliography{mmp}

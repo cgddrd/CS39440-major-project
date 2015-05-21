@@ -1,0 +1,2 @@
+python perspective_calib.py -h
+python perspective_calib.py --image ../eval_data/motion_images/flat_10cm/IMG1.JPG

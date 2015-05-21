@@ -1,0 +1,2 @@
+python main.py -h
+python main.py --source-folder "../eval_data/motion_images/wiltshire_outside_10cm" --images IMG1.JPG IMG2.JPG IMG3.JPG IMG4.JPG IMG5.JPG IMG6.JPG IMG7.JPG IMG8.JPG IMG9.JPG IMG10.JPG IMG11.JPG IMG12.JPG IMG13.JPG IMG14.JPG IMG15.JPG IMG16.JPG IMG17.JPG IMG18.JPG IMG19.JPG IMG20.JPG

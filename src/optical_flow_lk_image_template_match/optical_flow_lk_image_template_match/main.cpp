@@ -28,10 +28,12 @@ vector<int> calcHistogram(double bucketSize, vector<double> values, double maxVa
 
 Mat img1;
 Mat img2;
+Mat img2Copy;
+
 double imgROIStartX = 0;
 
-bool simplePatches = false;
-bool useGUI = false;
+bool simplePatches = true;
+bool useGUI = true;
 bool exhaustiveSearch = false;
 bool useHistogramMatching = false;
 
@@ -101,18 +103,7 @@ int main(int argc, char** argv) {
         merge(hsvChannelsImg1,3,img1ColourTransform);
         merge(hsvChannelsImg2,3,img2ColourTransform);
 
-        if (useGUI) {
-            imshow("Input - Image 1", img1ColourTransform);
-            imshow("Input - Image 2", img2ColourTransform);
-        }
-
         startTests(img1ColourTransform, img2ColourTransform, roiSizes, patchSizes, methods, pairNo);
-
-        if (useGUI) {
-            imshow("Output", img2);
-            destroyWindow("Template Patch");
-            destroyWindow("Search Window");
-        }
 
         pairNo++;
 
@@ -171,9 +162,6 @@ string getMatchMethodName(int matchMethod) {
                 return "CUSTOM_ED";
             case CUSTOM_CORR:
                 return "CUSTOM_CORR";
-            case CUSTOM_CORR_NORM:
-                return "CUSTOM_CORR_NORM";
-                return "ED_NORM";
             default:
                 return "UNKNOWN";
         }
@@ -213,10 +201,6 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
         Mat image1ROI = img1ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img1ColourTransform.rows) );
         Mat image2ROI = img2ColourTransform( Rect(imgROIStartX,0,imageROIWidth,img2ColourTransform.rows) );
 
-        if (useGUI) {
-            rectangle( img2, Point(imgROIStartX, 0), Point(imgROIEndX , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
-        }
-
         for(vector<int>::iterator it2 = patchDimensions.begin(); it2 != patchDimensions.end(); ++it2) {
 
             vector<int> result_rows;
@@ -241,6 +225,19 @@ void startTests(Mat img1ColourTransform, Mat img2ColourTransform, vector<int> ro
                 cout << "BEGIN: Test #" << testCount << ": ROI Size: " << *it1 << ", Patch Size: " << *it2 << ", Match Method: " << getMatchMethodName(*it3) << ", Pair No: " << pairNo << endl;
 
                 cout << "ROI Size: " << image2ROI.cols << "px x " << image2ROI.rows << "px" << endl;
+                
+                if (useGUI) {
+                    
+                    imshow("Input - Image 1", img1ColourTransform);
+                    imshow("Input - Image 2", img2ColourTransform);
+                    
+                    img2Copy = img2.clone();
+                    
+                    rectangle( img2Copy, Point(imgROIStartX, 0), Point(imgROIEndX , img2.rows), Scalar(0, 0, 255), 2, 8, 0 );
+                    imshow("Output", img2Copy);
+                    destroyWindow("Template Patch");
+                    destroyWindow("Search Window");
+                }
 
                 if (*it3 == CUSTOM_HIST_CHISQR || *it3 == CUSTOM_HIST_CORR) {
 
@@ -408,7 +405,7 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         if (useGUI) {
 
             //Draw a circle to represent the "starting pixel position".
-            circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), 2, Scalar(255, 255, 255), 1, 8, 0 );
+            circle( img2Copy, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), 2, Scalar(255, 255, 255), 1, 8, 0 );
         }
 
         //Once we reach the end of the row, we need to calculate the average displacement across the entire row.
@@ -457,11 +454,11 @@ vector<double> runTestPatch(Mat image2ROI, int patchSize, int match_method, vect
         if (useGUI) {
 
             //Draw a circle to represent the "finishing pixel position".
-            circle( img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), 2, Scalar(0, 255, 0), 1, 8, 0 );
+            circle( img2Copy, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), 2, Scalar(0, 255, 0), 1, 8, 0 );
 
-            Utils::arrowedLine(img2, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), Scalar(255, 0, 0));
+            Utils::arrowedLine(img2Copy, Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y), Point(imgROIStartX + originPixelCoords.x, originPixelCoords.y + displacement), Scalar(255, 0, 0));
 
-            imshow("Output", img2);
+            imshow("Output", img2Copy);
 
         }
 
@@ -590,7 +587,7 @@ void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_m
             rectangle( searchWindowGUI, Point(0, i), Point(templatePatch.cols , i + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
 
             //CG - Allows the output window displaying the current patch to be updated automatically.
-            cv::waitKey(50);
+            cv::waitKey(100);
             imshow("Search Window", searchWindowGUI);
             imshow("Template Patch", templatePatch);
 
@@ -607,96 +604,6 @@ void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_m
     highScoreIndexY = bestScoreYIndex;
 
 }
-
-void calcHistMatchScore(Mat localisedSearchWindow, Mat templatePatch, int hist_match_method, double& highScore, double& highScoreIndexY) {
-
-    Mat currentPatch, histCurrentPatch, histTemplatePatch;
-
-    //Set "initialiser" value for best match score.
-    double bestScoreYIndex = -1;
-    double bestScore = -1;
-
-    bool stop = false;
-
-    /// Using 50 bins for hue and 60 for saturation
-    int h_bins = 50; int s_bins = 60;
-    int histSize[] = { h_bins, s_bins };
-
-    // hue varies from 0 to 179, saturation from 0 to 255
-    float h_ranges[] = { 0, 180 };
-    float s_ranges[] = { 0, 256 };
-
-    const float* ranges[] = { h_ranges, s_ranges };
-
-    // Use the o-th and 1-st channels
-    int channels[] = { 0, 1 };
-
-    for(int i = 0; i < localisedSearchWindow.rows - templatePatch.rows; i++)
-    {
-        currentPatch = localisedSearchWindow.clone();
-        currentPatch = currentPatch(Rect(0, i, templatePatch.cols, templatePatch.rows));
-
-        calcHist( &currentPatch, 1, channels, Mat(), histCurrentPatch, 2, histSize, ranges, true, false );
-        calcHist( &templatePatch, 1, channels, Mat(), histTemplatePatch, 2, histSize, ranges, true, false );
-
-        double result = compareHist( histCurrentPatch, histTemplatePatch, hist_match_method );
-
-
-        if( hist_match_method == CV_COMP_CORREL || hist_match_method == CV_COMP_INTERSECT )
-        {
-
-            if (bestScore == -1 || result > bestScore) {
-
-                bestScore = result;
-                bestScoreYIndex = i;
-
-            } else {
-
-                stop = true;
-
-            }
-        }
-        else
-        {
-
-            if (bestScore == -1 || result < bestScore) {
-
-                bestScore = result;
-                bestScoreYIndex = i;
-
-            } else {
-
-                stop = true;
-
-            }
-
-        }
-
-        if (useGUI) {
-
-            Mat searchWindowGUI = localisedSearchWindow.clone();
-
-            rectangle( searchWindowGUI, Point(0, i), Point(templatePatch.cols , i + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
-
-            //CG - Allows the output window displaying the current patch to be updated automatically.
-            cv::waitKey(50);
-            imshow("Search Window", searchWindowGUI);
-            imshow("Template Patch", templatePatch);
-
-        }
-
-        if (stop) {
-
-            break;
-
-        }
-    }
-
-    highScore = bestScore;
-    highScoreIndexY = bestScoreYIndex;
-
-}
-
 
 void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match_method, double& highScore, double& highScoreIndexY) {
 
@@ -820,7 +727,7 @@ void calcPatchMatchScore(Mat localisedSearchWindow, Mat templatePatch, int match
             rectangle( searchWindowGUI, Point(0, i), Point(templatePatch.cols , i + templatePatch.rows), Scalar(0, 255, 0), 2, 8, 0 );
 
             //CG - Allows the output window displaying the current patch to be updated automatically.
-            cv::waitKey(50);
+            cv::waitKey(100);
             imshow("Search Window", searchWindowGUI);
             imshow("Template Patch", templatePatch);
 
