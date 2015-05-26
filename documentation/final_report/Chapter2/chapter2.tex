@@ -191,22 +191,27 @@ After also manually measuring the height $h$, it became possible to calculate th
 While unfortunately never pursued in this project due to time limitations, an alternative approach to gathering robust testing data was to capture motion sequences set within a 3D virtual environment. 
 
 A key advantage of creating artificial image datasets stems from the level of control that becomes available over properties including the choice of lighting, terrain textures and landscape geometry. This high degree of granularity that makes using computer-generated datasets a popular choice for many vision-based projects, perhaps especially within earlier stages of a project, where one is simply attempting to identify bugs in the system, rather than evaluating hypotheses \cite{ucl-dataset}, \cite{baker-dataset}, \cite{mpi-dataset}.
- 
-Other potentially very useful consequences of using computer-generated datasets include control over the amount of noise an image may contain (e.g. choice to include or remove specular reflections), and the high degree of speed at which new datasets adopting different condition configurations could be created almost ``on the fly" in order to test new ideas and approaches within an experiment. 
 
-\begin{wrapfigure}{l}{0.5\textwidth}
+ \begin{wrapfigure}{l}{0.5\textwidth}
+\vspace{-20pt}
   \begin{center}
     \includegraphics[width=0.45\textwidth]{images/cam_target.png}
   \end{center}
   \vspace{-10pt}
   \caption{Image indication the visual target used as part of the manual calibration of the camera rig setup.}
   \label{fig:target}
-  \vspace{-20pt}
+\vspace{-20pt}
 \end{wrapfigure}
+
+Other potentially very useful consequences of using computer-generated datasets include control over the amount of noise an image may contain (e.g. choice to include or remove specular reflections), and the high degree of speed at which new datasets adopting different condition configurations could be created almost ``on the fly" in order to test new ideas and approaches within an experiment. 
+
+
 
 The creation of artificial datasets would have provided an opportunity to test the robustness of the experiment methods against a much broader range of conditions than what was feasibly possible using only real-world imagery. However the use of datasets captured from real-world environments was still arguably the most crucial in terms of evaluating the performance of experiment methods, given that these would ultimately provide the closest representation to the input expected within a live deployment. 
 %
 %While there was no time available for the author to learn how to build 3D environments for use in artificial datasets, some simple 2D-shape image datasets were created as part of evaluating the correct functioning of the template-matching approach adopting geometric scaling (discussed further in Section \ref{tm-scaled}).
+
+%\clearpage
 
 \section{Establishment of Ground Truth}
 
@@ -293,7 +298,6 @@ For C++ development, the Xcode IDE\footnote{\url{https://developer.apple.com/xco
   \vspace{-10pt}
   \caption{Travis CI provided automated builds and test suite execution upon each commit to the Github repository}
   \label{fig:target}
-  \vspace{-10pt}
 \end{wrapfigure}
 
 Python development was conducted within the PyCharm IDE\footnote{\url{https://www.jetbrains.com/pycharm}} making use of the educational license provided by JetBrains. Of particular benefit was the support provided for the automatic management of external dependencies and libraries, which included the ability to export a complete list of a project's dependencies and their precise version numbers.
@@ -521,7 +525,6 @@ For experiments implemented in Python (i.e. all experiments except the first) th
   \vspace{-10pt}
   \caption{Example screenshot of the iPython web-based interface running the Python testing rig and displaying the subsequent results all from within a single `notebook'.}
      \label{fig:ipython}
-  \vspace{-10pt}
 \end{wrapfigure}
 
 A major feature provided within \textit{iPython} is the ability to \textit{interactively} write and run Python code within isolated computational environments known as `notebooks'\footnote{\url{http://ipython.org/notebook.html}}. By communicating with the test rig programmatically, it was possible to define all of the required test parameters within Python code, before passing these over to the test rig in order to then start the tests. Should any changes need to be made, this was accomplished within the web-based user interface, without the need for any interaction with the command line whatsoever. By creating multiple notebooks for each experiment, it was even possible to instruct iPython to automatically trigger either a selection, or indeed all of the tests for each experiment to start at the same time. 
@@ -542,6 +545,7 @@ For unit tests written in Python, the \textit{Nose}\footnote{\url{https://nose.r
      \label{fig:coveralls}
 \end{figure} 
 
+\clearpage
 \section{Experiment Methods}
 
 This section provides an overview the three main experiment methods conducted within the scope of the project investigation, that all relate to the first primary research aim discussed in Section \ref{primary-aims}.
@@ -596,7 +600,7 @@ The motivation behind non-exhaustive searching prevented the need to continue se
 \begin{wrapfigure}{r}{0.6\textwidth}
 \vspace{-20pt}
   \begin{center}
-    \includegraphics[width=0.55\textwidth]{images/ed.pdf}
+    \includegraphics[width=0.57\textwidth]{images/ed.pdf}
   \end{center}
   \vspace{-10pt}
   \caption{Example of potential early termination of non-exhaustive search due to entering local minima caused by noise, rather than global minima which represents to true best match.}
@@ -618,7 +622,7 @@ As template patches were now expected to span the \textit{full width} of the reg
 
 In order to achieve this, the system required knowledge of what the \textit{corresponding width} should be for every \textit{image row} that represented the ground plane (i.e from the central horizon line to the bottom of the image). 
 
-\begin{wrapfigure}{r}{0.6\textwidth}
+\begin{wrapfigure}{l}{0.6\textwidth}
 \vspace{-20pt}
   \begin{center}
     \includegraphics[width=0.55\textwidth]{images/calib.jpg}
@@ -644,9 +648,9 @@ Upon the definition of both long-side edges forming the trapezium-shaped area al
 
 The final experiment aimed to investigate if it could be possible to further increase the matching accuracy reported in experiment two, by adding the additional step of \textit{geometrically scaling} the current template patch as the search progressed down the trapezoidal-shaped region of interest.
 
-\begin{wrapfigure}{l}{0.5\textwidth}
+\begin{wrapfigure}{r}{0.5\textwidth}
   \begin{center}
-    \includegraphics[width=0.45\textwidth]{images/scaling.png}
+    \includegraphics[width=0.47\textwidth]{images/scaling.png}
   \end{center}
   \vspace{-10pt}
   \caption{Diagram depicting process of geometrically scaling the 2D position coordinates of the pixels from the template patch, in order to subsequently match with the pixels located in the corresponding position within the previously-scaled search window.}
@@ -687,12 +691,16 @@ where $C$ refers to the centre position coordinate within the template patch, $P
 
 Due to the reliance that appearance-based similarity measures hold on the evaluation of \textit{corresponding} pixel values between two images, a key condition of using such an approach is that both of the images to be compared demonstrate an \textit{equal size} (i.e. there are the \textit{same number of pixels in both images}). One of key challenges associated with the proposed method was how to still uphold this condition, while also wanting to potentially compare images of two different sizes (i.e. original template patch and larger search window). 
 
+\vspace{10pt}
+
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.4]{images/scaling_types.pdf}
+\includegraphics[scale=0.4]{images/scaling_types_new}
   \caption{Comparison between the various approaches of performing scaling of the original template patch image. In the case linear interpolation, additional information has been added to image as a result of ``estimating" the colour that lies between two original pixels. }
 \label{fig:scaletypes}
 \end{figure} 
+
+\vspace{10pt}
 
 The solution to this issue lay in the \textit{extraction} of pixels from the larger search window, whose 2D position corresponded to the \textit{scaled} position of each pixel in the original template patch. By subsequently comparing the original template patch, with the collection of newly-extracted corresponding pixels from the search window, it was possible to continue to use all of the appearance-based similarity measures as had previously been utilised in experiments one and two. 
 

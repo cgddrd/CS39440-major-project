@@ -82,7 +82,7 @@ A key aspect from the Ulrich and Nourbakhsh paper discusses details of how their
 
 As part of a survey conducted into various methodologies of appearance-based template matching methods, Perveen \textit{et al} \cite{perveen} discuss an enhancement to traditional template matching that has been shown to support the successful detection of objects whose observed appearance has been altered following a change in orientation. 
 
-  The development of vision-based systems that are invariant to object rotation has been an area of keen research interest over recent years. While a number of solutions now exist for providing resilience to such changes \cite{sift}, the majority of these solutions are only applicable to detection methods that are based upon the use of feature descriptors for representing scene objects, rather than the use of an object's appearance. 
+  The development of vision-based systems that are invariant to object rotation has been an area of keen research interest over recent years. While a number of solutions now exist for providing resilience to such changes \cite{lowe}, the majority of these solutions are only applicable to detection methods that are based upon the use of feature descriptors for representing scene objects, rather than the use of an object's appearance. 
   
   This is particularly important given the assumption that for most objects, even a slight rotation will cause its \textit{appearance}, in terms of pixel values, to be modified considerably. As such, a key weakness of appearance-based detectors describes a failure to find correct matches of an object that has undergone a rotation. This is generally caused as a result of such detectors relying on an explicit pattern of object appearance for use as the primary metric when comparing image patches for similarity equality.
  
@@ -267,8 +267,7 @@ Observing a significant extension or reduction in the length of displacement rec
  
  In the event of an oncoming obstacle, the rows representing that object in the image would be expected to demonstrate a significant increase (positive obstacle) or decrease (negative obstacle) in the level of displacement shown. 
 
-\clearpage
-\begin{wrapfigure}{l}{0.5\textwidth}
+\begin{wrapfigure}{l}{0.45\textwidth}
 \vspace{-20pt}
   \begin{center}
     \includegraphics[width=0.45\textwidth]{images/obstacle_graph.pdf}
@@ -283,24 +282,21 @@ However importantly, this change would typically not be representative of the ge
 
  Alternatively in the event of a change in terrain gradient, it would instead be expected that the vast majority of those pixels representing the ground would all demonstrate a similar change in displacement in terms of both direction and magnitude (Figure \ref{fig:gradient}). This is because a change in the slope of the actual \textit{ground} is likely to be observed across a much larger range of rows than what would be observed for an individual obstacle such as a rock or pit.
 
-\begin{figure}[htbp]
-\begin{minipage}[b]{0.5\linewidth}
+\begin{figure}[ht!]
 \centering
-\includegraphics[width=\linewidth]{images/multi_obstacle_graph.pdf}
+\includegraphics[scale=0.6]{images/multi_obstacle_graph.pdf}
 \caption{Simplified example of detection of multiple positive obstacles.}
 \label{fig:multi_obstacle}
-\end{minipage}
-\hspace{0.5cm}
-\begin{minipage}[b]{0.5\linewidth}
+\end{figure}
+
+\begin{figure}[ht!]
 \centering
-\includegraphics[width=\linewidth]{images/gradient_graph.pdf}
+\includegraphics[scale=0.6]{images/gradient_graph.pdf}
 \caption{Simplified example of recorded change in terrain gradient indicating a downwards slope (general reduction in recorded displacement).}
 \label{fig:gradient}
-\end{minipage}
 \end{figure}
  
- % ADD FIGURE SHOWING DIFFERENCE BETWEEN OBSTACLE AND GENERAL CHANGE IN TERRAIN.
- 
+\clearpage
 \subsubsection{Calibration \& Focus of Expansion}
 \label{hypo-calib}
 
@@ -328,6 +324,8 @@ Through the understanding of a concept known as \textit{Focus of Expansion} (FOE
 When a camera is moved forward and an image is subsequently taken, all of the motion vectors observed in the resulting perspective image appear to begin from a single point centred along the horizon \cite{stanford-cs}. This `single point' is known as the Focus of Expansion, and acts as the primary metric for an observer wishing to identify the direction in which they are currently headed \cite{texas-cs} (Figure \ref{fig:foe}). 
  
 By restricting the tracking of features to only those that lay within a specific range of the FOE, it was hoped that this would allow for a reasonable reduction in the effects caused by perspective distortion without requiring the explicit calibration of camera parameters. 
+
+\clearpage
 
 \subsection{Estimation of Robot Orientation}
 \label{hypo-rotation}
@@ -370,13 +368,14 @@ Therefore, a proposed extension to the vertical displacement model would instead
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[scale=0.6]{images/speed_graph.pdf}
+\includegraphics[scale=0.5]{images/speed_graph.pdf}
   \caption{Diagram indicating examples of alternative vertical displacement models calculated while travelling at different constant speeds. To infer the current speed using the calibrated vertical displacement models, the current displacement would be compared with the recorded displacement across each of the alternative displacement models before selecting the model that best fits the current displacement as an indication of the current speed.}
 \label{fig:speed}
 \end{figure}
 
 Once these multiple models have been established, it would not become an unfeasible task to further enhance the system in order for it to calculate which of the models best matches the current general trend of displacement demonstrated, which therefore would allow for it to present an estimation into current speed of travel.
 
+\clearpage
 \section{Analysis}
 
 The main focus for this project falls upon conducting research as part of an investigation into the proposed hypothesis. 
