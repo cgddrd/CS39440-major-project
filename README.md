@@ -11,7 +11,7 @@ mobile robot to possess in order to help to maximise its own chances of survival
 
 Combining recent advances in camera technology with appropriate computer vision algorithms and
 technique, the proposed project aims to design and implement a **vision-based software application capable
-of estimating the **gradient conditions** of the terrain currently in front of a moving robot as it follows
+of estimating the gradient conditions of the terrain currently in front of a moving robot as it follows
 a route through its environment**.
 
 Through this system, it should be possible to identify the presence of
